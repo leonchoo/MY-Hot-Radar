@@ -144,7 +144,6 @@ def run_scan(
     topics, story_to_topic = cluster(all_stories)
 
     # HISTORY: gather prior topics for momentum + previous status
-    history = {t.id: t for t in topics}
     history_by_id = read_history_for_id(radar_dir)
 
     # momentum

@@ -24,12 +24,46 @@ def _scan_dir(radar_dir: Path) -> Path:
     return Path(radar_dir) / "history"
 
 
+def _is_valid_snapshot(p: Path) -> bool:
+    """A snapshot is valid if it parses as JSON AND carries the expected
+    schema (top-level dict with a 'topics' key, ideally with content).
+
+    Stability rationale: a history directory may contain stale or
+    accidentally-poisoned files (malformed JSON, wrong schema, files with
+    future-dated filenames from manual copy/paste, etc.). If we naively
+    pick the lexicographically last file, a single such file permanently
+    poisons momentum for all subsequent scans (every topic appears NEW).
+    Instead, walk backwards from the newest file and pick the first one
+    that actually parses AND has at least one topic entry. This is
+    deterministic and survives malformed-history edge cases.
+    """
+    try:
+        raw = json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    if not isinstance(raw, dict):
+        return False
+    topics = raw.get("topics")
+    if not isinstance(topics, dict):
+        return False
+    return True
+
+
 def _latest_snapshot_path(radar_dir: Path) -> Path | None:
+    """Find the most recent VALID history snapshot.
+
+    Walks from newest (by filename) to oldest, skipping any file that is
+    malformed or has the wrong schema. Returns None if no valid snapshot
+    exists (fresh history).
+    """
     sd = _scan_dir(radar_dir)
     if not sd.exists():
         return None
-    files = sorted(sd.glob("scan-*.json"), key=lambda p: p.name)
-    return files[-1] if files else None
+    files = sorted(sd.glob("scan-*.json"), key=lambda p: p.name, reverse=True)
+    for p in files:
+        if _is_valid_snapshot(p):
+            return p
+    return None
 
 
 def read_history_for_id(radar_dir: Path) -> Dict[str, Topic]:

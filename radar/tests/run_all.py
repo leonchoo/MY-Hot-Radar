@@ -24,20 +24,24 @@ def main() -> int:
         "radar.tests.test_failures",
         "radar.tests.test_real_world",
         "radar.tests.test_evidence",
+        "radar.tests.test_stability",
     ]
     failures = []
     for mod in modules:
         print(f"\n=== {mod} ===")
+        # Stability tests do real RSS fetches; allow more time. Other
+        # modules are pure unit/integration and finish in <30s.
+        timeout_s = 300 if mod == "radar.tests.test_stability" else 60
         try:
             r = subprocess.run(
                 [sys.executable, "-m", mod],
                 capture_output=True, text=True,
                 cwd=str(ROOT),
-                timeout=60,
+                timeout=timeout_s,
             )
         except subprocess.TimeoutExpired:
             failures.append((mod, "timeout"))
-            print(f"FAIL {mod} (timeout)")
+            print(f"FAIL {mod} (timeout after {timeout_s}s)")
             continue
         sys.stdout.write(r.stdout)
         sys.stderr.write(r.stderr)
