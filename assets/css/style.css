@@ -476,7 +476,8 @@ body {
   max-width: 36ch;
   line-height: 1.5;
 }
-.site-footer__col h4 {
+.site-footer__col h4,
+.site-footer__heading {
   font-size: var(--fs-12);
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -504,6 +505,54 @@ body {
 @media (min-width: 700px) {
   .site-footer__inner { grid-template-columns: 2fr 1fr 1fr 1fr; gap: var(--sp-10); }
   .site-footer__bottom { flex-direction: row; justify-content: space-between; }
+}
+
+/* ---------- Prose (long-form text pages) ---------- */
+.prose > * + * { margin-top: var(--sp-4); }
+.prose h2 {
+  font-family: var(--font-display);
+  font-size: var(--fs-20);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+  margin-top: var(--sp-8);
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--color-line);
+}
+@media (min-width: 700px) {
+  .prose h2 { font-size: var(--fs-24); }
+}
+.prose h3 {
+  font-family: var(--font-display);
+  font-size: var(--fs-18);
+  font-weight: 700;
+  color: var(--color-ink);
+  margin-top: var(--sp-6);
+}
+.prose p {
+  font-size: var(--fs-16);
+  line-height: 1.7;
+  color: var(--color-ink-soft);
+}
+.prose p strong { color: var(--color-ink); }
+.prose ul {
+  list-style: disc;
+  padding-left: var(--sp-5);
+  color: var(--color-ink-soft);
+}
+.prose ul li { margin-top: var(--sp-2); }
+.prose a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose a:hover { color: var(--color-ink); }
+.prose .prose-meta {
+  font-size: var(--fs-12);
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--sp-6);
 }
 
 /* ---------- Utilities ---------- */
