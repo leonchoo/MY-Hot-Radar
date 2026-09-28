@@ -86,6 +86,57 @@ class VerificationStatus(str, Enum):
     RUMOUR = "RUMOUR"
 
 
+class ConfidenceLabel(str, Enum):
+    """Coarse qualitative bucket for the heuristic confidence score.
+
+    IMPORTANT: this is NOT a probability. It is a coarse ordinal bucket for
+    human inspection. See VERIFICATION_RULES.md and radar/verification.py
+    for the explicit heuristic definition. The numeric `Verification.confidence`
+    field is documented as heuristic and is NOT a calibrated probability.
+    """
+    VERY_LOW = "VERY_LOW"      # ~ 0.00..0.20  - unverified / only-Tier-F / social-only weak
+    LOW = "LOW"                # ~ 0.20..0.40  - single Tier-B, Tier-C alone
+    MEDIUM = "MEDIUM"          # ~ 0.40..0.60  - 2+ Tier-B independent
+    HIGH = "HIGH"              # ~ 0.60..0.85  - Tier A present + multi-source
+    VERY_HIGH = "VERY_HIGH"    # ~ 0.85..1.00  - Tier A + multi independent + corroboration
+
+
+class CounterSignalStance(str, Enum):
+    """A stance a counter-signal source can take on a topic.
+
+    Per VERIFICATION_RULES.md: a credible counter-signal (especially from a
+    Tier-A source) drops the topic at least one status rung. A confirmed
+    official denial = RUMOUR.
+    """
+    DENIAL = "DENIAL"          # explicit "the claim is false"
+    CORRECTION = "CORRECTION"  # partial correction / clarification
+    CONTRADICTION = "CONTRADICTION"  # competing credible account
+    DOWNPLAY = "DOWNPLAY"      # reduces importance without denying
+
+
+@dataclass
+class CounterSignal:
+    """A documented counter-signal against a topic.
+
+    Used by verification to demote or flag topics that an authoritative
+    source has contested. The signal is keyed by the Topic it contests
+    via a `topic_content_key` (Topic.content_key() of the contested topic).
+    """
+    topic_content_key: str
+    source_name: str
+    source_tier: SourceTier
+    stance: CounterSignalStance
+    evidence_url: str
+    summary: str
+    observed_at: str = field(default_factory=_utcnow_iso)
+
+    def to_dict(self) -> Dict[str, Any]:
+        d = asdict(self)
+        d["source_tier"] = self.source_tier.value
+        d["stance"] = self.stance.value
+        return d
+
+
 class Language(str, Enum):
     EN = "en"
     ZH = "zh"
@@ -144,19 +195,27 @@ class Story:
 
 @dataclass
 class Verification:
-    """Reasoned state for a Topic. Always carries evidence, never just a label."""
+    """Reasoned state for a Topic. Always carries evidence, never just a label.
+
+    IMPORTANT on `confidence`: this is a HEURISTIC value, not a calibrated
+    probability. The docstring at the top of radar/verification.py explains
+    exactly how it's computed. Use `confidence_label` for a coarse bucket.
+    """
     status: VerificationStatus = VerificationStatus.UNVERIFIED
     independent_sources: int = 0        # = distinct canonical origins
     raw_source_count: int = 0           # = sum of stories per origin (pre-independence)
     source_types: List[SourceType] = field(default_factory=list)
-    confidence: float = 0.0          # 0..1
+    confidence: float = 0.0             # HEURISTIC, 0..1, NOT a probability
+    confidence_label: ConfidenceLabel = ConfidenceLabel.VERY_LOW
     evidence_urls: List[str] = field(default_factory=list)
     reasons: List[str] = field(default_factory=list)
+    counter_signals: List[Dict[str, Any]] = field(default_factory=list)  # serialized CounterSignals
 
     def to_dict(self) -> Dict[str, Any]:
         d = asdict(self)
         d["status"] = self.status.value
         d["source_types"] = [s.value for s in self.source_types]
+        d["confidence_label"] = self.confidence_label.value
         return d
 
 
