@@ -111,5 +111,3 @@ content into this file.
 
 The library is empty by design. Entries are added by hand (or under
 human approval), and only at the `Verified` level.
-
-<!-- BACKUP-TEST-MARKER-DO-NOT-PROMOTE 2026-09-28 21:55 -->
