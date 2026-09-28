@@ -16,3 +16,7 @@ npm-debug.log*
 # Env
 .env
 .env.local
+
+# Radar runtime data (not part of the public website)
+/radar_data/
+/.pytest_cache/
