@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" aria-label="MY Hot Radar">
+  <!-- Concentric radar rings -->
+  <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="2" opacity="0.15"/>
+  <circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+  <circle cx="32" cy="32" r="12" stroke="currentColor" stroke-width="2" opacity="0.55"/>
+  <!-- Radar sweep wedge -->
+  <path d="M32 32 L32 4 A28 28 0 0 1 56 24 Z" fill="currentColor" opacity="0.18"/>
+  <!-- Center dot -->
+  <circle cx="32" cy="32" r="3.2" fill="currentColor"/>
+  <!-- Hot pulse (the "hot" signal) -->
+  <circle cx="32" cy="32" r="6" fill="#E11D2A" opacity="0.85"/>
+  <circle cx="32" cy="32" r="10" stroke="#E11D2A" stroke-width="1.5" fill="none" opacity="0.45"/>
+</svg>
