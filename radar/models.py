@@ -37,6 +37,28 @@ class SourceType(str, Enum):
     SEARCH_RESULT = "SEARCH_RESULT"
 
 
+class SourceTier(str, Enum):
+    """Source credibility tiers. See VERIFICATION_RULES.md.
+
+    A - Official / authoritative (govt press releases, national wire, royal,
+        statutory bodies).
+    B - Established outlet with documented corrections record.
+    C - Secondary or niche outlet with weaker corrections history.
+    D - Social primary (first-hand from a verifiable individual).
+    E - Social echo / forward (shares, quotes, comments).
+    F - Anonymous / unaccountable.
+
+    Tier F is NOT admissible as evidence for any CONFIRMED claim. It may be
+    used as a discovery input only.
+    """
+    A = "A"
+    B = "B"
+    C = "C"
+    D = "D"
+    E = "E"
+    F = "F"
+
+
 class Category(str, Enum):
     MALAYSIA = "MALAYSIA"
     VIRAL = "VIRAL"
@@ -81,11 +103,13 @@ class Source:
     reliability: int                       # 1..5
     country: str = "MY"
     languages: List[Language] = field(default_factory=lambda: [Language.EN])
+    tier: SourceTier = SourceTier.C        # credibility tier per VERIFICATION_RULES.md
     notes: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
         d = asdict(self)
         d["type"] = self.type.value
+        d["tier"] = self.tier.value
         d["languages"] = [l.value for l in self.languages]
         return d
 
@@ -160,6 +184,10 @@ class Topic:
 
     story_ids: List[str] = field(default_factory=list)
     related_urls: List[str] = field(default_factory=list)
+    canonical_url: str = ""             # stable content-keyed identifier; first
+                                         # related_url after canonicalization. Used
+                                         # by history/momentum to match topics
+                                         # across consecutive scans.
 
     first_seen: str = field(default_factory=_utcnow_iso)
     last_seen: str = field(default_factory=_utcnow_iso)
@@ -173,6 +201,18 @@ class Topic:
 
     # explainability: why this topic got the status it got
     classification_reasons: List[str] = field(default_factory=list)
+
+    def content_key(self) -> str:
+        """Stable content-derived identifier for cross-scan matching.
+
+        Prefer canonical_url; fall back to normalized title. Random
+        ids are NOT used here because they change every scan.
+        """
+        if self.canonical_url:
+            return f"u:{self.canonical_url}"
+        if self.title:
+            return f"t:{self.title.strip().lower()}"
+        return f"i:{self.id}"
 
     def to_dict(self) -> Dict[str, Any]:
         d = asdict(self)

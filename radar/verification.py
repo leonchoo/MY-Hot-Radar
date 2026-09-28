@@ -13,6 +13,13 @@ Order of evaluation (first match wins unless contradicted by a Tier A denial):
   5. neither                -> UNVERIFIED
 
 Confidence is a 0..1 number derived from the input, not a magic number.
+
+The tier for each source comes from the explicit `Source.tier` field on the
+registry (see radar/models.py:SourceTier). We do NOT derive tier from
+`Source.reliability` alone, because tier is a semantic judgment
+("is this outlet authoritative?") while reliability is a calibration knob.
+The mapping for sources that did not declare an explicit tier falls back to
+`default_tier_for(source_type, reliability)` below.
 """
 
 from __future__ import annotations
@@ -22,38 +29,35 @@ from collections import Counter
 from urllib.parse import urlsplit
 
 from .models import (
-    Topic, Verification, VerificationStatus, SourceType
+    Topic, Verification, VerificationStatus, SourceType, SourceTier,
 )
 from .thresholds import CONFIRMED_MIN_INDEPENDENT_SOURCES
 
 
-# Map reliability (1..5) on a Source to a coarse tier.
-def tier_for(source_type: SourceType, reliability: int) -> str:
-    """Coarse tier per VERIFICATION_RULES.md.
+# Fallback derivation for callers that still supply reliability only.
+def default_tier_for(source_type: SourceType, reliability: int) -> SourceTier:
+    """Default tier mapping when no explicit tier is provided.
 
-    A: official / authoritative            (OFFICIAL_SOURCE + reliability >=4)
-    B: established outlet                  (NEWS_SITE / RSS + reliability >=4)
-    C: secondary or niche outlet           (NEWS_SITE / RSS + reliability 2..3)
-    D: social primary                      (PUBLIC_SOCIAL + reliability >=3)
-    E: social echo / forward               (PUBLIC_SOCIAL + reliability 1..2)
-    F: anonymous / unaccountable           (SEARCH_RESULT)
-    Tier F is NOT admissible as evidence for CONFIRMED.
+    A: OFFICIAL_SOURCE (a property of source-type identity)
+    B: NEWS_SITE / RSS with reliability >= 4
+    C: NEWS_SITE / RSS with reliability 2..3
+    D: PUBLIC_SOCIAL with reliability >= 3
+    E: PUBLIC_SOCIAL with reliability 1..2
+    F: SEARCH_RESULT (anonymous)
     """
     if source_type == SourceType.OFFICIAL_SOURCE:
-        # Tier A is a property of the source-type identity, not of the
-        # 1..5 reliability rating. Confidence absorbs the reliability signal.
-        return "A"
+        return SourceTier.A
     if source_type in (SourceType.NEWS_SITE, SourceType.RSS) and reliability >= 4:
-        return "B"
+        return SourceTier.B
     if source_type in (SourceType.NEWS_SITE, SourceType.RSS):
-        return "C"
+        return SourceTier.C
     if source_type == SourceType.PUBLIC_SOCIAL and reliability >= 3:
-        return "D"
+        return SourceTier.D
     if source_type == SourceType.PUBLIC_SOCIAL:
-        return "E"
+        return SourceTier.E
     if source_type == SourceType.SEARCH_RESULT:
-        return "F"
-    return "E"
+        return SourceTier.F
+    return SourceTier.E
 
 
 def _canonical_origin(url: str) -> str:
@@ -82,11 +86,16 @@ def _distinct_sources(members) -> Dict[str, int]:
     return counts
 
 
-def evidence_for(topic: Topic, stories_by_id: Dict[str, dict], source_reliability: Dict[str, int]) -> Verification:
+def evidence_for(topic: Topic, stories_by_id: Dict[str, dict],
+                 source_reliability: Dict[str, int],
+                 source_tiers: Dict[str, str] | None = None) -> Verification:
     """Compute Verification for a Topic.
 
     `stories_by_id` maps story_id -> {url, source_type, source_reliability}.
     `source_reliability` maps source name -> reliability int (1..5).
+    `source_tiers` (preferred) maps source name -> 'A'..'F'. When a source
+    name has no explicit tier, default_tier_for(source_type, reliability) is
+    used.
     """
     members = [stories_by_id[sid] for sid in topic.story_ids]
     if not members:
@@ -94,6 +103,8 @@ def evidence_for(topic: Topic, stories_by_id: Dict[str, dict], source_reliabilit
             status=VerificationStatus.UNVERIFIED,
             reasons=["no stories attached"],
         )
+
+    source_tiers = source_tiers or {}
 
     # Per-source-type tally
     type_counts: Counter = Counter()
@@ -103,12 +114,15 @@ def evidence_for(topic: Topic, stories_by_id: Dict[str, dict], source_reliabilit
     raw_source_count = sum(origins.values())
     source_types_seen: List[SourceType] = []
     evidence_urls: List[str] = []
-    reasons: List[str] = []
 
     for s in members:
         st = s["source_type"] if isinstance(s["source_type"], SourceType) else SourceType(s["source_type"])
         rel = int(source_reliability.get(s["source"], 3))
-        t = tier_for(st, rel)
+        # Prefer explicit tier from registry; fall back to derivation
+        if s["source"] in source_tiers:
+            t = source_tiers[s["source"]]
+        else:
+            t = default_tier_for(st, rel).value
         tiers_present.add(t)
         type_counts[t] = type_counts.get(t, 0) + 1
         if st not in source_types_seen:
@@ -131,13 +145,14 @@ def evidence_for(topic: Topic, stories_by_id: Dict[str, dict], source_reliabilit
 
     if only_F:
         status = VerificationStatus.UNVERIFIED
-        reasons.append("only Tier-F (anonymous) sources; not admissible for any CONclusion")
+        reasons = ["only Tier-F (anonymous) sources; not admissible for any conclusion"]
 
     # Crude official-denial signal: if any Tier A produced a 'denial' sentinel,
     # we'd mark RUMOUR. We don't have a denial registry in Phase 1.
     # This is intentionally a placeholder -- a real impl would consume a
     # structured correction feed.
     status: VerificationStatus
+    reasons = []
 
     if has_A and independent_sources >= CONFIRMED_MIN_INDEPENDENT_SOURCES and len(source_types_seen) >= 2:
         status = VerificationStatus.CONFIRMED
@@ -175,15 +190,22 @@ def evidence_for(topic: Topic, stories_by_id: Dict[str, dict], source_reliabilit
     )
 
 
-def attach_verification(topics: List[Topic], stories: List[Story]) -> None:
-    """Mutates each topic: fills `.verification` and `.statuses_seen`."""
+def attach_verification(topics: List[Topic], stories: List[Story],
+                         source_reliability: dict | None = None,
+                         source_tiers: dict | None = None) -> None:
+    """Mutates each topic: fills `.verification` and `.statuses_seen`.
+
+    `source_reliability` maps source name -> reliability int (1..5).
+    `source_tiers`     maps source name -> tier letter 'A'..'F' (preferred).
+    When omitted, defaults to reliability=3 and tier C for every source.
+    """
+    if source_reliability is None:
+        source_reliability = {}
+    if source_tiers is None:
+        source_tiers = {}
     by_id = {s.id: s for s in stories}
-    # We only need source reliability proxy; reliability comes from the Source
-    # registry, but Phase 1 callers provide it via `source_reliability`.
-    # The wrapper in pipeline.py supplies this dict.
     for t in topics:
-        # Use the source_reliability proxy embedded in story (a Phase 1 convenience).
-        rel_for = {}
+        rel_for: Dict[str, int] = {}
         for sid in t.story_ids:
             s = by_id.get(sid)
             if not s:
@@ -196,5 +218,6 @@ def attach_verification(topics: List[Topic], stories: List[Story]) -> None:
                    "source": by_id[sid].source}
              for sid in t.story_ids if sid in by_id},
             rel_for,
+            source_tiers,
         )
         t.verification = ev

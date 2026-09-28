@@ -156,7 +156,10 @@ def classify(topic: Topic, prev: Topic | None = None) -> None:
 
 
 def classify_all(topics: List[Topic], history_by_id: dict) -> None:
-    """Apply classification to every topic in-place, reading prior status from history."""
+    """Apply classification to every topic in-place, reading prior status from history.
+
+    history_by_id is keyed by `Topic.content_key()`, not the random id.
+    """
     for t in topics:
-        prev = history_by_id.get(t.id)
+        prev = history_by_id.get(t.content_key())
         classify(t, prev)

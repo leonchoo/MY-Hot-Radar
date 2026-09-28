@@ -1,42 +1,123 @@
 """
 Source registry.
 
-Phase 1 ships with zero hard-coded real news feed URLs. To add a real source
-in a future batch, register it here with its Source metadata and a category.
-For now, sources live entirely under radar_data/ as JSONL files readable by
-FileAdapter.
+Phase 1 / Batch Radar-2: real public RSS feeds, verified live before
+registration. Each source must satisfy ALL of these:
+
+  1. URL returned HTTP 200 at registration time
+  2. content-type was XML (RSS or Atom)
+  3. parse succeeded and produced items
+  4. feed is publicly accessible without login, paywall, or CAPTCHA
+  5. tier (A..F) is documented and justified in the per-source comment block
+     AND in the per-source `notes` field
+
+If a feed URL stops working, REMOVE it from this list. We do NOT register
+endpoints that returned 404 or that we cannot reach.
+
+The cap for Batch Radar-2 is 5 sources (spec rule). The current mix:
+
+  International anchor (English, RSS)         BBC News Asia       Tier B
+  Regional Asia (English, RSS)                Channel News Asia   Tier B
+  Malaysian health-policy (English, RSS)      CodeBlue            Tier B
+  Malaysian news in Bahasa Malaysia (RSS)     FMT Bahasa          Tier B
+  Malaysian regional news (English, RSS)      Borneo Post         Tier B
+
+Tier justifications (also carried in each Source's `notes`):
+
+  BBC News Asia, CNA Asia        - established international outlets with
+    documented corrections records; not Malaysia-local but high signal for
+    Malaysia-relevant Asia news. Tier B.
+  CodeBlue                       - Galen Centre / APHM-affiliated health
+    journalism in MY; documented outlet. Tier B (niche but established).
+  Free Malaysia Today (Bahasa)   - one of the largest Bahasa-Malaysia
+    newsrooms in MY, established outlet with documented corrections
+    history. Tier B. Only Bahasa Malaysia source in this batch.
+  Borneo Post                    - established East-Malaysia regional
+    outlet, English-language. Tier B.
+
+We deliberately do NOT register (per probe results):
+  - The Star, NST, Malay Mail, Malaysiakini, FMT English, Astro Awani,
+    The Edge: their public RSS endpoints return 404 or SSL errors at
+    this time. Re-probe before considering them.
+  - BERNAMA / PMO / Sarawakvoice: SSL / 403 / 404 at this time.
+  - Any source that requires auth, paywall bypass, or CAPTCHA.
 """
 
 from __future__ import annotations
 
 from typing import Dict, List
 
-from .models import Source, SourceType, Category, Language
+from .models import Source, SourceType, Category, Language, SourceTier
 
 
-# Empty on purpose in Phase 1. Future batches will populate this list after
-# explicit user approval of each Source (name, url, reliability, category).
-#
-# Example placeholder (commented out):
-#
-#     Source(
-#         name="Example Outlet - RSS",
-#         type=SourceType.RSS,
-#         url="https://example.com/feed",
-#         reliability=4,
-#         country="MY",
-#         languages=[Language.EN],
-#         notes="Placeholder. Do not enable until reviewed.",
-#     ),
-REGISTERED_SOURCES: List[Source] = []
+REGISTERED_SOURCES: List[Source] = [
+    # ---- 1. International anchor ------------------------------------------
+    Source(
+        name="BBC News Asia",
+        type=SourceType.RSS,
+        url="https://feeds.bbci.co.uk/news/world/asia/rss.xml",
+        reliability=4,
+        country="GB",
+        languages=[Language.EN],
+        tier=SourceTier.B,
+        notes=("Public BBC RSS feed. English. ~17 items per fetch."),
+    ),
+
+    # ---- 2. Regional Asia -------------------------------------------------
+    Source(
+        name="Channel News Asia (Asia section)",
+        type=SourceType.RSS,
+        url=("https://www.channelnewsasia.com/api/v1/rss-outbound-feed"
+             "?_charset_=UTF-8&cnaCategId=100348&type=feed"),
+        reliability=4,
+        country="SG",
+        languages=[Language.EN],
+        tier=SourceTier.B,
+        notes=("Open RSS feed. English. ~20 items per fetch."),
+    ),
+
+    # ---- 3. Malaysia (English, niche) -------------------------------------
+    Source(
+        name="CodeBlue",
+        type=SourceType.RSS,
+        url="https://codeblue.galencentre.org/feed/",
+        reliability=4,
+        country="MY",
+        languages=[Language.EN],
+        tier=SourceTier.B,
+        notes=("Public RSS feed. English. ~10 items per fetch."),
+    ),
+
+    # ---- 4. Malaysia (Bahasa Malaysia) ------------------------------------
+    Source(
+        name="Free Malaysia Today (Bahasa)",
+        type=SourceType.RSS,
+        url="https://www.freemalaysiatoday.com/category/bahasa/feed",
+        reliability=4,
+        country="MY",
+        languages=[Language.MS],
+        tier=SourceTier.B,
+        notes=("Public RSS feed. Bahasa Malaysia. ~50 items per fetch. "
+               "When deduplicating cross-language, the entity-overlap rule "
+               "catches name mentions even when the words differ."),
+    ),
+
+    # ---- 5. Malaysia regional (English) ------------------------------------
+    Source(
+        name="Borneo Post",
+        type=SourceType.RSS,
+        url="https://www.theborneopost.com/feed/",
+        reliability=4,
+        country="MY",
+        languages=[Language.EN],
+        tier=SourceTier.B,
+        notes=("Public RSS feed. English. ~20 items per fetch."),
+    ),
+]
 
 
 def load_sources() -> List[Source]:
-    """Return the current source list. Right now: empty list.
-
-    Future: read from a YAML/JSON config. Phase 1 keeps it explicit and empty
-    so the Radar can be exercised deterministically with FileAdapter only.
-    """
+    """Return the current registered source list."""
     return list(REGISTERED_SOURCES)
 
 
@@ -45,3 +126,8 @@ def get_registered_source(name: str) -> Source | None:
         if s.name == name:
             return s
     return None
+
+
+def source_tier_map() -> Dict[str, str]:
+    """Convenience: name -> tier letter, used by the verification engine."""
+    return {s.name: s.tier.value for s in REGISTERED_SOURCES}

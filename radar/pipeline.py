@@ -27,6 +27,7 @@ from .models import (
 from .sources.base import FetchError
 from .sources.file_source import FileAdapter
 from .sources.rss import RSSAdapter
+from .sources.public_social import PublicSocialAdapter
 from .sources_registry import load_sources
 from .dedup import cluster, explain_match
 from .verification import attach_verification
@@ -41,6 +42,7 @@ SOURCE_STATUS_TEMPLATE = {
     "name": "",
     "type": "",
     "reliability": 0,
+    "tier": "",
     "fetched": 0,
     "duration_ms": 0,
     "ok": False,
@@ -52,17 +54,31 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def _default_category_for(source: Source) -> Category:
+    """Pick a category default from the source's declared country.
+
+    Phase 1: only MY -> MALAYSIA, everything else -> WORLD.
+    A future batch may add VIRAL / CELEBRITY / FOOD defaults based on
+    observed source content distribution.
+    """
+    if source.country == "MY":
+        return Category.MALAYSIA
+    return Category.WORLD
+
+
 def _build_adapter(source: Source, *, category: Category | None = None):
     import os as _os
     # File-source awareness: if the URL is a local path, route to FileAdapter
     # regardless of declared type, so tests can supply local fixtures.
     if source.url.startswith("file://"):
-        return FileAdapter(source, category=category or Category.MALAYSIA)
+        return FileAdapter(source, category=category or _default_category_for(source))
     if _os.path.isabs(source.url) and _os.path.exists(source.url):
-        return FileAdapter(source, category=category or Category.MALAYSIA)
+        return FileAdapter(source, category=category or _default_category_for(source))
 
-    if source.type == SourceType.RSS or source.type == SourceType.NEWS_SITE:
-        return RSSAdapter(source, category=category or Category.MALAYSIA)
+    if source.type in (SourceType.RSS, SourceType.NEWS_SITE):
+        return RSSAdapter(source, category=category or _default_category_for(source))
+    if source.type == SourceType.PUBLIC_SOCIAL:
+        return PublicSocialAdapter(source, category=category or _default_category_for(source))
     raise FetchError(f"{source.name}: no adapter available for source type {source.type}")
 
 
@@ -88,6 +104,7 @@ def run_scan(
         rec["name"] = src.name
         rec["type"] = src.type.value
         rec["reliability"] = src.reliability
+        rec["tier"] = src.tier.value
         try:
             adapter = _build_adapter(src)
             t0 = datetime.now(timezone.utc)
@@ -133,8 +150,16 @@ def run_scan(
     # momentum
     attach_momentum(topics, history_by_id)
 
-    # verification
-    attach_verification(topics, all_stories)
+    # Verification uses per-source reliability AND per-source explicit tier
+    # from registered Source objects. Reliability is a calibration knob;
+    # tier is a semantic credibility judgment (see VERIFICATION_RULES.md).
+    source_reliability = {s.name: s.reliability for s in sources}
+    source_tiers = {s.name: s.tier.value for s in sources}
+    attach_verification(
+        topics, all_stories,
+        source_reliability=source_reliability,
+        source_tiers=source_tiers,
+    )
 
     # classification (uses prior status if known)
     classify_all(topics, history_by_id)

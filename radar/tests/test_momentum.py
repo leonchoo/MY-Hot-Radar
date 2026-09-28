@@ -70,10 +70,40 @@ def test_previous_zero_current_zero():
     print("PASS test_previous_zero_current_zero")
 
 
+def test_content_key_matches_by_canonical_url():
+    """Regression: random ids change per scan, but content_key matches.
+    This is what makes cross-scan momentum work."""
+    a = Topic(id="t_aaa", title="Event X", canonical_url="https://example.com/x")
+    b = Topic(id="t_bbb", title="Event X", canonical_url="https://example.com/x")
+    assert a.content_key() == b.content_key(), \
+        "topics with the same canonical_url must share content_key"
+    assert "t_aaa" not in a.content_key() and "t_bbb" not in b.content_key(), \
+        "content_key must not include random ids"
+    print("PASS test_content_key_matches_by_canonical_url")
+
+
+def test_content_key_falls_back_to_title():
+    """When canonical_url is missing, content_key uses title (lower-cased)."""
+    a = Topic(id="t1", title="Event X happened today")
+    b = Topic(id="t2", title="Event X happened today")
+    assert a.content_key() == b.content_key()
+    print("PASS test_content_key_falls_back_to_title")
+
+
+def test_content_key_distinct_for_different_events():
+    a = Topic(id="t1", title="Flood in Bangkok", canonical_url="https://a.com/x")
+    b = Topic(id="t2", title="Trump-Xi summit",  canonical_url="https://b.com/y")
+    assert a.content_key() != b.content_key()
+    print("PASS test_content_key_distinct_for_different_events")
+
+
 if __name__ == "__main__":
     test_zero_to_five_is_new()
     test_five_to_five_no_growth()
     test_five_to_ten_doubles()
     test_ten_to_five_declines()
     test_previous_zero_current_zero()
+    test_content_key_matches_by_canonical_url()
+    test_content_key_falls_back_to_title()
+    test_content_key_distinct_for_different_events()
     print("ALL MOMENTUM TESTS PASSED")

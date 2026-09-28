@@ -41,7 +41,12 @@ def compute_momentum(current: Topic, previous: Optional[Topic]) -> Momentum:
 
 
 def attach_momentum(topics_now: list, topic_history: Dict[str, Topic]) -> None:
-    """Mutates each topic with `.momentum` based on the previous scan's snapshot."""
+    """Mutates each topic with `.momentum` based on the previous scan's snapshot.
+
+    `topic_history` is keyed by `Topic.content_key()` (canonical URL or
+    title), so consecutive scans of the same event match even though
+    random `Topic.id`s differ.
+    """
     for t in topics_now:
-        prev = topic_history.get(t.id)
+        prev = topic_history.get(t.content_key())
         t.momentum = compute_momentum(t, prev)

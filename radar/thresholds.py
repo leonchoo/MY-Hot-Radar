@@ -13,6 +13,9 @@ from __future__ import annotations
 # --- dedup thresholds ---
 TITLE_JACCARD_THRESHOLD = 0.55       # token-set Jaccard >= this -> strong title match
 KEYWORD_OVERLAP_THRESHOLD = 0.50     # smaller-keyword-set overlap >= this -> strong keyword match
+ENTITY_MIN_OVERLAP = 2               # shared named entities needed for entity-based merge
+ENTITY_MIN_SHARE = 0.0               # share floor; 0.0 = trust the overlap count alone
+EVENT_WINDOW_DAYS = 7                # publication-day window within which stories may cluster
 
 # --- verification thresholds ---
 # Independent sources needed for CONFIRMED. Tiers A or B only.

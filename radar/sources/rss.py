@@ -13,6 +13,7 @@ Accepts:
 from __future__ import annotations
 
 from typing import List
+import re
 from xml.etree import ElementTree as ET
 
 from .base import SourceAdapter, FetchError
@@ -101,7 +102,7 @@ class RSSAdapter(SourceAdapter):
         )
 
         s = Story(
-            title=title.strip()[:300],
+            title=self._clean_title(title)[:300],
             summary=summary.strip()[:1200],
             url=link.strip()[:1000],
             source=self.source.name,
@@ -112,6 +113,27 @@ class RSSAdapter(SourceAdapter):
             country=self.source.country,
         )
         return s
+
+    # Feed-specific title cleanup.
+    # Some aggregators (Google News) append " - Outlet Name" or " | outlet.com"
+    # to item titles. That's attribution, not part of the topic. We strip it
+    # defensively: anything after the LAST " - ", " | ", " — ", or " · " is
+    # dropped. Then we also remove domain-looking trailing tokens like
+    # "theborneopost.com" or "freemalaysiatoday.com".
+    @staticmethod
+    def _clean_title(title: str) -> str:
+        if not title:
+            return title
+        s = title.strip()
+        # Trim trailing attribution separators (use last occurrence)
+        for sep in (" - ", " \u2014 ", " | ", " / ", " \u00b7 "):
+            if sep in s:
+                s = s.rsplit(sep, 1)[0].rstrip()
+        # Trim trailing " - sitename.xxx" exactly when the suffix looks like a domain
+        m = re.search(r"\s*-\s*([a-z0-9-]+\.[a-z]{2,}(\.[a-z]{2,})?)\s*$", s, re.IGNORECASE)
+        if m and " " not in m.group(1):
+            s = s[:m.start()].rstrip()
+        return s.strip()
 
     def _first_text(self, parent, name) -> str | None:
         """Find the first matching child element (RSS or Atom naming) and return text."""

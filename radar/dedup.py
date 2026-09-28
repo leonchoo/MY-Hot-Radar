@@ -24,7 +24,11 @@ from urllib.parse import urlsplit, urlunsplit
 from .models import Story, Topic, Category, VerificationStatus, SourceType, Language
 from .normalize import (
     normalize_title, tokens, extract_keywords,
-    token_jaccard, keyword_overlap,
+    token_jaccard, keyword_overlap, entity_overlap,
+)
+from .thresholds import (
+    TITLE_JACCARD_THRESHOLD, KEYWORD_OVERLAP_THRESHOLD,
+    ENTITY_MIN_OVERLAP, ENTITY_MIN_SHARE, EVENT_WINDOW_DAYS,
 )
 from .thresholds import (
     TITLE_JACCARD_THRESHOLD,
@@ -73,7 +77,41 @@ def _is_strong_match(a: Story, b: Story) -> bool:
     if a.keywords and b.keywords:
         if keyword_overlap(a.keywords, b.keywords) >= KEYWORD_OVERLAP_THRESHOLD and a.category == b.category:
             return True
+    if a.title and b.title:
+        eo, smaller, _ = entity_overlap(a.title, b.title)
+        if (eo >= ENTITY_MIN_OVERLAP
+                and smaller > 0
+                and eo / smaller >= ENTITY_MIN_SHARE
+                and _same_event_window(a.published_at, b.published_at)):
+            return True
     return False
+
+
+def _same_event_window(pa, pb) -> bool:
+    """Two stories must be within EVENT_WINDOW_DAYS of each other.
+    If either timestamp is missing/unparseable, default to True so we don't
+    artificially fail to merge on bad input."""
+    if not pa or not pb:
+        return True
+    from datetime import datetime
+    def _try(s):
+        if not s:
+            return None
+        s = s.replace("Z", "+00:00")[:35]
+        for fmt in ("%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S",
+                    "%Y-%m-%d %H:%M:%S", "%Y-%m-%d", "%Y-%m-%dT%H:%M:%S.%f"):
+            try:
+                return datetime.strptime(s[:19], fmt[:19]) if "%z" not in fmt else datetime.strptime(s, fmt)
+            except Exception:
+                continue
+        return None
+    da, db = _try(pa), _try(pb)
+    if da is None or db is None:
+        return True
+    try:
+        return abs((da - db).total_seconds()) <= EVENT_WINDOW_DAYS * 86400
+    except TypeError:
+        return True
 
 
 def cluster(stories: List[Story]) -> Tuple[List[Topic], Dict[str, str]]:
@@ -143,6 +181,8 @@ def cluster(stories: List[Story]) -> Tuple[List[Topic], Dict[str, str]]:
                 seen.add(cu)
                 rel.append(cu)
         t.related_urls = rel
+        # canonical_url = first canonicalized URL; used as cross-scan stable key
+        t.canonical_url = rel[0] if rel else ""
         t.mention_count = len(members)
         # pick most common category among members (fallback to topic's category)
         cat_counts: Dict[Category, int] = {}
