@@ -86,6 +86,17 @@
     </div>
   </section>
 
+  <!-- ============== RADAR NOW (live data; JavaScript renders) ============== -->
+  <section class="section" aria-labelledby="radar-heading">
+    <div class="container">
+      <div id="radar-feed-host">
+        <p id="radar-feed-loading" class="rf-loading" role="status" aria-live="polite">
+          Loading Radar…
+        </p>
+      </div>
+    </div>
+  </section>
+
   <div class="container">
     <div class="ad-slot ad-slot--leaderboard" aria-label="Advertisement">Advertisement</div>
   </div>
@@ -527,5 +538,6 @@
 
 <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 <script src="/assets/js/main.js"></script>
+<script src="/assets/js/radar-feed.js" defer></script>
 </body>
 </html>

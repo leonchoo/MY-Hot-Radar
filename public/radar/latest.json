@@ -1,0 +1,2822 @@
+{
+  "generated_at": "2026-09-29T03:55:26Z",
+  "public_schema_version": 1,
+  "scan_id": "20260929T035526Z-16312",
+  "scan_status": "SUCCESS",
+  "schema_version": 1,
+  "summary": {
+    "by_claim_kind": {
+      "CLAIM": 7,
+      "EVENT": 10,
+      "NOT_POLITICAL": 73,
+      "OPINION": 1
+    },
+    "by_status": {
+      "WATCH": 91
+    },
+    "confirmed_count": 2,
+    "publishable_count": 90,
+    "reported_count": 89,
+    "rumour_count": 0,
+    "social_buzz_count": 0,
+    "topic_count": 91,
+    "unverified_count": 0
+  },
+  "topics": [
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.bbc.co.uk/news/articles/c61wxyzr4rwyo?at_medium=RSS&at_campaign=rss",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 18:37:15 GMT",
+          "source_name": "BBC News Asia",
+          "source_tier": "B",
+          "url": "https://www.bbc.co.uk/news/articles/c61wxyzr4rwyo?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "status": "WATCH",
+      "title": "The Frenemy: How Australia navigates superpower rivalry",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.bbc.co.uk/news/articles/cmj4jg2vxvpdo?at_medium=RSS&at_campaign=rss",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 00:50:19 GMT",
+          "source_name": "BBC News Asia",
+          "source_tier": "B",
+          "url": "https://www.bbc.co.uk/news/articles/cmj4jg2vxvpdo?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Sign before praying: A new conversion law is affecting churchgoers in Indian state",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.bbc.co.uk/news/articles/cmrl6ylzy4zxo?at_medium=RSS&at_campaign=rss",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 01:33:29 GMT",
+          "source_name": "BBC News Asia",
+          "source_tier": "B",
+          "url": "https://www.bbc.co.uk/news/articles/cmrl6ylzy4zxo?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Lost songs from iconic Australian rockstar found in garage",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.bbc.co.uk/news/articles/c8ly40xx0dr0o?at_medium=RSS&at_campaign=rss",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 14:57:31 GMT",
+          "source_name": "BBC News Asia",
+          "source_tier": "B",
+          "url": "https://www.bbc.co.uk/news/articles/c8ly40xx0dr0o?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Seoul summons Ukraine envoy over North Korean prisoner-of-war row",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.bbc.co.uk/news/videos/cm70lpg5z45go?at_medium=RSS&at_campaign=rss",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 16:15:57 GMT",
+          "source_name": "BBC News Asia",
+          "source_tier": "B",
+          "url": "https://www.bbc.co.uk/news/videos/cm70lpg5z45go?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Women protest in the streets of Delhi after string of sexual assaults",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.bbc.co.uk/news/articles/cxp84g2ly1mjo?at_medium=RSS&at_campaign=rss",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 4,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 4
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 4,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 07:52:23 GMT",
+          "source_name": "BBC News Asia",
+          "source_tier": "B",
+          "url": "https://www.bbc.co.uk/news/articles/cxp84g2ly1mjo?at_medium=RSS&at_campaign=rss"
+        },
+        {
+          "published_at": "Fri, 25 Sep 2026 03:57:09 GMT",
+          "source_name": "BBC News Asia",
+          "source_tier": "B",
+          "url": "https://www.bbc.co.uk/news/articles/cr93e4x7kdjjo?at_medium=RSS&at_campaign=rss"
+        },
+        {
+          "published_at": "Fri, 25 Sep 2026 16:01:54 GMT",
+          "source_name": "BBC News Asia",
+          "source_tier": "B",
+          "url": "https://www.bbc.co.uk/news/articles/cxq63dqp93n1o?at_medium=RSS&at_campaign=rss"
+        },
+        {
+          "published_at": "Fri, 25 Sep 2026 11:22:48 GMT",
+          "source_name": "BBC News Asia",
+          "source_tier": "B",
+          "url": "https://www.bbc.co.uk/news/articles/c6lyqlx0kp0po?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Trump and Xi exchange warm words at state dinner but little progress on key issues",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.bbc.co.uk/news/articles/cwjdvml9e897o?at_medium=RSS&at_campaign=rss",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 16:13:44 GMT",
+          "source_name": "BBC News Asia",
+          "source_tier": "B",
+          "url": "https://www.bbc.co.uk/news/articles/cwjdvml9e897o?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Four bodies found after avalanche hits Himalayan climbing group",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.bbc.co.uk/news/articles/ck1wxx8n2x3zo?at_medium=RSS&at_campaign=rss",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Sun, 27 Sep 2026 04:45:08 GMT",
+          "source_name": "BBC News Asia",
+          "source_tier": "B",
+          "url": "https://www.bbc.co.uk/news/articles/ck1wxx8n2x3zo?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Bangkok roads submerged as flood disaster declared",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.bbc.co.uk/news/articles/cmj643pd4e11o?at_medium=RSS&at_campaign=rss",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Fri, 25 Sep 2026 04:02:54 GMT",
+          "source_name": "BBC News Asia",
+          "source_tier": "B",
+          "url": "https://www.bbc.co.uk/news/articles/cmj643pd4e11o?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "status": "WATCH",
+      "title": "British rapper Yung Filly to face rape retrial in Australia next June",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.bbc.co.uk/news/articles/cw980vje6l3eo?at_medium=RSS&at_campaign=rss",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Sun, 27 Sep 2026 23:01:37 GMT",
+          "source_name": "BBC News Asia",
+          "source_tier": "B",
+          "url": "https://www.bbc.co.uk/news/articles/cw980vje6l3eo?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Why some Indian civil servants become heroes for doing their jobs",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.bbc.co.uk/news/articles/cvp8d0nezkeko?at_medium=RSS&at_campaign=rss",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Sat, 26 Sep 2026 23:02:47 GMT",
+          "source_name": "BBC News Asia",
+          "source_tier": "B",
+          "url": "https://www.bbc.co.uk/news/articles/cvp8d0nezkeko?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "status": "WATCH",
+      "title": "The young women guiding tourists through India's night sky",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.bbc.co.uk/news/articles/cq39me84zrkdo?at_medium=RSS&at_campaign=rss",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Sun, 27 Sep 2026 08:51:23 GMT",
+          "source_name": "BBC News Asia",
+          "source_tier": "B",
+          "url": "https://www.bbc.co.uk/news/articles/cq39me84zrkdo?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Before BTS and Blackpink, there was Big Bang: Now the Kings of K-pop are back",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.bbc.co.uk/news/articles/cq70dgdndr46o?at_medium=RSS&at_campaign=rss",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Sat, 26 Sep 2026 22:02:18 GMT",
+          "source_name": "BBC News Asia",
+          "source_tier": "B",
+          "url": "https://www.bbc.co.uk/news/articles/cq70dgdndr46o?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Young people in China are fangirling over a professor who gets their anxiety",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.bbc.co.uk/news/articles/cm5ydvww0erdo?at_medium=RSS&at_campaign=rss",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Fri, 25 Sep 2026 22:12:48 GMT",
+          "source_name": "BBC News Asia",
+          "source_tier": "B",
+          "url": "https://www.bbc.co.uk/news/articles/cm5ydvww0erdo?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "status": "WATCH",
+      "title": "The treasured 'eternal snow' on this tropical island is about to disappear forever",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.channelnewsasia.com/sport/games-sri-lanka-and-bangladesh-advance-rain-washes-out-cricket-again-6417376",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 11:45:19 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/sport/games-sri-lanka-and-bangladesh-advance-rain-washes-out-cricket-again-6417376"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Games-Sri Lanka and Bangladesh advance as rain washes out cricket again",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.channelnewsasia.com/world/cornell-gang-rape-accusation-lawsuit-prosecutor-reopens-probe-6416271",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 11:19:00 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/world/cornell-gang-rape-accusation-lawsuit-prosecutor-reopens-probe-6416271"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Prosecutor reopens probe into Cornell gang rape allegations after accuser files lawsuit",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.channelnewsasia.com/sport/scott-barrett-returns-all-blacks-squad-taylor-named-skipper-bledisloe-tests-6417351",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 11:14:51 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/sport/scott-barrett-returns-all-blacks-squad-taylor-named-skipper-bledisloe-tests-6417351"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Scott Barrett returns to All Blacks squad, Taylor named skipper for Bledisloe tests",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "HIGH",
+      "content_key": "u:https://www.channelnewsasia.com/asia/malaysia-myanmar-rohingya-refugees-repatriation-6417266",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 2,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 2
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 2,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 10:48:33 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/asia/malaysia-myanmar-rohingya-refugees-repatriation-6417266"
+        },
+        {
+          "published_at": "Tue, 29 Sep 2026 01:24:13 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/malaysia-mula-hantar-pulang-pelarian-myanmar"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Malaysia starts sending Myanmar migrants home",
+      "verification_status": "CONFIRMED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.channelnewsasia.com/entertainment/twice-tzuyu-williams-f1-dan-da-dan-6417126",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 10:48:00 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/entertainment/twice-tzuyu-williams-f1-dan-da-dan-6417126"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Twice's Tzuyu to visit Singapore as part of collaboration with Williams F1 and anime Dan Da Dan",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.channelnewsasia.com/singapore/worker-dies-fall-tanjong-rhu-road-bto-construction-site-6417106",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 10:21:41 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/singapore/worker-dies-fall-tanjong-rhu-road-bto-construction-site-6417106"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Worker dies after falling from height at Tanjong Rhu BTO construction site",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "EVENT",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.channelnewsasia.com/singapore/migrant-workers-human-rights-un-6414541",
+      "is_political": true,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 10:04:48 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/singapore/migrant-workers-human-rights-un-6414541"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Singapore supports 243 human rights recommendations, including stronger migrant worker protections",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.channelnewsasia.com/business/dollar-holds-near-two-month-peak-yields-rise-fed-data-looms-6417176",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 10:00:28 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/business/dollar-holds-near-two-month-peak-yields-rise-fed-data-looms-6417176"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Dollar holds near two-month peak as yields rise, Fed data looms",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.channelnewsasia.com/business/shares-fast-fashion-platform-shein-fall-6-after-quarterly-profit-slides-67-6417151",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 09:46:09 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/business/shares-fast-fashion-platform-shein-fall-6-after-quarterly-profit-slides-67-6417151"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Shares of fast-fashion platform Shein fall 6% after quarterly profit slides 67%",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.channelnewsasia.com/world/pope-leo-xiv-concerns-ai-taken-seriously-6417136",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 09:46:00 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/world/pope-leo-xiv-concerns-ai-taken-seriously-6417136"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Pope says concerns about AI 'should be taken seriously'",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "EVENT",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.channelnewsasia.com/business/openai-apologies-australian-government-website-hack-pledges-rebuild-trust-6417116",
+      "is_political": true,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 09:28:31 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/business/openai-apologies-australian-government-website-hack-pledges-rebuild-trust-6417116"
+        }
+      ],
+      "status": "WATCH",
+      "title": "OpenAI apologies for Australian government website hack, pledges to rebuild trust",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.channelnewsasia.com/business/south-korean-exports-seen-rising-16th-month-solid-ai-chip-demand-reuters-poll-6417096",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 09:08:01 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/business/south-korean-exports-seen-rising-16th-month-solid-ai-chip-demand-reuters-poll-6417096"
+        }
+      ],
+      "status": "WATCH",
+      "title": "South Korean exports seen rising for 16th month on solid AI chip demand: Reuters poll",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.channelnewsasia.com/business/samsung-electronics-says-hbm-account-nearly-30-industry-dram-capacity-next-year-6417091",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 09:07:39 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/business/samsung-electronics-says-hbm-account-nearly-30-industry-dram-capacity-next-year-6417091"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Samsung Electronics says HBM to account for nearly 30% of industry DRAM capacity next year",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.channelnewsasia.com/business/australias-csl-taps-amazons-cloud-unit-boost-research-pipeline-6417076",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 08:47:49 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/business/australias-csl-taps-amazons-cloud-unit-boost-research-pipeline-6417076"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Australia's CSL taps Amazon's cloud unit to boost research pipeline",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.channelnewsasia.com/business/oil-prices-rise-second-session-continued-middle-east-supply-concern-6417066",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 08:33:13 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/business/oil-prices-rise-second-session-continued-middle-east-supply-concern-6417066"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Oil prices rise for second session on continued Middle East supply concern",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.channelnewsasia.com/business/anthropic-ai-existential-risks-humanity-ipo-filing-6417036",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 3,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 3
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 3,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 08:17:00 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/business/anthropic-ai-existential-risks-humanity-ipo-filing-6417036"
+        },
+        {
+          "published_at": "Tue, 29 Sep 2026 08:09:06 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/business/exclusive-anthropic-leaders-control-ai-lab-founder-llc-promote-public-good-over-market-forces-6417026"
+        },
+        {
+          "published_at": "Tue, 29 Sep 2026 07:52:43 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/business/anthropics-path-ai-startup-industry-defining-ipo-6416996"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Exclusive-Anthropic leaders to control AI lab via 'Founder LLC' to promote public good over market forces",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.channelnewsasia.com/women/working-women-stress-caregiving-menopause-survey-6414686",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 08:04:00 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/women/working-women-stress-caregiving-menopause-survey-6414686"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Working women face different challenges across life stages: PAP Women’s Wing survey",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "WORLD",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.channelnewsasia.com/business/samsung-affiliates-commit-1-billion-kkr-backed-helix-digital-ai-buildout-6417001",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 07:57:03 +0800",
+          "source_name": "Channel News Asia (Asia section)",
+          "source_tier": "B",
+          "url": "https://www.channelnewsasia.com/business/samsung-affiliates-commit-1-billion-kkr-backed-helix-digital-ai-buildout-6417001"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Samsung, affiliates commit $1 billion to KKR-backed Helix Digital AI buildout",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "EVENT",
+      "confidence_label": "HIGH",
+      "content_key": "u:https://codeblue.galencentre.org/2026/09/dr-hasmah-in-retrospect-dr-loshi-rajen/",
+      "is_political": true,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 6,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 6
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 6,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 03:40:00 +0000",
+          "source_name": "CodeBlue",
+          "source_tier": "B",
+          "url": "https://codeblue.galencentre.org/2026/09/dr-hasmah-in-retrospect-dr-loshi-rajen/"
+        },
+        {
+          "published_at": "Mon, 28 Sep 2026 23:15:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/mengenang-dr-hasmah-10-kisah-daripada-kehidupan-penuh-pencapaian"
+        },
+        {
+          "published_at": "Mon, 28 Sep 2026 23:03:32 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/29/soon-koh-wife-extend-condolences-to-dr-mahathir-on-passing-of-dr-siti-hasmah/"
+        },
+        {
+          "published_at": "Mon, 28 Sep 2026 12:53:52 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/28/from-violin-to-rural-medicine-10-things-malaysians-may-have-forgotten-about-dr-hasmah/"
+        },
+        {
+          "published_at": "Mon, 28 Sep 2026 12:36:16 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/28/after-70-years-together-dr-mahathir-weeps-as-dr-hasmah-laid-to-rest/"
+        },
+        {
+          "published_at": "Mon, 28 Sep 2026 10:52:41 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/28/tun-dr-siti-hasmah-laid-to-rest-at-pusara-negara/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "From violin to rural medicine, 10 things Malaysians may have forgotten about Dr Hasmah",
+      "verification_status": "CONFIRMED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://codeblue.galencentre.org/2026/09/concern-regarding-delayed-promotion-of-medical-officers-anonymous-medical-officer/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 02:00:00 +0000",
+          "source_name": "CodeBlue",
+          "source_tier": "B",
+          "url": "https://codeblue.galencentre.org/2026/09/concern-regarding-delayed-promotion-of-medical-officers-anonymous-medical-officer/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Concern Regarding Delayed Promotion Of Medical Officers",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://codeblue.galencentre.org/2026/09/the-silent-surge-why-malaysians-keep-postponing-health-screening-brittany-richard-johny-kala-raani-chandra-guindan/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 08:00:00 +0000",
+          "source_name": "CodeBlue",
+          "source_tier": "B",
+          "url": "https://codeblue.galencentre.org/2026/09/the-silent-surge-why-malaysians-keep-postponing-health-screening-brittany-richard-johny-kala-raani-chandra-guindan/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "The Silent Surge: Why Malaysians Keep Postponing Health Screening",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://codeblue.galencentre.org/2026/09/hasmah-ali-represented-finest-traditions-of-medicine-mma/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 07:25:16 +0000",
+          "source_name": "CodeBlue",
+          "source_tier": "B",
+          "url": "https://codeblue.galencentre.org/2026/09/hasmah-ali-represented-finest-traditions-of-medicine-mma/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Hasmah Ali Represented Finest Traditions Of Medicine — MMA",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://codeblue.galencentre.org/2026/09/hasmah-pioneered-public-health-maternal-and-child-health-dzulkefly/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 04:38:54 +0000",
+          "source_name": "CodeBlue",
+          "source_tier": "B",
+          "url": "https://codeblue.galencentre.org/2026/09/hasmah-pioneered-public-health-maternal-and-child-health-dzulkefly/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Hasmah Pioneered Public Health, Maternal And Child Health: Dzulkefly",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://codeblue.galencentre.org/2026/09/a-response-to-are-we-still-practising-family-medicine-dr-mfh/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 03:40:00 +0000",
+          "source_name": "CodeBlue",
+          "source_tier": "B",
+          "url": "https://codeblue.galencentre.org/2026/09/a-response-to-are-we-still-practising-family-medicine-dr-mfh/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "A Response To ‘Are We Still Practising Family Medicine?’",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://codeblue.galencentre.org/2026/09/dont-quit-medicine-senior-doctors-tell-their-juniors/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 02:00:00 +0000",
+          "source_name": "CodeBlue",
+          "source_tier": "B",
+          "url": "https://codeblue.galencentre.org/2026/09/dont-quit-medicine-senior-doctors-tell-their-juniors/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Don’t Quit Medicine, Senior Doctors Tell Their Juniors",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://codeblue.galencentre.org/2026/09/sunway-medical-centre-named-malaysias-no-1-in-paediatrics-in-newsweeks-worlds-best-specialised-hospitals-2027/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Fri, 25 Sep 2026 08:59:27 +0000",
+          "source_name": "CodeBlue",
+          "source_tier": "B",
+          "url": "https://codeblue.galencentre.org/2026/09/sunway-medical-centre-named-malaysias-no-1-in-paediatrics-in-newsweeks-worlds-best-specialised-hospitals-2027/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Sunway Medical Centre Named Malaysia’s No 1 In Paediatrics In Newsweek’s World’s Best Specialised Hospitals 2027",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://codeblue.galencentre.org/2026/09/global-partnerships-in-malaysian-nursing-contributing-to-the-sustainable-development-goals-mohammad-irwan-hakeem-mohd-arif/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Fri, 25 Sep 2026 08:03:53 +0000",
+          "source_name": "CodeBlue",
+          "source_tier": "B",
+          "url": "https://codeblue.galencentre.org/2026/09/global-partnerships-in-malaysian-nursing-contributing-to-the-sustainable-development-goals-mohammad-irwan-hakeem-mohd-arif/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Global Partnerships In Malaysian Nursing: Contributing To The Sustainable Development Goals — Mohammad Irwan Hakeem Mohd Arif",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://codeblue.galencentre.org/2026/09/health-care-is-more-than-a-question-of-who-pays-david-lim/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Fri, 25 Sep 2026 06:00:00 +0000",
+          "source_name": "CodeBlue",
+          "source_tier": "B",
+          "url": "https://codeblue.galencentre.org/2026/09/health-care-is-more-than-a-question-of-who-pays-david-lim/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Health Care Is More Than A Question Of Who Pays",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/saravanan-sedia-dibicarakan-pendakwaan-mohon-lebih-masa",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 03:53:07 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/saravanan-sedia-dibicarakan-pendakwaan-mohon-lebih-masa"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Saravanan sedia dibicarakan, pendakwaan mohon lebih masa",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/mb-negeri-sembilan-menghadap-tuanku-muhriz",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 2,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 2
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 2,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 03:44:57 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/mb-negeri-sembilan-menghadap-tuanku-muhriz"
+        },
+        {
+          "published_at": "Mon, 28 Sep 2026 08:26:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/lebih-60-soalan-ditanya-polis-kata-bekas-exco-negeri-sembilan"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Lebih 60 soalan ditanya polis, kata bekas exco Negeri Sembilan",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/kementerian-pengangkutan-kendali-semua-lesen-bunkering-tahun-depan",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 03:37:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/kementerian-pengangkutan-kendali-semua-lesen-bunkering-tahun-depan"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Kementerian Pengangkutan kendali semua lesen bunkering tahun depan",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/orang-ramai-diingat-jangan-terpedaya-scam-pendaftaran-ubat-melalui-pos",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 03:16:41 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/orang-ramai-diingat-jangan-terpedaya-scam-pendaftaran-ubat-melalui-pos"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Orang ramai diingat jangan terpedaya ‘scam’ pendaftaran ubat melalui pos",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/belum-ada-perbincangan-rasmi-ph-bersatu-kata-fahmi",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 4,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 4
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 4,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 02:46:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/belum-ada-perbincangan-rasmi-ph-bersatu-kata-fahmi"
+        },
+        {
+          "published_at": "Tue, 29 Sep 2026 00:00:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/opinion/2026/09/29/bukan-pas-atau-ph-umno-ada-kekuatan-sendiri-atau-tidak"
+        },
+        {
+          "published_at": "Mon, 28 Sep 2026 15:53:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/pemimpin-ph-bersatu-makan-malam-bersama-di-tengah-spekulasi-rundingan-prn-melaka"
+        },
+        {
+          "published_at": "Mon, 28 Sep 2026 09:32:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/ph-p-pinang-tangguh-mesyuarat-bincang-kedudukan-umno"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Pemimpin PH, Bersatu makan malam bersama di tengah spekulasi rundingan PRN Melaka",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/bekas-ceo-fic-didakwa-perdaya-lembaga-pengarah-berkait-projek-jalan-semarak",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 2,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 2
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 2,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 01:38:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/bekas-ceo-fic-didakwa-perdaya-lembaga-pengarah-berkait-projek-jalan-semarak"
+        },
+        {
+          "published_at": "Mon, 28 Sep 2026 15:08:36 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/bekas-ceo-fic-dituduh-esok-berkait-kes-klvc"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Bekas CEO FIC didakwa perdaya lembaga pengarah berkait projek Jalan Semarak",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/opinion/2026/09/29/sanusi-dengan-ketuanan-pas",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 01:30:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/opinion/2026/09/29/sanusi-dengan-ketuanan-pas"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Sanusi dengan ketuanan PAS",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/mahasiswa-perlu-cipta-nilai-bukan-sekadar-pengguna-teknologi-titah-raja-muda-perlis",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 2,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 2
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 2,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 01:04:38 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/mahasiswa-perlu-cipta-nilai-bukan-sekadar-pengguna-teknologi-titah-raja-muda-perlis"
+        },
+        {
+          "published_at": "Tue, 29 Sep 2026 00:41:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/raja-perlis-terima-mengadap-kpn"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Mahasiswa perlu cipta nilai, bukan sekadar pengguna teknologi, titah Raja Muda Perlis",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "EVENT",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/pandangan/2026/09/29/mengapa-perpecahan-multikoalisi-mutlak-berlaku-dalam-pru16",
+      "is_political": true,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 01:00:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/pandangan/2026/09/29/mengapa-perpecahan-multikoalisi-mutlak-berlaku-dalam-pru16"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Mengapa perpecahan multikoalisi mutlak berlaku dalam PRU16",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/sebelum-malaysia-mengenali-mahathir-dan-hasmah",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 7,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 7
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 7,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 00:30:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/sebelum-malaysia-mengenali-mahathir-dan-hasmah"
+        },
+        {
+          "published_at": "Mon, 28 Sep 2026 23:30:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/sentuhan-keibuan-hasmah-buat-badminton-malaysia"
+        },
+        {
+          "published_at": "Mon, 28 Sep 2026 13:15:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/hasmah-ceria-sehari-sebelum-meninggal-dunia-kata-mokhzani"
+        },
+        {
+          "published_at": "Mon, 28 Sep 2026 07:45:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/radio-tv-diarah-ubah-program-tanda-penghormatan-buat-hasmah"
+        },
+        {
+          "published_at": "Mon, 28 Sep 2026 06:46:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/sultan-pahang-tengku-ampuan-beri-penghormatan-terakhir-buat-hasmah"
+        },
+        {
+          "published_at": "Mon, 28 Sep 2026 06:05:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/tokoh-kenamaan-beri-penghormatan-terakhir-buat-hasmah"
+        },
+        {
+          "published_at": "Mon, 28 Sep 2026 05:04:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/hasmah-angkat-martabat-wanita-kata-pas"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Sultan Pahang, Tengku Ampuan beri penghormatan terakhir buat Hasmah",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "CLAIM",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/hak-40-sabah-bukan-syarat-sokong-kerajaan-madani-kata-pegawai-mustapha",
+      "is_political": true,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 2,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 2
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 2,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 00:27:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/hak-40-sabah-bukan-syarat-sokong-kerajaan-madani-kata-pegawai-mustapha"
+        },
+        {
+          "published_at": "Mon, 28 Sep 2026 10:34:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/saya-tak-tahu-kenapa-saksi-pinda-kenyataan-kata-pegawai-penyiasat"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Hak 40% Sabah bukan syarat sokong kerajaan Madani, kata pegawai Mustapha",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/opinion/2026/09/29/ai-memanglah-tak-ada-jiwa-tapi-kita-ada",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 23:00:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/opinion/2026/09/29/ai-memanglah-tak-ada-jiwa-tapi-kita-ada"
+        }
+      ],
+      "status": "WATCH",
+      "title": "AI memanglah tak ada jiwa, tapi kita ada",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/pandangan/2026/09/29/hasmah-wibawa-tanpa-perlu-menonjol",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 22:30:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/pandangan/2026/09/29/hasmah-wibawa-tanpa-perlu-menonjol"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Hasmah, wibawa tanpa perlu menonjol",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/pemberi-maklumat-kartel-akan-dapat-perlindungan-ganjaran-kata-mycc",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 16:04:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/29/pemberi-maklumat-kartel-akan-dapat-perlindungan-ganjaran-kata-mycc"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Pemberi maklumat kartel akan dapat perlindungan, ganjaran, kata MyCC",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/beraksi-10-pemain-indonesia-ikat-malaysia-tanpa-jaringan",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 15:54:36 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/beraksi-10-pemain-indonesia-ikat-malaysia-tanpa-jaringan"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Beraksi 10 pemain, Indonesia ikat Malaysia tanpa jaringan",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "CLAIM",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/rua-alharam-almakki-teroka-kerjasama-mrcb",
+      "is_political": true,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 15:02:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/rua-alharam-almakki-teroka-kerjasama-mrcb"
+        }
+      ],
+      "status": "WATCH",
+      "title": "RUA AlHaram AlMakki teroka kerjasama MRCB",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/jangan-ambil-tindakan-sendiri-nasihat-jpv-susulan-kes-rabies-di-kedah",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 14:21:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/jangan-ambil-tindakan-sendiri-nasihat-jpv-susulan-kes-rabies-di-kedah"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Jangan ambil tindakan sendiri, nasihat JPV susulan kes rabies di Kedah",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/2-ditahan-bawa-690kg-ketum-dalam-alphard",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 13:39:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/2-ditahan-bawa-690kg-ketum-dalam-alphard"
+        }
+      ],
+      "status": "WATCH",
+      "title": "2 ditahan bawa 690kg ketum dalam Alphard",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "OPINION",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/ruu-kebebasan-maklumat-adakah-pandangan-pemegang-taruh-diambil-kira-soal-wan-saiful",
+      "is_political": true,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": false,
+      "publishable": false,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 12:39:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/ruu-kebebasan-maklumat-adakah-pandangan-pemegang-taruh-diambil-kira-soal-wan-saiful"
+        }
+      ],
+      "status": "WATCH",
+      "title": "RUU Kebebasan Maklumat: Adakah pandangan pemegang taruh diambil kira, soal Wan Saiful",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/jangan-serah-isu-disiplin-kepada-sekolah-semata-mata-ibu-bapa-diberitahu",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 2,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 2
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 2,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 12:00:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/jangan-serah-isu-disiplin-kepada-sekolah-semata-mata-ibu-bapa-diberitahu"
+        },
+        {
+          "published_at": "Mon, 28 Sep 2026 05:38:51 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/suhakam-gesa-kpm-semak-amalan-disiplin-tidak-rasmi-di-sekolah-berasrama"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Jangan serah isu disiplin kepada sekolah semata-mata, ibu bapa diberitahu",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "EVENT",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/hasmah-selamat-disemadikan-di-pusara-negara",
+      "is_political": true,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 11:39:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/hasmah-selamat-disemadikan-di-pusara-negara"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Hasmah selamat disemadikan di Pusara Negara",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "CLAIM",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/sprm-salah-guna-kuasa-panggil-bekas-menteri-keluarga-dakwa-waytha",
+      "is_political": true,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 11:38:17 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/sprm-salah-guna-kuasa-panggil-bekas-menteri-keluarga-dakwa-waytha"
+        }
+      ],
+      "status": "WATCH",
+      "title": "SPRM salah guna kuasa panggil bekas menteri, keluarga, dakwa Waytha",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/suami-isteri-maut-dalam-nahas-2-kenderaan-di-tampin",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 11:01:42 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/suami-isteri-maut-dalam-nahas-2-kenderaan-di-tampin"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Suami isteri maut dalam nahas 2 kenderaan di Tampin",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/sprm-kemuka-syor-perkukuh-tatakelola-felda-anak-syarikat",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 10:42:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/sprm-kemuka-syor-perkukuh-tatakelola-felda-anak-syarikat"
+        }
+      ],
+      "status": "WATCH",
+      "title": "SPRM kemuka syor perkukuh tatakelola Felda, anak syarikat",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "EVENT",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/tiada-layanan-berbeza-dalam-tindakan-terhadap-isu-ajaran-bercanggah-akidah-kata-menteri",
+      "is_political": true,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 09:58:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/tiada-layanan-berbeza-dalam-tindakan-terhadap-isu-ajaran-bercanggah-akidah-kata-menteri"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Tiada layanan berbeza dalam tindakan terhadap isu ajaran bercanggah akidah, kata menteri",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/polis-bekukan-5-akaun-berkait-siasatan-terhadap-mandiri",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 09:41:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/polis-bekukan-5-akaun-berkait-siasatan-terhadap-mandiri"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Polis beku 5 akaun berkait siasatan terhadap Mandiri",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/polis-sabah-nasihat-tangguh-konsert-israel-houghton",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 09:06:43 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/polis-sabah-nasihat-tangguh-konsert-israel-houghton"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Polis Sabah nasihat tangguh konsert Israel Houghton",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/rakan-jv-boleh-saman-tuntut-semula-wang-putus-mahkamah",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 08:40:00 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/rakan-jv-boleh-saman-tuntut-semula-wang-putus-mahkamah"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Rakan JV boleh saman tuntut semula wang, putus mahkamah",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/penganggur-rompak-guna-kapak-dipenjara-7-tahun-3-sebatan",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 07:50:34 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/penganggur-rompak-guna-kapak-dipenjara-7-tahun-3-sebatan"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Penganggur rompak guna kapak dipenjara 7 tahun, 3 sebatan",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "EVENT",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/kkm-lancar-nsfirm-garis-panduan-postvention-perkukuh-usaha-cegah-bunuh-diri",
+      "is_political": true,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 07:49:37 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/kkm-lancar-nsfirm-garis-panduan-postvention-perkukuh-usaha-cegah-bunuh-diri"
+        }
+      ],
+      "status": "WATCH",
+      "title": "KKM lancar NSFIRM, garis panduan postvention perkukuh usaha cegah bunuh diri",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "CLAIM",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/cadangan-laras-gaji-minimum-perlu-imbang-kebajikan-pekerja-kelangsungan-majikan",
+      "is_political": true,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 07:00:19 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/cadangan-laras-gaji-minimum-perlu-imbang-kebajikan-pekerja-kelangsungan-majikan"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Cadangan laras gaji minimum perlu imbang kebajikan pekerja, kelangsungan majikan",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/sabitan-edar-dadah-dikembalikan-2-lelaki-perlu-jalani-baki-penjara-30-tahun",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 06:10:29 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/sabitan-edar-dadah-dikembalikan-2-lelaki-perlu-jalani-baki-penjara-30-tahun"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Sabitan edar dadah dikembalikan, 2 lelaki perlu jalani baki penjara 30 tahun",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "EVENT",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/status-aset-rosmah-diketahui-januari-depan",
+      "is_political": true,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 05:46:04 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/status-aset-rosmah-diketahui-januari-depan"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Status aset Rosmah diketahui Januari depan",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/guru-agama-didakwa-amang-seksual-pelajar-lelaki",
+      "is_political": false,
+      "language": "ms",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 05:33:02 +0000",
+          "source_name": "Free Malaysia Today (Bahasa)",
+          "source_tier": "B",
+          "url": "https://www.freemalaysiatoday.com/category/bahasa/tempatan/2026/09/28/guru-agama-didakwa-amang-seksual-pelajar-lelaki"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Guru agama didakwa amang seksual pelajar lelaki",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "EVENT",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.theborneopost.com/2026/09/29/sarawak-puts-forward-budget-2027-proposals-to-boost-high-value-investments-strategic-industries/",
+      "is_political": true,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 2,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 2
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 2,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 02:50:48 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/29/sarawak-puts-forward-budget-2027-proposals-to-boost-high-value-investments-strategic-industries/"
+        },
+        {
+          "published_at": "Tue, 29 Sep 2026 00:03:03 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/29/social-activist-hopes-for-prioritised-funding-to-sarawak-healthcare-under-budget-2027/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Sarawak puts forward Budget 2027 proposals to boost high-value investments, strategic industries",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.theborneopost.com/2026/09/29/air-quality-worsens-in-sarawak-as-7-stations-record-unhealthy-api-readings/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 01:39:39 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/29/air-quality-worsens-in-sarawak-as-7-stations-record-unhealthy-api-readings/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Air quality worsens in Sarawak as 7 stations record ‘Unhealthy’ API readings",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "CLAIM",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.theborneopost.com/2026/09/29/younger-generation-key-to-achieving-sarawaks-2030-goals-says-gerald/",
+      "is_political": true,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 00:58:54 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/29/younger-generation-key-to-achieving-sarawaks-2030-goals-says-gerald/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Younger generation key to achieving Sarawak’s 2030 goals, says Gerald",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.theborneopost.com/2026/09/29/woman-found-unconscious-in-donggongon-dies/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 00:45:48 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/29/woman-found-unconscious-in-donggongon-dies/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Woman found unconscious in Donggongon dies",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.theborneopost.com/2026/09/29/mayor-motacs-rm3-8-million-to-cover-improvement-works-on-taman-awam-miri/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 00:02:23 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/29/mayor-motacs-rm3-8-million-to-cover-improvement-works-on-taman-awam-miri/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Mayor: Motac’s RM3.8 million to cover improvement works on Taman Awam Miri",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "CLAIM",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.theborneopost.com/2026/09/29/mou-out-to-open-opportunities-for-neurodivergent-underprivileged-kids-through-music/",
+      "is_political": true,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 00:01:25 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/29/mou-out-to-open-opportunities-for-neurodivergent-underprivileged-kids-through-music/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "MoU out to open opportunities for neurodivergent, underprivileged kids through music",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.theborneopost.com/2026/09/29/dr-sim-cancer-care-framework-must-consider-states-rural-remote-communities/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Tue, 29 Sep 2026 00:00:06 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/29/dr-sim-cancer-care-framework-must-consider-states-rural-remote-communities/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Dr Sim: Cancer care framework must consider state’s rural, remote communities",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.theborneopost.com/2026/09/29/sarawak-beyond-2026-brings-global-biz-market-closer-to-local-communities/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 23:02:51 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/29/sarawak-beyond-2026-brings-global-biz-market-closer-to-local-communities/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Sarawak Beyond 2026 brings global biz market closer to local communities",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.theborneopost.com/2026/09/29/couple-turn-to-ngo-for-family-support-amid-health-challenges/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 23:01:51 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/29/couple-turn-to-ngo-for-family-support-amid-health-challenges/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Couple turn to NGO for family support amid health challenges",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.theborneopost.com/2026/09/29/match-gaming-skills-with-academic-credentials-e-sports-players-advised/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 23:00:54 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/29/match-gaming-skills-with-academic-credentials-e-sports-players-advised/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Match gaming skills with academic credentials, e-sports players advised",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.theborneopost.com/2026/09/29/quality-violin-making-finds-unexpected-home-in-rural-chinese-county/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 22:01:51 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/29/quality-violin-making-finds-unexpected-home-in-rural-chinese-county/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Quality violin making finds unexpected home in rural Chinese county",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.theborneopost.com/2026/09/29/70-years-on-the-road-how-traveling-troupe-takes-stage-to-herders-in-remote-grassland/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 22:00:31 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/29/70-years-on-the-road-how-traveling-troupe-takes-stage-to-herders-in-remote-grassland/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "70 years on the road: How traveling troupe takes stage to herders in remote grassland",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "EVENT",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.theborneopost.com/2026/09/28/sabah-may-get-more-parliamentary-seats-but-all-pending-state-cabinet-level-discussion-says-head-backbencher/",
+      "is_political": true,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 13:51:25 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/28/sabah-may-get-more-parliamentary-seats-but-all-pending-state-cabinet-level-discussion-says-head-backbencher/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Sabah may get more parliamentary seats, but all pending state cabinet level discussion, says head backbencher",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "CLAIM",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.theborneopost.com/2026/09/28/ldp-man-proposed-rm3100-living-wage-needs-careful-assessment/",
+      "is_political": true,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 13:48:27 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/28/ldp-man-proposed-rm3100-living-wage-needs-careful-assessment/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "LDP man: Proposed RM3,100 living wage needs careful assessment",
+      "verification_status": "REPORTED"
+    },
+    {
+      "category": "MALAYSIA",
+      "claim_kind": "NOT_POLITICAL",
+      "confidence_label": "MEDIUM",
+      "content_key": "u:https://www.theborneopost.com/2026/09/28/sports-integrity-confab-timely-as-sarawak-preps-for-sea-games/",
+      "is_political": false,
+      "language": "en",
+      "momentum": {
+        "current_mentions": 1,
+        "growth": 0,
+        "growth_rate": 0.0,
+        "is_new": false,
+        "previous_mentions": 1
+      },
+      "political_neutral": true,
+      "publishable": true,
+      "source_count": 1,
+      "sources": [
+        {
+          "published_at": "Mon, 28 Sep 2026 10:39:47 +0000",
+          "source_name": "Borneo Post",
+          "source_tier": "B",
+          "url": "https://www.theborneopost.com/2026/09/28/sports-integrity-confab-timely-as-sarawak-preps-for-sea-games/"
+        }
+      ],
+      "status": "WATCH",
+      "title": "Sports integrity confab ‘timely’ as Sarawak preps for SEA Games",
+      "verification_status": "REPORTED"
+    }
+  ]
+}

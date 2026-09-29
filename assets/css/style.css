@@ -704,3 +704,282 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ==========================================================================
+   MY Hot Radar — Radar Feed (Phase 2 B3B-1)
+   New section on the homepage that renders real Radar topics.
+   Reuses existing tokens (.badge--hot/--rising/--breaking/--cooling/--sample)
+   plus a new .badge--watch variant.
+   ========================================================================== */
+
+/* WATCH status badge — neutral gray-blue, calmer than the alarm tones. */
+.badge--watch {
+  background: var(--color-surface-alt);
+  color: var(--color-ink-soft);
+  border: 1px solid var(--color-line-strong);
+}
+
+/* Lede paragraph under the section heading. */
+.rf-lede {
+  font-size: var(--fs-14);
+  color: var(--color-ink-soft);
+  margin-top: calc(var(--sp-3) * -1);
+  margin-bottom: var(--sp-5);
+  max-width: 64ch;
+  line-height: 1.55;
+}
+
+/* Inline meta on the right of the section heading. */
+.rf-meta {
+  font-size: var(--fs-12);
+  color: var(--color-muted);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* PARTIAL / stale banner. */
+.rf-banner {
+  margin-bottom: var(--sp-5);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--color-rising-soft);
+  border: 1px solid var(--color-rising);
+  border-left-width: 3px;
+  border-radius: var(--radius-md);
+  color: var(--color-ink);
+  font-size: var(--fs-14);
+  font-weight: 600;
+}
+.rf-banner--stale {
+  background: var(--color-cooling-soft);
+  border-color: var(--color-cooling);
+}
+
+/* Grid: same breakpoints as the existing .grid. */
+.rf-grid {
+  margin-bottom: var(--sp-4);
+}
+@media (min-width: 700px) {
+  .rf-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .rf-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Topic card — slightly tighter than the homepage .card. */
+.rf-card {
+  /* Uses the existing .card visuals; minor adjustments only. */
+  border-style: dashed; /* visually distinguishes Radar cards from solid DEMO cards */
+  border-color: var(--color-line);
+}
+.rf-card .card__title {
+  /* Radar titles are real headlines — slightly larger */
+  font-size: var(--fs-18);
+  line-height: 1.3;
+}
+@media (min-width: 700px) {
+  .rf-card .card__title { font-size: var(--fs-20); }
+}
+.rf-card--featured .card__title {
+  font-size: var(--fs-20);
+}
+@media (min-width: 700px) {
+  .rf-card--featured .card__title { font-size: var(--fs-24); }
+}
+
+/* Verification pill — uses the existing brand tokens. */
+.verify-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-line-strong);
+  background: var(--color-surface-alt);
+  color: var(--color-ink-soft);
+  line-height: 1;
+  white-space: nowrap;
+}
+.verify--confirmed {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #6ee7b7;
+}
+.verify--reported {
+  background: var(--color-surface-alt);
+  color: var(--color-ink-soft);
+  border-color: var(--color-line-strong);
+}
+.verify--socialbuzz {
+  background: var(--color-rising-soft);
+  color: #92400e;
+  border-color: #fcd34d;
+}
+.verify--unverified {
+  background: var(--color-cooling-soft);
+  color: var(--color-cooling);
+  border-color: var(--color-line-strong);
+}
+.verify--rumour {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  border-color: #fda4af;
+}
+
+/* Confidence pill — always neutral, never used as "probability". */
+.confidence-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  border: 1px dashed var(--color-line-strong);
+  color: var(--color-muted);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Sources list (collapsible). */
+.rf-sources {
+  margin-top: var(--sp-2);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--color-line);
+}
+.rf-sources__toggle {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+}
+.rf-sources__toggle:hover,
+.rf-sources__toggle:focus-visible {
+  color: var(--color-accent);
+}
+.rf-sources__list {
+  margin-top: var(--sp-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.rf-sources__item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-14);
+  min-width: 0;
+}
+.rf-sources__link,
+.rf-sources__name {
+  color: var(--color-ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
+}
+.rf-sources__link:hover { color: var(--color-accent); }
+.rf-sources__name { text-decoration: none; color: var(--color-muted); }
+
+/* Source tier badge — small pill. */
+.rf-tier {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 20px;
+  padding: 0 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  color: #fff;
+}
+.rf-tier--A { background: #047857; } /* authoritative */
+.rf-tier--B { background: var(--color-ink); } /* established */
+.rf-tier--C { background: #6366f1; }
+.rf-tier--D { background: #d97706; }
+.rf-tier--E { background: #71717a; }
+.rf-tier--F { background: var(--color-cooling); } /* anonymous */
+
+/* Political-topic tag. */
+.rf-pol {
+  font-size: var(--fs-12);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+.rf-pol--ok {
+  background: var(--color-surface-alt);
+  color: var(--color-ink-soft);
+  border: 1px solid var(--color-line-strong);
+}
+.rf-pol--no {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  border: 1px solid #fda4af;
+}
+
+/* Footer line under the grid. */
+.rf-footer {
+  margin-top: var(--sp-3);
+  font-size: var(--fs-12);
+  color: var(--color-ink-soft);
+}
+
+/* Fallback / unavailable state. */
+.rf-unavailable {
+  margin-top: var(--sp-3);
+  padding: var(--sp-4);
+  border: 1px dashed var(--color-line-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-14);
+  color: var(--color-muted);
+  background: var(--color-surface-alt);
+}
+
+/* Loading state (pre-render placeholder). */
+.rf-loading {
+  margin-top: var(--sp-3);
+  padding: var(--sp-4);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-14);
+  color: var(--color-muted);
+  background: var(--color-surface);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.rf-loading::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--color-line-strong);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: rf-spin 0.8s linear infinite;
+}
+@keyframes rf-spin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rf-loading::before { animation: none; }
+}
