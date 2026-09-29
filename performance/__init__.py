@@ -1,5 +1,6 @@
 """
-Performance & Market Intelligence Agent — P1 (Foundation) + P2 (Story Clustering).
+Performance & Market Intelligence Agent — P1 (Foundation) + P2 (Story
+Clustering) + P3-A (Adapter Foundation).
 
 This module is the **observation** layer. It does NOT predict,
 recommend, scrape, or change the News Radar.
@@ -28,13 +29,31 @@ P2 scope (added):
   * Deterministic feature extraction for headline / caption / image.
   * SYNTHETIC story-cluster fixtures.
 
+P3-A scope (added):
+  * Adapter framework: PublicPerformanceAdapter abstract base.
+  * RetrievalStatus enum (AVAILABLE / PARTIAL / UNAVAILABLE /
+    RATE_LIMITED / NOT_SUPPORTED / INVALID_SOURCE / ERROR).
+  * AdapterCapability enum (what an adapter can actually fetch).
+  * DataAccess enum (PUBLIC / PRIVATE / SYNTHETIC).
+  * AdapterObservation: per-row normalized observation carrying
+    source, source_url, retrieval_status, observed_at, metrics
+    (None = unknown / not exposed by source).
+  * AdapterResult: batched output with per-row + overall statuses.
+  * SyntheticAdapter: fixture-backed adapter for tests + offline dev.
+  * BernamaRssAdapter: real, public, no-login adapter for BERNAMA.
+  * Quality checks: timestamp validity, published_at <= observed_at,
+    metric non-negative, no fake zero, no duplicate content_id in
+    one batch, source/platform identity preserved.
+  * NO Facebook/Instagram/TikTok/YouTube/X API integration.
+  * NO login bypass, NO anti-bot bypass, NO scraping of private data.
+
 All public functions are pure. Persistence is the only side-effecting
 layer, separated into PerformanceStore.
 """
 
 from __future__ import annotations
 
-PERFORMANCE_SCHEMA_VERSION = 2
+PERFORMANCE_SCHEMA_VERSION = 3
 
 from .enums import (
     InsightScope,
@@ -116,6 +135,23 @@ from .story import (
     validate_packaging_snapshot,
     validate_story_cluster,
 )
+from .adapters import (
+    AdapterCapability,
+    AdapterObservation,
+    AdapterResult,
+    AdapterSourceSpec,
+    BERNAMA_PLATFORM,
+    BERNAMA_RSS_URL,
+    BernamaRssAdapter,
+    DataAccess,
+    PublicPerformanceAdapter,
+    RetrievalStatus,
+    SYNTHETIC_ADAPTER_TAG,
+    SyntheticAdapter,
+    SyntheticAdapterRecord,
+    check_observation_quality,
+    validate_adapter_result,
+)
 
 
 __all__ = [
@@ -180,6 +216,22 @@ __all__ = [
     "JACCARD_HIGH",
     "JACCARD_MEDIUM",
     "DATE_PROXIMITY_MAX_HOURS",
+    # P3-A adapter framework
+    "RetrievalStatus",
+    "AdapterCapability",
+    "DataAccess",
+    "AdapterSourceSpec",
+    "AdapterObservation",
+    "AdapterResult",
+    "PublicPerformanceAdapter",
+    "SyntheticAdapter",
+    "SyntheticAdapterRecord",
+    "SYNTHETIC_ADAPTER_TAG",
+    "BernamaRssAdapter",
+    "BERNAMA_RSS_URL",
+    "BERNAMA_PLATFORM",
+    "check_observation_quality",
+    "validate_adapter_result",
     # storage
     "DEFAULT_PERFORMANCE_DATA_DIR",
     "PerformanceStore",

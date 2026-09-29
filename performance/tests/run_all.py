@@ -23,6 +23,7 @@ def main() -> int:
     modules = [
         "performance.tests.test_performance",
         "performance.tests.test_story",
+        "performance.tests.test_adapters",
     ]
     failures = []
     for mod in modules:
