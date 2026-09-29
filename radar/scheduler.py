@@ -418,6 +418,31 @@ def run_once(
             warn = f"output_generation_warning: {type(e).__name__}: {e}"
             record.error = warn if not record.error else f"{record.error}; {warn}"
 
+        # Phase 2 Batch 3B-2: also build Article Candidates.
+        # Like output generation, candidate generation is best-effort
+        # and MUST NOT cause the scheduler to report FAILED when the
+        # scan itself succeeded. Candidate errors are logged as warnings.
+        try:
+            from .candidate import run_candidate_pipeline
+            candidate_summary = run_candidate_pipeline(
+                internal_output_path=radar_dir / "output" / "latest.json",
+                candidate_dir=radar_dir / "candidates",
+            )
+            if candidate_summary.get("errors"):
+                warn = (
+                    f"candidate_generation_warnings: "
+                    f"{len(candidate_summary['errors'])}"
+                )
+                record.error = (
+                    warn if not record.error
+                    else f"{record.error}; {warn}"
+                )
+        except Exception as e:
+            # Candidate pipeline failure must not affect the scan
+            # execution status. Record as warning, continue.
+            warn = f"candidate_generation_warning: {type(e).__name__}: {e}"
+            record.error = warn if not record.error else f"{record.error}; {warn}"
+
         record.finished_at = _now_iso()
         ExecutionLog(log_path).append(record)
         return record
