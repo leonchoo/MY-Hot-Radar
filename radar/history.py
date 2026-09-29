@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import os
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Dict
 
@@ -22,6 +23,10 @@ from .models import Topic, Status
 
 def _scan_dir(radar_dir: Path) -> Path:
     return Path(radar_dir) / "history"
+
+
+# Tolerate up to 5 minutes of clock drift between scan start and now.
+_FUTURE_TOLERANCE = timedelta(minutes=5)
 
 
 def _is_valid_snapshot(p: Path) -> bool:
@@ -34,8 +39,14 @@ def _is_valid_snapshot(p: Path) -> bool:
     pick the lexicographically last file, a single such file permanently
     poisons momentum for all subsequent scans (every topic appears NEW).
     Instead, walk backwards from the newest file and pick the first one
-    that actually parses AND has at least one topic entry. This is
-    deterministic and survives malformed-history edge cases.
+    that actually parses AND has at least one topic entry AND is not
+    future-dated. This is deterministic and survives malformed-history
+    edge cases.
+
+    Future-date rejection rationale (per Radar-4A's real bug fix): a
+    manually-copied file with a future filename (or a system clock
+    drift) would otherwise be selected as "latest" and poison every
+    subsequent momentum calculation.
     """
     try:
         raw = json.loads(p.read_text(encoding="utf-8"))
@@ -46,6 +57,21 @@ def _is_valid_snapshot(p: Path) -> bool:
     topics = raw.get("topics")
     if not isinstance(topics, dict):
         return False
+    # Reject future-dated snapshots
+    meta = raw.get("meta") or {}
+    ts_str = meta.get("started_at")
+    if ts_str:
+        try:
+            ts_clean = ts_str.rstrip("Z")
+            ts = datetime.fromisoformat(ts_clean)
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=timezone.utc)
+            if ts > datetime.now(timezone.utc) + _FUTURE_TOLERANCE:
+                return False
+        except ValueError:
+            # If we can't parse the date, fall through to schema check
+            # (don't reject -- the schema check already passed).
+            pass
     return True
 
 
@@ -53,8 +79,8 @@ def _latest_snapshot_path(radar_dir: Path) -> Path | None:
     """Find the most recent VALID history snapshot.
 
     Walks from newest (by filename) to oldest, skipping any file that is
-    malformed or has the wrong schema. Returns None if no valid snapshot
-    exists (fresh history).
+    malformed, has the wrong schema, or is future-dated. Returns None if
+    no valid snapshot exists (fresh history).
     """
     sd = _scan_dir(radar_dir)
     if not sd.exists():
@@ -111,7 +137,16 @@ def save_scan(radar_dir: Path, topics, scan_meta: dict) -> Path:
 
     Idempotent-ish: writes one file per call, never overwrites. The most
     recent file is the live "previous scan" for the next run.
+
+    Atomic write per spec §14:
+      1. write to <target>.tmp
+      2. fsync (best-effort)
+      3. os.replace(tmp, target) -- atomic on POSIX and Windows
+
+    If the process is killed mid-write, the target file is unchanged
+    and a stale .tmp may remain (harmless).
     """
+    import os
     sd = _scan_dir(Path(radar_dir))
     sd.mkdir(parents=True, exist_ok=True)
     ts = scan_meta.get("started_at", "unknown").replace(":", "")
@@ -121,7 +156,17 @@ def save_scan(radar_dir: Path, topics, scan_meta: dict) -> Path:
         "meta": scan_meta,
         "topics": {t.content_key(): _topic_min(t) for t in topics},
     }
-    target.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp = target.with_suffix(".json.tmp")
+    data = json.dumps(payload, ensure_ascii=False, indent=2)
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write(data)
+        try:
+            f.flush()
+            os.fsync(f.fileno())
+        except (OSError, AttributeError):
+            # fsync may not be available on some platforms; non-fatal
+            pass
+    os.replace(tmp, target)
     return target
 
 
