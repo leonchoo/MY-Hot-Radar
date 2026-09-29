@@ -1,6 +1,7 @@
 """
 Performance & Market Intelligence Agent — P1 (Foundation) + P2 (Story
-Clustering) + P3-A (Adapter Foundation).
+Clustering) + P3-A (Adapter Foundation) + Android Bridge (pre-P3-B
+design contract).
 
 This module is the **observation** layer. It does NOT predict,
 recommend, scrape, or change the News Radar.
@@ -46,6 +47,20 @@ P3-A scope (added):
     one batch, source/platform identity preserved.
   * NO Facebook/Instagram/TikTok/YouTube/X API integration.
   * NO login bypass, NO anti-bot bypass, NO scraping of private data.
+
+Android Bridge scope (added; pre-P3-B design only):
+  * Defines the agreed wire shape Android Collector hands to
+    MY Hot Radar (AndroidObservationInput).
+  * Evidence reference type (SCREENSHOT / UI_TEXT / UI_NODE / OCR /
+    COMPOSITE) — metadata only, never binary.
+  * Validation rules specific to Android-collected observations.
+  * Translation layer AndroidObservationInput -> P3-A
+    AdapterObservation (preserving None semantics, publisher
+    identity, platform separation).
+  * NO actual Android / ADB / Facebook / Instagram / YouTube
+    integration code lives in MY Hot Radar.
+  * Waits for android-collector's first-stage verification before
+    P3-B can be designed.
 
 All public functions are pure. Persistence is the only side-effecting
 layer, separated into PerformanceStore.
@@ -152,6 +167,19 @@ from .adapters import (
     check_observation_quality,
     validate_adapter_result,
 )
+from .android_bridge import (
+    ANDROID_BRIDGE_SOURCE_PREFIX,
+    AndroidObservationInput,
+    AndroidValidationIssue,
+    Evidence,
+    EvidenceType,
+    batch_to_adapter_dicts,
+    build_adapter_result_from_android_batch,
+    derive_content_id,
+    to_adapter_observation,
+    validate_android_batch,
+    validate_android_observation,
+)
 
 
 __all__ = [
@@ -232,6 +260,18 @@ __all__ = [
     "BERNAMA_PLATFORM",
     "check_observation_quality",
     "validate_adapter_result",
+    # Android Bridge (pre-P3-B design)
+    "EvidenceType",
+    "Evidence",
+    "AndroidObservationInput",
+    "AndroidValidationIssue",
+    "ANDROID_BRIDGE_SOURCE_PREFIX",
+    "derive_content_id",
+    "to_adapter_observation",
+    "batch_to_adapter_dicts",
+    "build_adapter_result_from_android_batch",
+    "validate_android_observation",
+    "validate_android_batch",
     # storage
     "DEFAULT_PERFORMANCE_DATA_DIR",
     "PerformanceStore",

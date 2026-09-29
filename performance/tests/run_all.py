@@ -24,6 +24,7 @@ def main() -> int:
         "performance.tests.test_performance",
         "performance.tests.test_story",
         "performance.tests.test_adapters",
+        "performance.tests.test_android_bridge",
     ]
     failures = []
     for mod in modules:
