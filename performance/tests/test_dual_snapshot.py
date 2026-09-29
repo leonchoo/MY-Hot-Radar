@@ -292,17 +292,21 @@ def test_deterministic_observation_preserves_none_for_all_metrics():
 def test_deterministic_velocity_not_fabricated_when_delta_none():
     """Even when elapsed_seconds > 0, *_per_hour stays None when
     the underlying delta is None. No division-by-elapsed fabrication.
+
+    Uses real BERNAMA content_id from cached fetch but hardcoded
+    captured_at to avoid wall-clock coupling.
     """
+    # Get a real BERNAMA content_id but pin captured_at to fixed values
     res = _fetch_via_cache()
     snap1 = PerformanceSnapshot(
         content_id=res.observations[0].content_id,
-        captured_at=res.observations[0].observed_at,
+        captured_at="2026-09-29T10:00:00Z",
         views=None, likes=None, comments=None, shares=None, reposts=None,
     )
-    # Force a large elapsed window
+    # Force a large elapsed window (>= 1s later, fixed)
     snap2 = PerformanceSnapshot(
         content_id=snap1.content_id,
-        captured_at="2026-09-29T20:00:00Z",
+        captured_at="2026-09-29T15:00:00Z",  # 5 hours later
         views=None, likes=None, comments=None, shares=None, reposts=None,
     )
     obs = compute_observation(snap1, snap2)
@@ -345,16 +349,19 @@ def test_deterministic_classify_returns_insufficient_data():
     """With all metrics None, classify_performance must return
     INSUFFICIENT_DATA — not STABLE, not EARLY_SPIKE, not any
     growth class. It must NOT guess.
+
+    Uses real BERNAMA content_id but hardcoded captured_at to
+    avoid wall-clock coupling.
     """
     res = _fetch_via_cache()
     snap1 = PerformanceSnapshot(
         content_id=res.observations[0].content_id,
-        captured_at=res.observations[0].observed_at,
+        captured_at="2026-09-29T10:00:00Z",
         views=None, likes=None, comments=None, shares=None, reposts=None,
     )
     snap2 = PerformanceSnapshot(
         content_id=snap1.content_id,
-        captured_at="2026-09-29T20:00:00Z",
+        captured_at="2026-09-29T15:00:00Z",  # 5 hours later
         views=None, likes=None, comments=None, shares=None, reposts=None,
     )
     obs = compute_observation(snap1, snap2)
@@ -368,22 +375,26 @@ def test_deterministic_classify_returns_insufficient_data():
 def test_deterministic_same_article_two_snapshots_compose():
     """Two snapshots of the SAME article must compose into an
     observation. Different articles must NOT.
+
+    Uses real BERNAMA content_ids from cached fetch but hardcoded
+    captured_at to avoid wall-clock coupling.
     """
     res = _fetch_via_cache()
     assert len(res.observations) >= 2
     a = res.observations[0]
     b = res.observations[1]
+    # Use hardcoded captured_at that is always monotonic
     snap_a = PerformanceSnapshot(
-        content_id=a.content_id, captured_at=a.observed_at,
+        content_id=a.content_id, captured_at="2026-09-29T10:00:00Z",
         views=None, likes=None, comments=None, shares=None, reposts=None,
     )
     snap_a_later = PerformanceSnapshot(
         content_id=a.content_id,
-        captured_at="2026-09-29T20:00:00Z",
+        captured_at="2026-09-29T11:00:00Z",  # 1 hour later
         views=None, likes=None, comments=None, shares=None, reposts=None,
     )
     snap_b = PerformanceSnapshot(
-        content_id=b.content_id, captured_at=b.observed_at,
+        content_id=b.content_id, captured_at="2026-09-29T10:00:00Z",
         views=None, likes=None, comments=None, shares=None, reposts=None,
     )
     # Same article -> composes
