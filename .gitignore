@@ -19,6 +19,7 @@ npm-debug.log*
 
 # Radar runtime data (not part of the public website)
 /radar_data/
+/performance_data/
 /.pytest_cache/
 
 # Python bytecode (added after first radar scan)
