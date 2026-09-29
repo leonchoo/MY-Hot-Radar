@@ -22,6 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 def main() -> int:
     modules = [
         "performance.tests.test_performance",
+        "performance.tests.test_story",
     ]
     failures = []
     for mod in modules:

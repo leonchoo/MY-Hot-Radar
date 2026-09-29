@@ -1,5 +1,5 @@
 """
-Performance & Market Intelligence Agent — P1 (Foundation).
+Performance & Market Intelligence Agent — P1 (Foundation) + P2 (Story Clustering).
 
 This module is the **observation** layer. It does NOT predict,
 recommend, scrape, or change the News Radar.
@@ -17,13 +17,24 @@ P1 scope:
   * Synthetic fixture helpers, clearly marked SYNTHETIC.
   * NO crawler, NO API, NO LLM, NO auto-publishing.
 
+P2 scope (added):
+  * StoryCluster — multiple media coverage of the same event.
+  * StoryMatch — explainable match result with reasons.
+  * PackagingSnapshot — descriptive features of how a publisher
+    packaged a single piece of content.
+  * StoryComparison — observed performance across cluster members
+    (no ranking, no normalization, null-safe).
+  * Deterministic same-story matching (no LLM, no embedding API).
+  * Deterministic feature extraction for headline / caption / image.
+  * SYNTHETIC story-cluster fixtures.
+
 All public functions are pure. Persistence is the only side-effecting
 layer, separated into PerformanceStore.
 """
 
 from __future__ import annotations
 
-PERFORMANCE_SCHEMA_VERSION = 1
+PERFORMANCE_SCHEMA_VERSION = 2
 
 from .enums import (
     InsightScope,
@@ -78,6 +89,33 @@ from .fixtures import (
     make_synthetic_market_content,
     make_synthetic_own_content,
 )
+from .story import (
+    JACCARD_HIGH,
+    JACCARD_MEDIUM,
+    DATE_PROXIMITY_MAX_HOURS,
+    IMAGE_TYPES,
+    NORMALIZED_COMPARISON_UNAVAILABLE,
+    MemberPerformance,
+    PackagingSnapshot,
+    StoryCluster,
+    StoryComparison,
+    StoryMatch,
+    StoryMember,
+    build_packaging_snapshot,
+    build_story_comparison,
+    extract_headline_features,
+    extract_known_entities,
+    extract_locations,
+    jaccard_similarity,
+    match_stories,
+    minutes_between,
+    normalize_title,
+    normalize_title_stemmed,
+    story_cluster_id_for,
+    timing_offsets,
+    validate_packaging_snapshot,
+    validate_story_cluster,
+)
 
 
 __all__ = [
@@ -94,6 +132,15 @@ __all__ = [
     "ContentFeatureSnapshot",
     "MarketObservation",
     "Insight",
+    # P2 story models
+    "StoryCluster",
+    "StoryMember",
+    "StoryMatch",
+    "PackagingSnapshot",
+    "StoryComparison",
+    "MemberPerformance",
+    "NORMALIZED_COMPARISON_UNAVAILABLE",
+    "IMAGE_TYPES",
     # validation
     "ValidationError",
     "validate_content_identity",
@@ -101,12 +148,15 @@ __all__ = [
     "validate_feature_snapshot",
     "validate_market_observation",
     "validate_insight",
+    "validate_story_cluster",
+    "validate_packaging_snapshot",
     # ids
     "content_id_for",
     "snapshot_id_for",
     "observation_id_for",
     "feature_id_for",
     "market_observation_id_for",
+    "story_cluster_id_for",
     # analysis
     "compute_observation",
     "engagement_total",
@@ -115,6 +165,21 @@ __all__ = [
     "classify_performance",
     "classify_late_breakout",
     "extract_features",
+    # P2 helpers
+    "match_stories",
+    "extract_headline_features",
+    "extract_locations",
+    "extract_known_entities",
+    "normalize_title",
+    "normalize_title_stemmed",
+    "jaccard_similarity",
+    "build_packaging_snapshot",
+    "build_story_comparison",
+    "minutes_between",
+    "timing_offsets",
+    "JACCARD_HIGH",
+    "JACCARD_MEDIUM",
+    "DATE_PROXIMITY_MAX_HOURS",
     # storage
     "DEFAULT_PERFORMANCE_DATA_DIR",
     "PerformanceStore",
