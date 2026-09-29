@@ -232,8 +232,14 @@ class PerformanceStore:
         # Sanitize timestamps for filesystem
         safe_from = obs.from_captured_at.replace(":", "-").replace("+", "p")
         safe_to = obs.to_captured_at.replace(":", "-").replace("+", "p")
+        # P3-B-4: include observation_id in filename for indexing.
+        # Filename keeps (content_id, from, to) tuple ordering so
+        # two observations of the same content with different
+        # timestamps land in different files; same (from, to)
+        # overwrite (idempotent).
+        oid = obs.observation_id or "unidentified"
         path = self.observations_dir / (
-            f"{obs.content_id}__{safe_from}__{safe_to}.json"
+            f"{obs.content_id}__{safe_from}__{safe_to}__{oid}.json"
         )
         _atomic_write_json(path, payload)
         return path

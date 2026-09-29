@@ -28,6 +28,7 @@ from .models import (
     PerformanceSnapshot,
 )
 from .validation import parse_timestamp_any, utcnow, iso_utc
+from .ids import observation_id_for
 
 
 # ============================================================================
@@ -89,6 +90,15 @@ def compute_observation(snap_old, snap_new):
     ld = _safe_delta(snap_old.likes, snap_new.likes)
     cd = _safe_delta(snap_old.comments, snap_new.comments)
     sd = _safe_delta(snap_old.shares, snap_new.shares)
+    # P3-B-4: stamp a deterministic observation_id. Same content
+    # with same (from, to) timestamps -> same id. Different
+    # timestamps -> different ids. This is the basis for the
+    # repeated-snapshot scheduler's history integrity.
+    obs_id = observation_id_for(
+        content_id=snap_new.content_id,
+        from_captured_at=snap_old.captured_at,
+        to_captured_at=snap_new.captured_at,
+    )
     return PerformanceObservation(
         content_id=snap_new.content_id,
         from_captured_at=snap_old.captured_at,
@@ -102,6 +112,7 @@ def compute_observation(snap_old, snap_new):
         likes_per_hour=_per_hour(ld, elapsed),
         comments_per_hour=_per_hour(cd, elapsed),
         shares_per_hour=_per_hour(sd, elapsed),
+        observation_id=obs_id,
     )
 
 

@@ -113,6 +113,14 @@ from .store import (
     PerformanceStore,
     SyntheticFixtureError,
 )
+from .scheduler import (
+    ExecutionLog,
+    ExecutionRecord,
+    ExecutionStatus,
+    SchedulerLock,
+    SchedulerLockError,
+    run_once as scheduler_run_once,
+)
 from .fixtures import (
     SYNTHETIC_TAG,
     all_synthetic_fixtures,
@@ -282,6 +290,13 @@ __all__ = [
     "DEFAULT_PERFORMANCE_DATA_DIR",
     "PerformanceStore",
     "SyntheticFixtureError",
+    # scheduler foundation
+    "ExecutionStatus",
+    "ExecutionRecord",
+    "ExecutionLog",
+    "SchedulerLock",
+    "SchedulerLockError",
+    "scheduler_run_once",
     # fixtures (test-only)
     "SYNTHETIC_TAG",
     "make_synthetic_article_a",

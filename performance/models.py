@@ -103,7 +103,15 @@ class PerformanceSnapshot:
 
 @dataclass
 class PerformanceObservation:
-    """Change between two snapshots, plus derived velocity metrics."""
+    """Change between two snapshots, plus derived velocity metrics.
+
+    ``observation_id`` is a deterministic id derived from
+    (content_id, from_captured_at, to_captured_at). Two observations
+    of the same content with different timestamps produce different
+    observation_ids. ``None`` is permitted for in-flight or
+    pre-construction observations; the actual id is stamped by
+    ``compute_observation()`` before persistence.
+    """
     content_id: str
     from_captured_at: str
     to_captured_at: str
@@ -116,9 +124,13 @@ class PerformanceObservation:
     likes_per_hour: Optional[float]
     comments_per_hour: Optional[float]
     shares_per_hour: Optional[float]
+    observation_id: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        d = asdict(self)
+        # observation_id may be None for in-flight observations;
+        # we keep it in the dict so persistence is symmetric.
+        return d
 
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> "PerformanceObservation":
@@ -135,6 +147,7 @@ class PerformanceObservation:
             likes_per_hour=d.get("likes_per_hour"),
             comments_per_hour=d.get("comments_per_hour"),
             shares_per_hour=d.get("shares_per_hour"),
+            observation_id=d.get("observation_id"),
         )
 
 
