@@ -27,6 +27,7 @@ def main() -> int:
         "radar.tests.test_stability",
         "radar.tests.test_tier_a",
         "radar.tests.test_source_scope",
+        "radar.tests.test_tier_b_review",
     ]
     failures = []
     for mod in modules:
