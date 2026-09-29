@@ -28,6 +28,7 @@ def main() -> int:
         "performance.tests.test_real_adapter_persistence",
         "performance.tests.test_dual_snapshot",
         "performance.tests.test_category_extraction",
+        "performance.tests.test_category_propagation",
     ]
     failures = []
     for mod in modules:

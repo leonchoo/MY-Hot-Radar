@@ -74,12 +74,22 @@ SUPPORT_REASONS = {
 
 @dataclass
 class StoryMember:
-    """A single content record that is part of a StoryCluster."""
+    """A single content record that is part of a StoryCluster.
+
+    ``source_category`` is the per-row category as published by the
+    source itself (BERNAMA writes ``World : title`` and we capture
+    that as ``"WORLD"`` in P3-B-3). It is independent from
+    ``StoryCluster.category`` (which is the propagated story-level
+    category set by ``derive_story_cluster_category``). A StoryMember
+    may have ``source_category = None`` when the source did not
+    publish a recognized category prefix.
+    """
     content_id: str
     publisher: str
     platform: Platform
     published_at: str
     url: str
+    source_category: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         d = asdict(self)
@@ -131,6 +141,9 @@ class StoryCluster:
                     platform=Platform(m["platform"]),
                     published_at=m["published_at"],
                     url=m["url"],
+                    # source_category is optional; old JSON may not
+                    # carry it. Default to None when missing.
+                    source_category=m.get("source_category"),
                 ) for m in d["members"]
             ],
         )
@@ -655,6 +668,150 @@ def validate_story_cluster(c: StoryCluster) -> None:
             raise ValidationError(
                 f"member.published_at not valid: {m.published_at!r}"
             )
+        # P3-B-5: source_category is optional per member; when present,
+        # it must be a short canonical string (e.g. "WORLD"). We do
+        # NOT validate it against a whitelist here — different
+        # publishers may emit different vocabularies.
+        if m.source_category is not None:
+            validate_str(
+                "member.source_category", m.source_category, max_len=64
+            )
+
+
+# ============================================================================
+# P3-B-5: StoryCluster category propagation
+# ============================================================================
+#
+# Propagating the source-provided category from a StoryCluster's
+# members into the cluster-level ``StoryCluster.category`` is a
+# conservative, explainable operation. We DO NOT classify, infer,
+# vote, or rank. We only forward what members already agree on.
+#
+# Strict rules (per P3-B-5 spec):
+#
+#   Case A — All members have source_category AND they agree:
+#               propagate that category.
+#   Case B — Partial coverage (some members None, others have a
+#            category): cluster.category = None.
+#               We do NOT guess, impute, or vote.
+#   Case C — Members carry CONFLICTING categories (e.g. WORLD vs
+#            SPORTS): cluster.category = None; conflict flag is set.
+#   Case D — No members have any category: cluster.category = None.
+#   Case E — Single member: propagate iff it carries a category.
+#               A lone member is its own corroboration.
+#
+# IMPORTANT — what this is NOT:
+#
+#   * NOT a classifier. We do not look at titles, URLs,
+#     publishers, or any other signal. Only the literal
+#     ``StoryMember.source_category`` values.
+#   * NOT a vote. Case B explicitly refuses voting.
+#   * NOT a resolution of conflict. Case C returns None on conflict.
+#   * NOT a rank, score, or normalization.
+#
+# The audit metadata (``StoryCategoryPropagation``) is the
+# documented trail of HOW the propagated category was derived.
+# ``StoryCluster.category`` stays a simple ``str`` field; the
+# audit info is returned alongside it, not stored on the cluster.
+
+@dataclass
+class StoryCategoryPropagation:
+    """Audit metadata for ``derive_story_cluster_category``.
+
+    This is a pure result object. It is not stored on
+    ``StoryCluster``; callers that want the audit trail keep this
+    object separately.
+
+    Fields:
+
+      * ``category`` — the propagated story-level category. ``None``
+        when unresolved (Case B / C / D / single-None).
+      * ``conflict`` — ``True`` iff at least two members carry
+        DIFFERENT non-None categories. ``False`` in Case A, Case B,
+        Case D, Case E.
+      * ``has_any`` — ``True`` iff at least one member carries a
+        non-None source_category. Useful for distinguishing "no
+        member published a category" from "members disagree".
+      * ``member_count`` — number of members passed in.
+      * ``known_count`` — number of members with non-None category.
+    """
+    category: Optional[str]
+    conflict: bool
+    has_any: bool
+    member_count: int
+    known_count: int
+
+
+def derive_story_cluster_category(
+    members: List[StoryMember],
+) -> StoryCategoryPropagation:
+    """Propagate source_category from members to cluster.category.
+
+    Strict (see module docstring). Returns a
+    ``StoryCategoryPropagation`` with the propagated category and
+    audit metadata. Never raises.
+
+    Examples:
+
+      * members = []                                -> None, no conflict
+      * members = [WORLD]                           -> WORLD, single
+      * members = [None]                            -> None, single unknown
+      * members = [WORLD, WORLD, WORLD]             -> WORLD
+      * members = [WORLD, None, None]               -> None (Case B)
+      * members = [WORLD, SPORTS]                   -> None + conflict=True
+      * members = [None, None, None]                -> None (Case D)
+
+    The original ``members`` list is not mutated.
+    """
+    member_count = len(members)
+    known: List[str] = [
+        m.source_category for m in members if m.source_category is not None
+    ]
+    known_count = len(known)
+    has_any = known_count > 0
+
+    # Case D: no member carries a category.
+    if known_count == 0:
+        return StoryCategoryPropagation(
+            category=None,
+            conflict=False,
+            has_any=False,
+            member_count=member_count,
+            known_count=0,
+        )
+
+    # Detect conflict: at least two distinct non-None values.
+    distinct = set(known)
+    if len(distinct) >= 2:
+        return StoryCategoryPropagation(
+            category=None,
+            conflict=True,
+            has_any=True,
+            member_count=member_count,
+            known_count=known_count,
+        )
+
+    # Single distinct category. Now check coverage.
+    the_category = next(iter(distinct))
+    if known_count == member_count:
+        # Case A: every member agrees.
+        return StoryCategoryPropagation(
+            category=the_category,
+            conflict=False,
+            has_any=True,
+            member_count=member_count,
+            known_count=known_count,
+        )
+
+    # Case B: partial coverage (some members None, others agree).
+    # Don't guess. Return None.
+    return StoryCategoryPropagation(
+        category=None,
+        conflict=False,
+        has_any=True,
+        member_count=member_count,
+        known_count=known_count,
+    )
 
 
 def validate_packaging_snapshot(p: PackagingSnapshot) -> None:
