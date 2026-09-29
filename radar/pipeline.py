@@ -88,8 +88,16 @@ def run_scan(
     extra_stories: List[Story] | None = None,
     since_previous: bool = True,
     radar_dir: str | os.PathLike | None = None,
+    return_internals: bool = False,
 ) -> dict:
-    """Execute one radar scan. Returns a dict summary suitable for inspection."""
+    """Execute one radar scan. Returns a dict summary suitable for inspection.
+
+    When `return_internals=True`, the returned dict additionally contains:
+      - "topics": List[Topic]          (the in-memory Topic objects)
+      - "stories_by_id": Dict[str, Story]  (story_id -> Story mapping)
+    These keys are NOT present when `return_internals=False` (the default)
+    so existing callers are unaffected.
+    """
     radar_dir = Path(radar_dir) if radar_dir else Path(__file__).resolve().parents[1] / "radar_data"
     radar_dir.mkdir(parents=True, exist_ok=True)
 
@@ -178,13 +186,20 @@ def run_scan(
         "topics_produced": len(topics),
     })
 
-    return {
+    result = {
         "ok": True,
         "topics_count": len(topics),
         "stories_count": len(all_stories),
         "source_status": source_status,
         "report_paths": report_paths,
     }
+    if return_internals:
+        # Build a stories_by_id map. Story ids may be re-generated
+        # by the adapter; we use the existing story.id as the key.
+        stories_by_id = {s.id: s for s in all_stories if getattr(s, "id", None)}
+        result["topics"] = topics
+        result["stories_by_id"] = stories_by_id
+    return result
 
 
 if __name__ == "__main__":

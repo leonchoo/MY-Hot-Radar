@@ -347,10 +347,14 @@ def run_once(
     try:
         # Invoke the scan entry point. We pass radar_dir through to
         # run_scan so history writes to the same dir as the lock/log.
+        # We also pass return_internals=True so the output layer can
+        # build a structured Radar output from the in-memory topics
+        # + stories.
         try:
             summary = run_scan(
                 extra_stories=extra_stories,
                 radar_dir=str(radar_dir),
+                return_internals=True,
             )
         except Exception as e:
             # Catastrophic failure: scan pipeline itself raised
@@ -393,6 +397,26 @@ def run_once(
                 f"all {record.source_count} sources failed; "
                 f"snapshot may still have been written"
             )
+
+        # Phase 2 Batch 3A: also generate the structured Radar output.
+        # Output generation is best-effort: a validation failure here
+        # MUST NOT cause the scheduler to report FAILED (the scan
+        # itself succeeded). Output failures are logged but do not
+        # affect the execution status.
+        try:
+            from .output import _generate_output_from_scan_summary
+            _generate_output_from_scan_summary(
+                summary=summary,
+                scan_id=record.scan_id,
+                scan_status=record.status,
+                started_at=record.started_at,
+                radar_dir=radar_dir,
+            )
+        except Exception as e:
+            # Don't fail the scan just because output failed.
+            # Append a warning to the record error (preserved as text).
+            warn = f"output_generation_warning: {type(e).__name__}: {e}"
+            record.error = warn if not record.error else f"{record.error}; {warn}"
 
         record.finished_at = _now_iso()
         ExecutionLog(log_path).append(record)
