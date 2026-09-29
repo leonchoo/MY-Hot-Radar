@@ -165,6 +165,7 @@ from .adapters import (
     SyntheticAdapter,
     SyntheticAdapterRecord,
     check_observation_quality,
+    extract_source_category_from_title,
     validate_adapter_result,
 )
 from .android_bridge import (
@@ -258,6 +259,7 @@ __all__ = [
     "BernamaRssAdapter",
     "BERNAMA_RSS_URL",
     "BERNAMA_PLATFORM",
+    "extract_source_category_from_title",
     "check_observation_quality",
     "validate_adapter_result",
     # Android Bridge (pre-P3-B design)

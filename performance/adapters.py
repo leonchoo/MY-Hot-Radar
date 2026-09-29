@@ -645,6 +645,19 @@ class BernamaRssAdapter(PublicPerformanceAdapter):
         # Deterministic content_id derived from the canonical URL.
         # Same URL across fetches -> same id -> P1 dedup works.
         content_id = _content_id_from_url(url)
+        # P3-B-3: source-provided category prefix extraction. We
+        # only surface the prefix when BERNAMA has written a
+        # recognized prefix into the title. The original title is
+        # preserved verbatim — we never strip or modify it. The
+        # result goes into ``extra["source_category"]``; if no
+        # recognized prefix, the field is absent (we never emit
+        # ``source_category: null``).
+        extra: Dict[str, Any] = {}
+        if description:
+            extra["description_excerpt"] = description[:200]
+        source_category = extract_source_category_from_title(title)
+        if source_category is not None:
+            extra["source_category"] = source_category
         return AdapterObservation(
             content_id=content_id,
             platform=BERNAMA_PLATFORM,
@@ -665,7 +678,7 @@ class BernamaRssAdapter(PublicPerformanceAdapter):
             unavailable_reason=(
                 "engagement_metrics_not_exposed_by_source"
             ),
-            extra={"description_excerpt": description[:200]} if description else {},
+            extra=extra,
         )
 
     def _error_result(self, started: str, reason: str) -> AdapterResult:
@@ -823,6 +836,91 @@ def _parse_description_date(s: str, anchor_year: int) -> Optional[str]:
     return iso_utc(dt)
 
 
+# ============================================================================
+# BERNAMA title-prefix category extraction (P3-B-3)
+# ============================================================================
+#
+# BERNAMA's English RSS feed annotates every item title with a
+# publisher-supplied category prefix, e.g. "World : ...", "Business :
+# ...", "General : ...". We surface this signal as a structured
+# ``extra["source_category"]`` field on the AdapterObservation.
+#
+# IMPORTANT — what this is and what it is NOT:
+#
+# * This is a SOURCE-PROVIDED prefix extraction. BERNAMA tells us the
+#   category by literally writing it into the title.
+# * It is NOT a classifier. We do not run ML, keywords, NER, or
+#   LLM on the title body.
+# * It is NOT a story-level category. StoryCluster already carries a
+#   separate ``category`` field; that is set by StoryCluster's own
+#   classification logic, not here.
+# * It is NOT a general news taxonomy. We only normalize the exact
+#   words that BERNAMA emits. We do not expand to synonyms,
+#   hierarchies, or broader topics.
+#
+# The recognition set is intentionally narrow:
+#
+#   * WORLD       — "World : ..."
+#   * BUSINESS    — "Business : ..."
+#   * GENERAL     — "General : ..."
+#   * SPORTS      — "Sport : ..." and "Sports : ..."
+#   * LIFESTYLE   — "Lifestyle : ..."
+#
+# Any other prefix → ``None`` (unknown → null). We do NOT guess.
+#
+# Format tolerance:
+#
+#   * Case-insensitive: "world : ...", "WORLD : ...", "World : ..."
+#     all map to WORLD.
+#   * Whitespace-tolerant: "World: ...", "World : ...", "World  :  ..."
+#     all map to WORLD.
+#
+# Anti-patterns we explicitly refuse:
+#
+#   * "The World Economic Forum" mid-title → None (not a prefix).
+#   * "World" appearing anywhere except position 0 (before first ':')
+#     → None.
+#   * Any keyword in the description body → None (we only look at title).
+#   * URL-based inference → None (we only look at title).
+#   * Source-name inference → None (we only look at title).
+
+# Map BERNAMA's emitted prefix (uppercased) -> canonical category code.
+# Keep this list tight; every key must be a confirmed BERNAMA prefix.
+_BERNAMA_TITLE_PREFIX_CATEGORIES = {
+    "WORLD":     "WORLD",
+    "BUSINESS":  "BUSINESS",
+    "GENERAL":   "GENERAL",
+    "SPORT":     "SPORTS",   # BERNAMA emits "Sport" (singular)
+    "SPORTS":    "SPORTS",   # tolerate "Sports" if it ever appears
+    "LIFESTYLE": "LIFESTYLE",
+}
+
+# Anchor on the exact "PREFIX : TITLE" pattern at the start of the
+# title string. The prefix must be a single ASCII word (letters only)
+# followed by whitespace and a colon.
+_BERNAMA_PREFIX_RE = re.compile(
+    r"^\s*([A-Za-z]+)\s*:\s*(.*)$"
+)
+
+
+def extract_source_category_from_title(title: str) -> Optional[str]:
+    """Extract a BERNAMA source-provided category from a title.
+
+    Returns the canonical category code (e.g. "WORLD") if and only if
+    the title begins with a recognized BERNAMA prefix in the format
+    ``Category Name : rest of title``. Returns ``None`` otherwise.
+
+    Never raises. Never mutates the title.
+    """
+    if not title:
+        return None
+    m = _BERNAMA_PREFIX_RE.match(title)
+    if not m:
+        return None
+    prefix_word = m.group(1).strip().upper()
+    return _BERNAMA_TITLE_PREFIX_CATEGORIES.get(prefix_word)
+
+
 def _content_id_from_url(url: str) -> str:
     """Deterministic content_id from a URL (SHA-256 prefix)."""
     import hashlib
@@ -850,6 +948,7 @@ __all__ = [
     "BernamaRssAdapter",
     "BERNAMA_RSS_URL",
     "BERNAMA_PLATFORM",
+    "extract_source_category_from_title",
     "check_observation_quality",
     "validate_adapter_result",
 ]
