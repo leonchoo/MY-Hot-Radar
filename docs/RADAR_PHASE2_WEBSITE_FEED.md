@@ -92,7 +92,8 @@ C:\MY-Hot-Radar
                                 ▼
                   ┌─────────────────────────────────────┐
                   │   Cloudflare Pages                  │
-                  │   serves /radar/latest.json         │
+                  │   serves /public/radar/latest.json  │
+                  │   (no rewrite; repo path = URL path)│
                   └─────────────┬───────────────────────┘
                                 │ fetch()
                                 ▼
@@ -131,8 +132,14 @@ the runtime directory.
 
 **Solution**: a separate **public artifact** at `public/radar/latest.json`,
 written by `radar/public_output.py` from the validated internal output.
-This file is intended to be committed to Git. Cloudflare Pages serves
-it at `/radar/latest.json`.
+This file is committed to Git. Cloudflare Pages serves repo paths
+**literally** — `public/radar/latest.json` is served at
+**`https://myhotradar.com/public/radar/latest.json`**. There is no
+auto-rewriting. The JS adapter fetches from this exact URL.
+
+This is a real-world production observation, captured as a verified
+test (`test_js_adapter_uses_correct_public_url`) so future batches
+that move the file location must update the URL in lockstep.
 
 ### Why we are NOT auto-committing it
 
@@ -524,8 +531,8 @@ explicit fallback.
 | Phase 1 / Radar-1..6, Phase 2 B1..B3A | 248 | — | 248 |
 | **Phase 2 B3B-1** | | | |
 | `test_public_output.py` (34 tests) | — | 34 | 34 |
-| `test_radar_adapter.py` (31 tests) | — | 31 | 31 |
-| **Total** | 248 | **65** | **313** |
+| `test_radar_adapter.py` (32 tests) | — | 32 | 32 |
+| **Total** | 248 | **66** | **314** |
 
 Categories per spec §31:
 
@@ -537,14 +544,14 @@ Categories per spec §31:
 * Real-world integration (4) ✓
 * JS structure (4) ✓
 * Mirror tests (10) ✓
-* Host page integration (4) ✓
+* Host page integration (5) ✓
 * Public JSON integration (3) ✓
 * Source-attachment (2) ✓
 * Anti-fake-fact (3) ✓
 * Mobile / a11y (3) ✓
 * Existing pages unchanged (2) ✓
 
-> **All 313 tests PASS, 0 failures, 0 regressions.**
+> **All 314 tests PASS, 0 failures, 0 regressions.**
 
 Fault-injection (`radar/tests/fault_injection.py`) adds 10 additional
 scenarios (Test B / C / D / E / F / G / H / I / J / restore), all PASS.
@@ -760,15 +767,15 @@ Phase 2 Batch 3B-1 ships:
   validates, sanitises, and renders Radar topic cards.
 - 65 new tests (34 public-output + 31 radar-adapter) + 10 fault-injection
   scenarios + 12 server-side smoke checks, all PASS.
-- 0 regressions: **313/313 tests still PASS**.
+- 0 regressions: **314/314 tests still PASS**.
 
 The Radar now has a presence on the MY Hot Radar homepage while
 remaining clearly distinct from DEMO content, free of fake facts,
 and safe from URL injection or schema drift.
 
-Total project state: **313 tests PASS, 0 failures, 0 regressions,
+Total project state: **314 tests PASS, 0 failures, 0 regressions,
 11 batches shipped (Radar-1..6, Phase 2 B1/B2/B3A/B3B-1), working
-tree clean.**
+tree clean**.
 
 ---
 

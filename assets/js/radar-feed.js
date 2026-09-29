@@ -57,9 +57,14 @@
   // ---------- Config ----------
   var CONFIG = {
     // Public path served by Cloudflare Pages (relative to site root).
-    // The radar runtime writes to public/radar/latest.json, which Pages
-    // serves at this URL.
-    jsonUrl: '/radar/latest.json',
+    // The radar runtime writes to public/radar/latest.json (gitignored
+    // source) which is committed to the repo and served as
+    // /public/radar/latest.json. Cloudflare Pages maps repo paths
+    // 1:1 to URL paths — there is NO auto-rewriting away from /public/.
+    //
+    // If the project later moves this file to repo-root /radar/
+    // latest.json, change this URL to /radar/latest.json.
+    jsonUrl: '/public/radar/latest.json',
 
     // DOM id of the host element where Radar Feed will render.
     hostId: 'radar-feed-host',

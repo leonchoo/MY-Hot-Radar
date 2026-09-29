@@ -277,6 +277,19 @@ def test_index_html_includes_radar_feed_script():
           f"(host@{host_pos}, script@{script_pos})")
 
 
+def test_js_adapter_uses_correct_public_url():
+    """The JS adapter's jsonUrl points to the real production URL.
+
+    Cloudflare Pages serves repo path 'public/radar/latest.json' at
+    URL '/public/radar/latest.json'. The JS adapter MUST match.
+    """
+    src = JS_PATH.read_text(encoding="utf-8")
+    assert "jsonUrl: '/public/radar/latest.json'" in src, \
+        f"JS adapter jsonUrl must be '/public/radar/latest.json'"
+    print("PASS test_js_adapter_uses_correct_public_url "
+          "(points to /public/radar/latest.json)")
+
+
 def test_index_html_mvp_disclaimer_preserved():
     """The MVP disclaimer must still be present (per spec §17 / §9)."""
     html = INDEX_HTML.read_text(encoding="utf-8")
@@ -490,6 +503,7 @@ if __name__ == "__main__":
         test_index_html_has_radar_feed_host,
         test_index_html_has_loading_state,
         test_index_html_includes_radar_feed_script,
+        test_js_adapter_uses_correct_public_url,
         test_index_html_mvp_disclaimer_preserved,
         # Public JSON integration (3)
         test_public_latest_json_exists,

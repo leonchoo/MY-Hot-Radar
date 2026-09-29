@@ -2,22 +2,9 @@
 #
 # Defensive: Cloudflare Pages can fall back to serving the homepage
 # HTML for any path that doesn't match a static file (SPA-style
-# catch-all). This is documented behavior and shows up on
-# myhotradar.com: a request to /radar/latest.json returns the
-# homepage with Content-Type text/html when the file is not yet
-# deployed.
-#
-# To guarantee the JSON artifact is served with its real Content-Type
-# (application/json), we add explicit self-redirect rules for the
-# known public asset paths. These rules are no-ops when the file
-# exists (the static asset serves directly), but they force the
-# catch-all to step aside if the path would otherwise rewrite.
-#
-# See the static-site-mvp skill: Cloudflare Pages doesn't 404
-# missing paths — it falls back to index.html with text/html.
+# catch-all). The Radar Feed JSON artifact lives at
+# /public/radar/latest.json on the repo and is served at the
+# matching URL on production. No rewrite needed there.
 #
 # Format reference:
 #   https://developers.cloudflare.com/pages/configuration/redirects/
-
-# Radar Feed JSON artifact (Phase 2 B3B-1)
-/radar/latest.json   /radar/latest.json   200
