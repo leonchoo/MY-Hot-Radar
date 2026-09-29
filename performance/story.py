@@ -649,7 +649,17 @@ def validate_story_cluster(c: StoryCluster) -> None:
     for fname in ("created_at", "first_seen_at", "last_seen_at"):
         if parse_timestamp_any(getattr(c, fname)) is None:
             raise ValidationError(f"{fname} not valid: {getattr(c, fname)!r}")
-    for name in ("category", "topic_type", "geographic_scope"):
+    # P3-B-5 follow-up: StoryCluster.category may legitimately be the
+    # empty string "" when derive_story_cluster_category returned
+    # None (Case B / C / D / single-None). This aligns with P2's
+    # existing match_stories() convention where left_category="" /
+    # right_category="" means "no category -> skip the category
+    # check" instead of treating "" as a real category code that
+    # could collide with another cluster's category. topic_type and
+    # geographic_scope stay non-empty (separate fields; not changed
+    # by P3-B-5).
+    validate_str("category", c.category, max_len=64, allow_empty=True)
+    for name in ("topic_type", "geographic_scope"):
         validate_str(name, getattr(c, name), max_len=64)
     if not c.members:
         raise ValidationError("StoryCluster must have at least one member")

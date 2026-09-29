@@ -39,6 +39,7 @@ from performance import (
     StoryCluster,
     StoryMember,
     derive_story_cluster_category,
+    match_stories,
     validate_story_cluster,
 )
 
@@ -354,17 +355,21 @@ def test_propagation_does_not_alter_source_category_field():
 # ============================================================================
 # StoryCluster integration: build a cluster from derived category
 # ============================================================================
+#
+# Convention (P3-B-5 follow-up): when derive_story_cluster_category
+# returns None (Case B / C / D / single-None), the caller writes
+# "" into cluster.category. This aligns with P2's existing
+# match_stories() convention where left_category="" / right_category=""
+# means "no category -> skip the category check" instead of treating
+# "" as a real category code.
 
 def test_story_cluster_accepts_derived_category():
     """A StoryCluster built with the propagated category validates.
 
-    The cluster-level ``category`` field is a required ``str``. When
-    the propagation returns ``None``, we use the documented sentinel
-    ``"UNRESOLVED"`` to satisfy validation. This is a presentation
-    sentinel only; the per-member ``source_category`` field carries
-    the real audit trail.
+    When propagation returns the category ("WORLD"), it goes
+    straight into cluster.category. The per-member source_category
+    field is preserved as the audit trail.
     """
-    UNRESOLVED = "UNRESOLVED"
     members = [
         _make_member("c1", "bernama", Platform.WEBSITE, "2026-09-29T10:00:00Z",
                      "https://example.com/c1", source_category="WORLD"),
@@ -378,11 +383,10 @@ def test_story_cluster_accepts_derived_category():
         created_at="2026-09-29T10:00:00Z",
         first_seen_at="2026-09-29T10:00:00Z",
         last_seen_at="2026-09-29T11:00:00Z",
-        # Category field is required (str, not Optional). When the
-        # propagation returns None, we use the documented sentinel
-        # UNRESOLVED to satisfy validate_str. Per-member
-        # source_category is the authoritative signal.
-        category=prop.category if prop.category is not None else UNRESOLVED,
+        # When propagation returns a value, use it directly.
+        # When it returns None, callers should write "" (P2
+        # match_stories convention) — see below in this file.
+        category=prop.category if prop.category is not None else "",
         topic_type="news",
         geographic_scope="LOCAL",
         members=members,
@@ -395,11 +399,10 @@ def test_story_cluster_accepts_derived_category():
 
 
 def test_story_cluster_with_conflict_keeps_member_level_signal():
-    """When propagation finds a conflict, cluster.category uses the
-    ``UNRESOLVED`` sentinel but per-member source_category is
-    preserved for auditability.
+    """When propagation finds a conflict, cluster.category is set to
+    the empty string "" (P2 match_stories convention for unresolved)
+    while per-member source_category is preserved for auditability.
     """
-    UNRESOLVED = "UNRESOLVED"
     members = [
         _make_member("c1", "bernama", Platform.WEBSITE, "2026-09-29T10:00:00Z",
                      "https://example.com/c1", source_category="WORLD"),
@@ -414,22 +417,28 @@ def test_story_cluster_with_conflict_keeps_member_level_signal():
         created_at="2026-09-29T10:00:00Z",
         first_seen_at="2026-09-29T10:00:00Z",
         last_seen_at="2026-09-29T11:00:00Z",
-        category=UNRESOLVED,  # unresolved
+        # P2 convention: unresolved -> "" so match_stories skips
+        # the category check instead of treating "UNRESOLVED" as a
+        # real category that would falsely match another cluster's
+        # "UNRESOLVED".
+        category="",
         topic_type="news",
         geographic_scope="LOCAL",
         members=members,
     )
     validate_story_cluster(cluster)
-    # Cluster-level shows the sentinel
-    assert cluster.category == UNRESOLVED
-    # But per-member audit trail is intact
+    # Cluster-level shows the P2 empty-string convention
+    assert cluster.category == ""
+    # Per-member audit trail is intact
     assert cluster.members[0].source_category == "WORLD"
     assert cluster.members[1].source_category == "SPORTS"
 
 
 def test_story_cluster_serialization_round_trip_preserves_source_category():
-    """to_dict() + from_dict() preserves source_category on members."""
-    UNRESOLVED = "UNRESOLVED"
+    """to_dict() + from_dict() preserves source_category on members.
+
+    With P3-B-5 follow-up, cluster.category="" also round-trips.
+    """
     members = [
         _make_member("c1", "bernama", Platform.WEBSITE, "2026-09-29T10:00:00Z",
                      "https://example.com/c1", source_category="WORLD"),
@@ -442,7 +451,7 @@ def test_story_cluster_serialization_round_trip_preserves_source_category():
         created_at="2026-09-29T10:00:00Z",
         first_seen_at="2026-09-29T10:00:00Z",
         last_seen_at="2026-09-29T11:00:00Z",
-        category=UNRESOLVED,
+        category="",  # unresolved — P2 convention
         topic_type="news",
         geographic_scope="LOCAL",
         members=members,
@@ -453,8 +462,175 @@ def test_story_cluster_serialization_round_trip_preserves_source_category():
     rebuilt = StoryCluster.from_dict(parsed)
     assert rebuilt.members[0].source_category == "WORLD"
     assert rebuilt.members[1].source_category == "SPORTS"
-    # Cluster-level category round-trips (UNRESOLVED sentinel preserved)
-    assert rebuilt.category == UNRESOLVED
+    # Cluster-level category round-trips ("" preserved as "")
+    assert rebuilt.category == ""
+
+
+def test_validate_story_cluster_accepts_empty_category():
+    """P3-B-5 follow-up: validate_story_cluster accepts category=""
+    (was previously rejected by validate_str's default
+    allow_empty=False). This aligns cluster-level representation
+    with match_stories's ""-means-no-category convention.
+    """
+    cluster = StoryCluster(
+        story_cluster_id="sc_empty_cat",
+        canonical_topic_key="tk_empty",
+        created_at="2026-09-29T10:00:00Z",
+        first_seen_at="2026-09-29T10:00:00Z",
+        last_seen_at="2026-09-29T11:00:00Z",
+        category="",  # unresolved cluster-level category
+        topic_type="news",
+        geographic_scope="LOCAL",
+        members=[
+            _make_member("c1", "bernama", Platform.WEBSITE,
+                         "2026-09-29T10:00:00Z",
+                         "https://example.com/c1", source_category=None),
+        ],
+    )
+    # Must NOT raise
+    validate_story_cluster(cluster)
+
+
+def test_validate_story_cluster_rejects_empty_topic_type():
+    """Only category is loosened; topic_type and geographic_scope
+    remain required (non-empty). P3-B-5 follow-up intentionally
+    limits the change to category.
+    """
+    cluster = StoryCluster(
+        story_cluster_id="sc_empty_tt",
+        canonical_topic_key="tk_empty_tt",
+        created_at="2026-09-29T10:00:00Z",
+        first_seen_at="2026-09-29T10:00:00Z",
+        last_seen_at="2026-09-29T11:00:00Z",
+        category="WORLD",   # OK (non-empty)
+        topic_type="",      # still rejected
+        geographic_scope="LOCAL",
+        members=[
+            _make_member("c1", "bernama", Platform.WEBSITE,
+                         "2026-09-29T10:00:00Z",
+                         "https://example.com/c1", source_category="WORLD"),
+        ],
+    )
+    raised = False
+    try:
+        validate_story_cluster(cluster)
+    except Exception as e:
+        raised = True
+        assert "topic_type" in str(e).lower(), str(e)
+    assert raised, "empty topic_type must still be rejected"
+
+
+def test_validate_story_cluster_rejects_empty_geographic_scope():
+    """geographic_scope stays required (non-empty) — unchanged by
+    P3-B-5 follow-up.
+    """
+    cluster = StoryCluster(
+        story_cluster_id="sc_empty_geo",
+        canonical_topic_key="tk_empty_geo",
+        created_at="2026-09-29T10:00:00Z",
+        first_seen_at="2026-09-29T10:00:00Z",
+        last_seen_at="2026-09-29T11:00:00Z",
+        category="WORLD",
+        topic_type="news",
+        geographic_scope="",  # still rejected
+        members=[
+            _make_member("c1", "bernama", Platform.WEBSITE,
+                         "2026-09-29T10:00:00Z",
+                         "https://example.com/c1", source_category="WORLD"),
+        ],
+    )
+    raised = False
+    try:
+        validate_story_cluster(cluster)
+    except Exception as e:
+        raised = True
+        assert "geographic_scope" in str(e).lower(), str(e)
+    assert raised, "empty geographic_scope must still be rejected"
+
+
+# ============================================================================
+# CRITICAL REGRESSION — match_stories with empty vs "UNRESOLVED"
+# ============================================================================
+#
+# Before P3-B-5 follow-up, cluster.category="UNRESOLVED" was used as
+# a sentinel. But match_stories checks `left_category == right_category
+# and left_category != ""`, so two clusters both carrying
+# "UNRESOLVED" were treated as category-compatible and given a +0.2
+# match score bonus. This was a false-positive collision.
+#
+# With P3-B-5 follow-up, the cluster-level convention is "" (P2
+# match_stories convention). Two clusters both carrying "" must
+# NOT receive a category_compatible bonus. Two clusters both
+# carrying a real category ("WORLD") must STILL be treated as
+# compatible (existing behavior).
+
+def test_regression_empty_categories_dont_match_compatibly():
+    """Two clusters with cluster.category="" must NOT be treated as
+    category-compatible by match_stories.
+    """
+    m = match_stories(
+        left_content_id="c1",
+        right_content_id="c2",
+        left_title="Different title A",
+        right_title="Different title B",
+        left_published_at="2026-09-29T10:00:00Z",
+        right_published_at="2026-09-29T11:00:00Z",
+        left_category="",
+        right_category="",
+    )
+    # The category_compatible reason must NOT appear
+    assert "category_compatible" not in m.reasons, (
+        f"empty categories must not produce category_compatible; "
+        f"got reasons={m.reasons}"
+    )
+    # Score is below the categories-match-incompatibility threshold
+    # (no category_mismatch either, since both are empty -> skip).
+    assert m.score < 0.7, (
+        f"empty categories should keep score low; got {m.score}"
+    )
+
+
+def test_regression_real_categories_still_match_compatibly():
+    """Two clusters with cluster.category="WORLD" must still be
+    treated as category-compatible (existing P2 behavior preserved).
+    """
+    m = match_stories(
+        left_content_id="c1",
+        right_content_id="c2",
+        left_title="Similar enough headline here",
+        right_title="Similar enough headline there",
+        left_published_at="2026-09-29T10:00:00Z",
+        right_published_at="2026-09-29T11:00:00Z",
+        left_category="WORLD",
+        right_category="WORLD",
+    )
+    # The category_compatible reason MUST appear
+    assert "category_compatible" in m.reasons, (
+        f"matching real categories must produce category_compatible; "
+        f"got reasons={m.reasons}"
+    )
+
+
+def test_regression_unresolved_sentinel_no_longer_used():
+    """Sentinel regression: the literal string "UNRESOLVED" must not
+    be referenced by the production StoryCluster code path for
+    unresolved categories. Only the empty string "" is the P2
+    convention.
+
+    This test scans the production module (performance/story.py) for
+    the literal sentinel.
+    """
+    import re as _re
+    story_path = Path(r"C:\MY-Hot-Radar\performance\story.py")
+    text = story_path.read_text(encoding="utf-8")
+    # Find any reference to "UNRESOLVED" in the production module.
+    # We exclude docstrings/comments only for the assert's own docstring;
+    # the production file must not contain "UNRESOLVED" as a value.
+    matches = _re.findall(r'["\']UNRESOLVED["\']', text)
+    assert len(matches) == 0, (
+        f"production code (performance/story.py) must not use "
+        f'"UNRESOLVED" sentinel; found {len(matches)} occurrences'
+    )
 
 
 def test_story_cluster_from_dict_handles_old_json_without_source_category():
