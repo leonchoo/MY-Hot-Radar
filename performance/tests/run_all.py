@@ -29,6 +29,7 @@ def main() -> int:
         "performance.tests.test_dual_snapshot",
         "performance.tests.test_category_extraction",
         "performance.tests.test_category_propagation",
+        "performance.tests.test_bernama_cluster_integration",
     ]
     failures = []
     for mod in modules:
