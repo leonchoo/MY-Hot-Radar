@@ -191,6 +191,12 @@ from .android_bridge import (
     validate_android_batch,
     validate_android_observation,
 )
+from .adapters_facebook_hcb import (
+    FACEBOOK_HCB_SOURCE_NAME,
+    FacebookHcbAdapter,
+    FacebookHcbInput,
+    derive_hcb_content_id,
+)
 
 
 __all__ = [
@@ -286,6 +292,11 @@ __all__ = [
     "build_adapter_result_from_android_batch",
     "validate_android_observation",
     "validate_android_batch",
+    # Facebook HCB adapter (Phase 2B)
+    "FACEBOOK_HCB_SOURCE_NAME",
+    "FacebookHcbAdapter",
+    "FacebookHcbInput",
+    "derive_hcb_content_id",
     # storage
     "DEFAULT_PERFORMANCE_DATA_DIR",
     "PerformanceStore",
