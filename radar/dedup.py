@@ -18,7 +18,8 @@ Tunable thresholds live in radar.thresholds so changes don't scatter across file
 
 from __future__ import annotations
 
-from typing import List, Dict, Tuple, Set
+import re
+from typing import List, Dict, Tuple, Set, Optional
 from urllib.parse import urlsplit, urlunsplit
 
 from .models import Story, Topic, Category, VerificationStatus, SourceType, Language
@@ -29,11 +30,105 @@ from .normalize import (
 from .thresholds import (
     TITLE_JACCARD_THRESHOLD, KEYWORD_OVERLAP_THRESHOLD,
     ENTITY_MIN_OVERLAP, ENTITY_MIN_SHARE, EVENT_WINDOW_DAYS,
+    ENTITY_PATH_REQUIRE_DATE_BOTH_SIDES,
 )
 from .thresholds import (
     TITLE_JACCARD_THRESHOLD,
     KEYWORD_OVERLAP_THRESHOLD,
 )
+
+
+# ============================================================================
+# A2.3.2 — URL date extraction (Guard C helper)
+# ============================================================================
+#
+# HTML_LISTING adapters (Sin Chew, China Press, Kwong Wah) don't populate
+# ``Story.published_at``. However, their URL paths almost always embed a
+# date: either ``/YYYYMMDD/`` (most common, e.g.
+# ``https://mysinchew.sinchew.com.my/news/20260928/...``) or ``/YYYY/MM/DD/``
+# (e.g. FMT: ``.../2026/09/30/...``).
+#
+# The dedup signal needs an extra date source for these adapters. We extract
+# the date as a SEPARATE return value (an ISO ``YYYY-MM-DD`` string or
+# ``None``) without mutating ``Story.published_at`` or ``Story.url``.
+#
+# Date validation is strict:
+#   - 4-digit year in [1900, 2100]
+#   - month in [1, 12]
+#   - day in [1, max_day_in_that_month] (handles leap years)
+#
+# Both YYYYMMDD and YYYY/MM/DD patterns are tried; the first valid match wins.
+# 8-digit runs that don't form valid dates (month 13, day 32, Feb 30, etc.)
+# return ``None``.
+
+_URL_DATE_YYYYMMDD = re.compile(r"/(\d{4})(\d{2})(\d{2})(?:/|$|[^0-9])")
+_URL_DATE_YYYYMMDD_NO_SLASH = re.compile(r"(?:^|/|[^0-9])(\d{4})(\d{2})(\d{2})(?:/|$|[^0-9])")
+_URL_DATE_SLASHED = re.compile(r"/(\d{4})/(\d{1,2})/(\d{1,2})(?:/|$)")
+
+
+def _is_valid_yyyy_mm_dd(year: int, month: int, day: int) -> bool:
+    """Strict validation: year range, month range, day-of-month with leap-year handling."""
+    if not (1900 <= year <= 2100):
+        return False
+    if not (1 <= month <= 12):
+        return False
+    if not (1 <= day <= 31):
+        return False
+    # Days per month (index 0 = Jan)
+    days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    # Leap year adjustment for February
+    is_leap = (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0)
+    if is_leap:
+        days_in_month[1] = 29
+    return day <= days_in_month[month - 1]
+
+
+def _extract_date_from_url(url: str) -> Optional[str]:
+    """Try to extract an ISO date (``YYYY-MM-DD``) from a URL path.
+
+    Returns ``None`` if the URL is empty, malformed, or contains no valid
+    date pattern. The function is a pure read — it does NOT mutate the
+    ``Story.published_at`` field. URL-derived dates are passed to
+    ``_same_event_window`` as an optional fallback signal.
+
+    Patterns tried in order:
+      1. ``/YYYY/MM/DD/`` (FMT-style)
+      2. ``/YYYYMMDD/`` (Sin Chew / China Press / Kwong Wah style)
+
+    Invalid dates (month 13, day 32, Feb 30, etc.) are rejected.
+    """
+    if not url or not isinstance(url, str):
+        return None
+    try:
+        parts = urlsplit(url.strip())
+    except ValueError:
+        return None
+    path = parts.path
+
+    # Pattern 1: /YYYY/MM/DD/ (FMT)
+    m = _URL_DATE_SLASHED.search(path)
+    if m:
+        year, month, day = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        if _is_valid_yyyy_mm_dd(year, month, day):
+            return f"{year:04d}-{month:02d}-{day:02d}"
+
+    # Pattern 2: /YYYYMMDD/ (Sin Chew / China Press / Kwong Wah)
+    # We require a / or $ boundary before/after to avoid matching inside longer numbers
+    m = _URL_DATE_YYYYMMDD.search(path)
+    if m:
+        year, month, day = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        if _is_valid_yyyy_mm_dd(year, month, day):
+            return f"{year:04d}-{month:02d}-{day:02d}"
+
+    return None
+
+
+def _known_date(*candidates: Optional[str]) -> Optional[str]:
+    """Return the first non-empty string among ``candidates`` (used for date fallback chain)."""
+    for c in candidates:
+        if c:
+            return c
+    return None
 
 
 def canonicalize_url(u: str) -> str:
@@ -82,9 +177,50 @@ def _is_strong_match(a: Story, b: Story) -> bool:
         if (eo >= ENTITY_MIN_OVERLAP
                 and smaller > 0
                 and eo / smaller >= ENTITY_MIN_SHARE
-                and _same_event_window(a.published_at, b.published_at)):
+                and _entity_window_ok(a, b)):
             return True
     return False
+
+
+def _entity_window_ok(a: Story, b: Story) -> bool:
+    """A2.3.2 Guard C — date-confident window for the entity-overlap merge path.
+
+    Behavior matrix (when ENTITY_PATH_REQUIRE_DATE_BOTH_SIDES is True, default):
+
+      | pa | pb | url_a | url_b | Result | Rationale
+      |----|----|-------|-------|--------|----------
+      | ok | ok |  any  |  any  | _same_event_window(pa,pb) | Both dated → trust dates
+      | ok | -- |  any  |  any  | False | One side has date, other has no signal → fail-closed
+      | -- | ok |  any  |  any  | False | Same as above
+      | ok | -- |  --   | date  | False | Even URL date on other side differs → fail-closed
+      | -- | -- | date  |  --   | False | Same as above
+      | -- | -- | date  | date  | _same_event_window(url_a, url_b) | Both URL-dated → trust URL dates
+      | -- | -- |  --   |  --   | True  | Permissive fallback: no date info either side
+
+    Date fallback chain: ``published_at`` first, then ``_extract_date_from_url(url)``.
+
+    The keyword-overlap path, title-Jaccard path, and URL path are NOT
+    affected — they continue to use the original ``_same_event_window`` for
+    their date semantics. This guard specifically targets the entity-path
+    false merge identified in A2.3.2 Investigation 1.
+    """
+    if not ENTITY_PATH_REQUIRE_DATE_BOTH_SIDES:
+        return _same_event_window(a.published_at, b.published_at)
+
+    date_a = _known_date(a.published_at, _extract_date_from_url(a.url))
+    date_b = _known_date(b.published_at, _extract_date_from_url(b.url))
+
+    # Both dates available — defer to the standard window check
+    if date_a and date_b:
+        return _same_event_window(date_a, date_b)
+
+    # Exactly one side has a date: fail-closed (reject the merge)
+    if date_a or date_b:
+        return False
+
+    # Neither side has a date: permissive fallback (don't break historical
+    # behavior when both adapters produce sparse dates)
+    return True
 
 
 def _same_event_window(pa, pb) -> bool:
