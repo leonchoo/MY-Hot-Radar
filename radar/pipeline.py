@@ -81,24 +81,16 @@ def _build_adapter(source: Source, *, category: Category | None = None):
         from .sources.wp_json import WpJsonAdapter
         return WpJsonAdapter(source, category=category or _default_category_for(source))
     if source.type == SourceType.HTML_LISTING:
-        from .sources.html_listing import (
-            HtmlListingAdapter,
-            ChinaPressHtmlListingAdapter,
-            ENanyangHtmlListingAdapter,
+        # Dispatch to the right HtmlListingAdapter subclass via the
+        # ``for_source`` factory method on the parent class. The
+        # factory lives in radar/sources/html_listing.py (A2.2-D) so
+        # this pipeline module stays decoupled from source-specific
+        # subclasses. Per-source dispatch logic (which source -> which
+        # subclass) is documented in HtmlListingAdapter.for_source.
+        from .sources.html_listing import HtmlListingAdapter
+        return HtmlListingAdapter.for_source(
+            source, category=category or _default_category_for(source)
         )
-        # China Press (A2.2-C) and eNanyang (A2.2-D) use structurally
-        # different URL/title/timestamp patterns. Dispatch to the
-        # dedicated subclass for each so the parent HtmlListingAdapter
-        # class (Sin Chew A2.2-A + A2.2-B) regression stays green.
-        if source.name == "China Press":
-            return ChinaPressHtmlListingAdapter(
-                source, category=category or _default_category_for(source)
-            )
-        if source.name == "eNanyang":
-            return ENanyangHtmlListingAdapter(
-                source, category=category or _default_category_for(source)
-            )
-        return HtmlListingAdapter(source, category=category or _default_category_for(source))
     if source.type == SourceType.PUBLIC_SOCIAL:
         return PublicSocialAdapter(source, category=category or _default_category_for(source))
     raise FetchError(f"{source.name}: no adapter available for source type {source.type}")

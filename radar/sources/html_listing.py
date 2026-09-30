@@ -304,6 +304,41 @@ class HtmlListingAdapter(SourceAdapter):
         self.source = source
         self._category = category
 
+    @classmethod
+    def for_source(cls, source: Source, *, category: Category | None = None
+                  ) -> "HtmlListingAdapter":
+        """Factory: pick the right HtmlListingAdapter subclass for ``source``.
+
+        Each HTML-listing source may need its own subclass because the
+        title extraction strategy (Phase-1/2/3 vs Phase-4/4b/5) and
+        timestamp source differ across publishers. This factory keeps
+        the dispatch logic inside the ``html_listing`` module (where
+        the subclasses live) so that callers (e.g. ``radar/pipeline.py``)
+        do not need to know about individual subclasses.
+
+        Mapping (canonical name -> subclass):
+
+          - "China Press" -> ChinaPressHtmlListingAdapter (Phase-4 +
+            Phase-5 with <div data-pdatetime>)
+          - "eNanyang" -> ENanyangHtmlListingAdapter (Phase-4b walk:
+            <img alt="TITLE"> only; no timestamps)
+          - everything else -> HtmlListingAdapter (Phase-1 + Phase-2 +
+            Phase-3, the original Sin Chew pattern)
+
+        Added in A2.2-D as part of the scope-discipline correction
+        (the previous pipeline.py dispatch was moved here so the
+        pipeline module stays untouched).
+        """
+        if source.name == "China Press":
+            return ChinaPressHtmlListingAdapter(
+                source, category=category or Category.MALAYSIA,
+            )
+        if source.name == "eNanyang":
+            return ENanyangHtmlListingAdapter(
+                source, category=category or Category.MALAYSIA,
+            )
+        return cls(source, category=category or Category.MALAYSIA)
+
     def fetch(self) -> List[Story]:
         """Fetch the listing page and return normalized Stories."""
         html = self._http_get(self.source.url)
