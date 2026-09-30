@@ -5,7 +5,8 @@ Phase 1 / Batch Radar-2: real public RSS feeds, verified live before
 registration. Each source must satisfy ALL of these:
 
   1. URL returned HTTP 200 at registration time
-  2. content-type was XML (RSS or Atom)
+  2. content-type was XML (RSS or Atom) — or, for WP-JSON sources,
+     the JSON response body parsed cleanly and contained posts
   3. parse succeeded and produced items
   4. feed is publicly accessible without login, paywall, or CAPTCHA
   5. tier (A..F) is documented and justified in the per-source comment block
@@ -14,13 +15,20 @@ registration. Each source must satisfy ALL of these:
 If a feed URL stops working, REMOVE it from this list. We do NOT register
 endpoints that returned 404 or that we cannot reach.
 
-The cap for Batch Radar-2 is 5 sources (spec rule). The current mix:
+History:
+
+  Radar-2 (2026-09-29): 5 RSS sources.
+  A2.3 (2026-09-30): 2 WP-JSON sources added (Chinese). Total: 7.
+
+Current mix:
 
   International anchor (English, RSS)         BBC News Asia       Tier B
   Regional Asia (English, RSS)                Channel News Asia   Tier B
   Malaysian health-policy (English, RSS)      CodeBlue            Tier B
   Malaysian news in Bahasa Malaysia (RSS)     FMT Bahasa          Tier B
   Malaysian regional news (English, RSS)      Borneo Post         Tier B
+  Malaysian Chinese news (WP-JSON)            Kwong Wah Yit Poh   Tier B
+  Malaysian Chinese news (WP-JSON)            Guang Ming Daily    Tier B
 
 Tier justifications (also carried in each Source's `notes`):
 
@@ -34,12 +42,19 @@ Tier justifications (also carried in each Source's `notes`):
     history. Tier B. Only Bahasa Malaysia source in this batch.
   Borneo Post                    - established East-Malaysia regional
     outlet, English-language. Tier B.
+  Kwong Wah Yit Poh (光华日报)    - established Penang-based Chinese
+    daily (since 1910); WordPress backend, public /wp-json endpoint.
+    Tier B. Joined in A2.3.
+  Guang Ming Daily (光明日报)    - established Malaysian Chinese daily;
+    WordPress backend, public /wp-json endpoint. Tier B. Joined in A2.3.
 
 We deliberately do NOT register (per probe results):
   - The Star, NST, Malay Mail, Malaysiakini, FMT English, Astro Awani,
     The Edge: their public RSS endpoints return 404 or SSL errors at
     this time. Re-probe before considering them.
   - BERNAMA / PMO / Sarawakvoice: SSL / 403 / 404 at this time.
+  - Sin Chew / China Press / eNanyang: HTML-listing sources requiring
+    a separate HTML adapter (deferred to A2.2 / future batches).
   - Any source that requires auth, paywall bypass, or CAPTCHA.
 """
 
@@ -112,6 +127,47 @@ REGISTERED_SOURCES: List[Source] = [
         languages=[Language.EN],
         tier=SourceTier.B,
         notes=("Public RSS feed. English. ~20 items per fetch."),
+    ),
+
+    # ---- 6. Malaysia (Chinese, WP-JSON) — A2.3 -----------------------------
+    # Kwong Wah Yit Poh / 光华日报 — established Penang-based Chinese-
+    # language daily; published continuously since 1910. WordPress
+    # backend exposes a public /wp-json/wp/v2/posts endpoint returning
+    # a JSON array of recent posts with date_gmt, title.rendered,
+    # excerpt.rendered, content.rendered, link. Verified live
+    # 2026-09-30: 10 posts, sha12 d9b3b8cfbebb, all today's dates.
+    # Tier B — established regional outlet, not Tier A.
+    Source(
+        name="Kwong Wah Yit Poh",
+        type=SourceType.WP_JSON,
+        url="https://www.kwongwah.com.my/wp-json/wp/v2/posts",
+        reliability=4,
+        country="MY",
+        languages=[Language.ZH],
+        tier=SourceTier.B,
+        notes=("Public WordPress JSON API endpoint. Chinese (Simplified/Traditional). "
+               "~10 items per fetch. Joined registry in A2.3 (2026-09-30). "
+               "Publisher identity preserved as a single source (Penang-based). "
+               "Distinct from Sin Chew Main (which uses HTML listing, deferred to A2.2)."),
+    ),
+
+    # ---- 7. Malaysia (Chinese, WP-JSON) — A2.3 -----------------------------
+    # Guang Ming Daily / 光明日报 — established Malaysian Chinese-language
+    # daily. WordPress backend exposes /wp-json/wp/v2/posts. Verified
+    # live 2026-09-30: 10 posts, sha12 8222bdc0982c, all today's dates.
+    # Tier B — established regional outlet, not Tier A.
+    Source(
+        name="Guang Ming Daily",
+        type=SourceType.WP_JSON,
+        url="https://guangming.com.my/wp-json/wp/v2/posts",
+        reliability=4,
+        country="MY",
+        languages=[Language.ZH],
+        tier=SourceTier.B,
+        notes=("Public WordPress JSON API endpoint. Chinese. ~10 items per fetch. "
+               "Joined registry in A2.3 (2026-09-30). "
+               "Cross-language dedup works via the A1 Chinese place-name aliases "
+               "(马来西亚 / 新加坡 / 吉隆坡 / 柔佛 / 新山 / 马新 / 新马)."),
     ),
 ]
 

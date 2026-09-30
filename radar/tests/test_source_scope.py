@@ -587,11 +587,16 @@ def test_event_fraction_shortcut_works():
 # ============================================================================
 
 def test_existing_tier_b_registry_unchanged():
-    """The 5 Tier-B sources must still be in registry.  Radar-5B does
-    not touch the registry.
+    """The 5 original Tier-B sources must remain in registry.
+
+    A2.3 (2026-09-30) added 2 new sources (Kwong Wah Yit Poh,
+    Guang Ming Daily) alongside the original 5. The original 5
+    must still be present. This test asserts the original 5
+    names are a subset of the current registered names and all
+    sources still have tier B.
     """
     from radar.sources_registry import REGISTERED_SOURCES, source_tier_map
-    expected = {
+    expected_original = {
         "BBC News Asia",
         "Channel News Asia (Asia section)",
         "CodeBlue",
@@ -599,23 +604,32 @@ def test_existing_tier_b_registry_unchanged():
         "Borneo Post",
     }
     actual = {s.name for s in REGISTERED_SOURCES}
-    assert actual == expected, (
-        f"existing Tier-B registry changed: {actual} vs {expected}"
+    assert expected_original.issubset(actual), (
+        f"original Tier-B registry changed: {actual} vs {expected_original}"
     )
     tiers = source_tier_map()
     for name, tier in tiers.items():
         assert tier == "B", f"source {name} tier changed to {tier}"
-    print("PASS test_existing_tier_b_registry_unchanged")
+    print("PASS test_existing_tier_b_registry_unchanged "
+          "(5 original sources preserved; 2 A2.3 additions all Tier-B)")
 
 
 def test_radar_5b_did_not_add_any_new_source():
     """Radar-5B does not add ANY source to the registry, regardless of
-    scope/relevance classification."""
+    scope/relevance classification.
+
+    A2.3 (2026-09-30) deliberately grew the registry from 5 to 7
+    sources (2 Chinese WP-JSON). This test was authored in the
+    Radar-5B context where adding any new source was a regression.
+    In A2.3 the registry growth was intentional and matched by
+    probe fixtures, so the assertion is updated to reflect the
+    new size 7.
+    """
     from radar.sources_registry import load_sources
     sources = load_sources()
-    assert len(sources) == 5, (
-        f"expected exactly 5 sources; got {len(sources)}. Radar-5B "
-        f"must not modify sources_registry.py."
+    assert len(sources) == 7, (
+        f"expected exactly 7 sources (5 RSS + 2 WP-JSON); "
+        f"got {len(sources)}"
     )
     candidate_names = {"SPR", "SPR (Suruhanjaya Pilihan Raya)",
                        "KPM", "KPM (Ministry of Education)",

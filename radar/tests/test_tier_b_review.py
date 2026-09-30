@@ -37,6 +37,7 @@ from radar.sources_registry import REGISTERED_SOURCES
 from radar.tests.fixtures_tier_b_review import (
     FIXTURES, ALL_TIER_B_SOURCES,
     BBC, CNA, CODEBLUE, FMT, BORNEO,
+    KWONG_WAH, GUANG_MING,
 )
 
 
@@ -103,18 +104,26 @@ def _build_review(src_name: str, wire_indicator_count: int = 0) -> SourceReview:
 # STABILITY (3 tests, per spec section 15.1-3)
 # ============================================================================
 
-def test_all_five_sources_reachable():
-    """Spec section 15.1: every Tier-B source's 3 fetches returned HTTP 200."""
+def test_all_seven_sources_reachable():
+    """Spec section 15.1: every Tier-B source's 3 fetches returned HTTP 200.
+
+    After A2.3 (Chinese WP-JSON registration): 7 sources (5 RSS + 2 WP-JSON).
+    """
     for src in ALL_TIER_B_SOURCES:
         review = _build_review(src)
         assert review.probe.all_ok, f"{src}: not all 3 fetches succeeded"
         for f in review.probe.fetches:
             assert f.status == 200, f"{src}: fetch returned status {f.status}"
-    print("PASS test_all_five_sources_reachable (5/5 HTTP 200 across 3 fetches each)")
+    print("PASS test_all_seven_sources_reachable (7/7 HTTP 200 across 3 fetches each)")
 
 
-def test_all_five_sources_parse_success():
-    """Spec section 15.2: every fetched body parsed as a valid RSS feed."""
+def test_all_seven_sources_parse_success():
+    """Spec section 15.2: every fetched body parsed successfully.
+
+    parse_status for RSS feeds starts with ``ok_rss``; for WP-JSON
+    feeds it starts with ``ok_wp_json``. Both satisfy
+    ``parse_succeeds`` which only requires ``startswith('ok_')``.
+    """
     for src in ALL_TIER_B_SOURCES:
         review = _build_review(src)
         assert review.probe.parse_succeeds, \
@@ -122,7 +131,8 @@ def test_all_five_sources_parse_success():
         for f in review.probe.fetches:
             assert f.parse_status.startswith("ok_"), \
                 f"{src}: parse_status={f.parse_status}"
-    print("PASS test_all_five_sources_parse_success (5/5 RSS parsed cleanly)")
+    print("PASS test_all_seven_sources_parse_success (7/7 parsed cleanly; "
+          "5 RSS + 2 WP-JSON)")
 
 
 def test_repeated_fetch_structure_stable():
@@ -139,14 +149,14 @@ def test_repeated_fetch_structure_stable():
         assert review.probe.all_sha_identical, \
             f"{src}: response body varied across fetches"
     print("PASS test_repeated_fetch_structure_stable "
-          "(item count + SHA stable across 3 fetches, 5/5)")
+          "(item count + SHA stable across 3 fetches, 7/7)")
 
 
 # ============================================================================
 # FRESHNESS (2 tests, per spec section 15.4-5)
 # ============================================================================
 
-def test_all_five_sources_are_active():
+def test_all_seven_sources_are_active():
     """Spec section 15.4: each source's newest item is recent enough to
     qualify as ACTIVE (< 2 days old)."""
     for src in ALL_TIER_B_SOURCES:
@@ -156,8 +166,8 @@ def test_all_five_sources_are_active():
         assert review.newest_age_days is not None
         assert review.newest_age_days <= 2, \
             f"{src}: newest item {review.newest_age_days}d old (> 2 days)"
-    print(f"PASS test_all_five_sources_are_active "
-          f"(newest items 0d across all 5)")
+    print(f"PASS test_all_seven_sources_are_active "
+          f"(newest items 0d across all 7)")
 
 
 def test_stale_feed_detection_works():
@@ -229,7 +239,7 @@ def test_content_distribution_recorded_for_all_sources():
         assert 95.0 <= total <= 105.0, \
             f"{src}: distribution sums to {total}, expected ~100"
     print("PASS test_content_distribution_recorded_for_all_sources "
-          "(5/5 have valid ContentNature-keyed distribution summing to ~100%)")
+          "(7/7 have valid ContentNature-keyed distribution summing to ~100%)")
 
 
 def test_placeholder_detection_flags_placeholder_heavy_source():
@@ -345,7 +355,7 @@ def test_non_news_dominance_detection_flags_scope_drift():
 # ============================================================================
 
 def test_no_cross_source_wire_origin_indicators_detected():
-    """Spec section 15.9: none of the 5 Tier-B sources show wire-origin
+    """Spec section 15.9: none of the 7 Tier-B sources show wire-origin
     indicators (>=5 content-word title overlap with another source)."""
     # Build samples_by_source from fixtures
     samples_by_source = {src: _build_samples(src) for src in ALL_TIER_B_SOURCES}
@@ -355,7 +365,7 @@ def test_no_cross_source_wire_origin_indicators_detected():
         assert c == 0, \
             f"{src}: {c} titles look like wire-origin duplicates; expected 0"
     print("PASS test_no_cross_source_wire_origin_indicators_detected "
-          "(5/5 sources have 0 cross-source overlap)")
+          "(7/7 sources have 0 cross-source overlap)")
 
 
 def test_independent_source_count_equals_registered_count():
@@ -366,8 +376,11 @@ def test_independent_source_count_equals_registered_count():
       - all distinct_url_hosts are the publisher's own host
       - no cross-source wire-origin indicators
 
-    This guards against the "5 websites, 1 wire" failure mode described
+    This guards against the "N websites, 1 wire" failure mode described
     in VERIFICATION_RULES.md "Multi-source trap".
+
+    After A2.3: 7 registered sources = 7 self-host publishers = 7
+    independent (5 RSS + 2 WP-JSON).
     """
     for src in ALL_TIER_B_SOURCES:
         review = _build_review(src)
@@ -377,23 +390,23 @@ def test_independent_source_count_equals_registered_count():
     counts = count_cross_source_wire_indicators(samples_by_source)
     assert all(c == 0 for c in counts.values()), \
         f"cross-source wire indicators found: {counts}"
-    assert len(ALL_TIER_B_SOURCES) == len(REGISTERED_SOURCES) == 5
+    assert len(ALL_TIER_B_SOURCES) == len(REGISTERED_SOURCES) == 7
     print("PASS test_independent_source_count_equals_registered_count "
-          "(5 registered = 5 self-host publishers = 5 independent)")
+          "(7 registered = 7 self-host publishers = 7 independent)")
 
 
 # ============================================================================
 # REGISTRY (2 tests, per spec section 15.11-12)
 # ============================================================================
 
-def test_all_five_current_sources_get_keep_tier_b():
+def test_all_seven_current_sources_get_keep_tier_b():
     """Spec section 15.11: every currently-registered Tier-B source that
     passes today's review stays in the registry."""
     for src in ALL_TIER_B_SOURCES:
         review = _build_review(src)
         assert review.decision == RegistryDecision.KEEP_TIER_B, \
             f"{src}: should be KEEP_TIER_B; got {review.decision.value} ({review.reason})"
-    print("PASS test_all_five_current_sources_get_keep_tier_b (5/5 KEEP_TIER_B)")
+    print("PASS test_all_seven_current_sources_get_keep_tier_b (7/7 KEEP_TIER_B)")
 
 
 def test_unsuitable_source_is_correctly_flagged():
@@ -502,6 +515,48 @@ def test_borneo_post_review():
           f"event_oriented={r.event_oriented_ratio*100:.1f}%, KEEP_TIER_B)")
 
 
+def test_kwong_wah_review():
+    """Kwong Wah Yit Poh (Chinese WP-JSON, A2.3).
+
+    Per Audit §3 + A2.1 spec §2: Chinese-language, MH17-style,
+    WordPress JSON API. Verified live 2026-09-30:
+    endpoint https://www.kwongwah.com.my/wp-json/wp/v2/posts
+    returned HTTP 200 with 10 posts and stable SHA across 3 fetches.
+
+    Tier: B (established regional outlet, not Tier A).
+    """
+    r = _build_review(KWONG_WAH)
+    assert r.freshness == FreshnessVerdict.ACTIVE
+    assert r.items_total == 10
+    assert r.unique_title_count == 10
+    assert r.unique_pubdate_count == 10
+    assert r.self_host_count == 10
+    assert r.decision == RegistryDecision.KEEP_TIER_B
+    print(f"PASS test_kwong_wah_review (10 items, ACTIVE, "
+          f"event_oriented={r.event_oriented_ratio*100:.1f}%, KEEP_TIER_B)")
+
+
+def test_guang_ming_review():
+    """Guang Ming Daily (Chinese WP-JSON, A2.3).
+
+    Per Audit §3 + A2.1 spec §2: Chinese-language, WordPress JSON API.
+    Verified live 2026-09-30:
+    endpoint https://guangming.com.my/wp-json/wp/v2/posts
+    returned HTTP 200 with 10 posts and stable SHA across 3 fetches.
+
+    Tier: B (established regional outlet, not Tier A).
+    """
+    r = _build_review(GUANG_MING)
+    assert r.freshness == FreshnessVerdict.ACTIVE
+    assert r.items_total == 10
+    assert r.unique_title_count == 10
+    assert r.unique_pubdate_count == 10
+    assert r.self_host_count == 10
+    assert r.decision == RegistryDecision.KEEP_TIER_B
+    print(f"PASS test_guang_ming_review (10 items, ACTIVE, "
+          f"event_oriented={r.event_oriented_ratio*100:.1f}%, KEEP_TIER_B)")
+
+
 # ============================================================================
 # Model / dataclass tests
 # ============================================================================
@@ -539,15 +594,32 @@ def test_radar_6_did_not_modify_engine_files():
           "(no verification/momentum/classification imports in tier_b_review.py)")
 
 
-def test_radar_6_did_not_add_new_sources():
-    """Regression: Radar-6 registry remains the same 5 sources."""
+def test_radar_6_a23_registry_size_and_names():
+    """Regression: registry size and source-name invariant for Radar-6 + A2.3.
+
+    After A2.3 the registry grew from 5 to 7 sources. This test
+    asserts:
+      - registry has exactly 7 sources
+      - registry names match ALL_TIER_B_SOURCES (5 RSS + 2 WP-JSON)
+      - no source was added without a matching probe fixture
+        (enforced transitively by ALL_TIER_B_SOURCES itself)
+
+    History:
+      - Pre-A2.3 (Radar-6): 5 sources. Test was
+        ``test_radar_6_did_not_add_new_sources`` and asserted == 5.
+      - Post-A2.3: 7 sources. The original assertion would have
+        been wrong-by-stale-state; updated to reflect the new
+        factual registry size while preserving the spirit of the
+        invariant (registry == fixtures).
+    """
     from radar.sources_registry import REGISTERED_SOURCES
-    assert len(REGISTERED_SOURCES) == 5, \
-        f"expected 5 sources in registry; got {len(REGISTERED_SOURCES)}"
+    assert len(REGISTERED_SOURCES) == 7, \
+        f"expected 7 sources in registry; got {len(REGISTERED_SOURCES)}"
     names = {s.name for s in REGISTERED_SOURCES}
     assert names == set(ALL_TIER_B_SOURCES), \
         f"registry names differ: {names} vs {set(ALL_TIER_B_SOURCES)}"
-    print("PASS test_radar_6_did_not_add_new_sources (5/5 unchanged)")
+    print("PASS test_radar_6_a23_registry_size_and_names "
+          "(7/7 registry names match ALL_TIER_B_SOURCES)")
 
 
 def test_radar_6_uses_content_nature_taxonomy_from_radar_5b():
@@ -570,11 +642,11 @@ if __name__ == "__main__":
         test_freshness_verdict_enum,
         test_registry_decision_enum,
         # Stability
-        test_all_five_sources_reachable,
-        test_all_five_sources_parse_success,
+        test_all_seven_sources_reachable,
+        test_all_seven_sources_parse_success,
         test_repeated_fetch_structure_stable,
         # Freshness
-        test_all_five_sources_are_active,
+        test_all_seven_sources_are_active,
         test_stale_feed_detection_works,
         # Content
         test_content_distribution_recorded_for_all_sources,
@@ -584,17 +656,20 @@ if __name__ == "__main__":
         test_no_cross_source_wire_origin_indicators_detected,
         test_independent_source_count_equals_registered_count,
         # Registry
-        test_all_five_current_sources_get_keep_tier_b,
+        test_all_seven_current_sources_get_keep_tier_b,
         test_unsuitable_source_is_correctly_flagged,
-        # Per-source
+        # Per-source (5 original RSS)
         test_bbc_news_asia_review,
         test_cna_asia_review,
         test_codeblue_review,
         test_fmt_bahasa_review,
         test_borneo_post_review,
+        # Per-source (2 WP-JSON, added in A2.3)
+        test_kwong_wah_review,
+        test_guang_ming_review,
         # Regression
         test_radar_6_did_not_modify_engine_files,
-        test_radar_6_did_not_add_new_sources,
+        test_radar_6_a23_registry_size_and_names,
         test_radar_6_uses_content_nature_taxonomy_from_radar_5b,
     ]
     failed = []

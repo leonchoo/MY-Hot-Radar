@@ -676,15 +676,25 @@ def test_real_bernama_not_qualified():
 # ----------------------------------------------------------------------------
 
 def test_tier_a_registry_remains_empty_after_radar_5a():
-    """No candidate was qualified and added to the registry.
-    The registered sources must still be exactly the Radar-2 5 Tier-B
-    sources, with no Tier-A sources injected.
+    """No candidate was qualified and added to the registry as Tier-A.
+
+    History:
+      - Radar-5A (2026-09-29): all 12 candidates were rejected; the
+        registry stayed at 5 Tier-B sources.
+      - A2.3 (2026-09-30): registry grew to 7 Tier-B sources (5 RSS
+        + 2 Chinese WP-JSON). No Tier-A candidates have been added.
+
+    This test asserts:
+      - registry has 7 sources (5 original + 2 added in A2.3)
+      - all sources have tier B (no Tier-A candidates were promoted)
+      - no candidate name from the original 12-name list appears in
+        the registry
     """
     from radar.sources_registry import load_sources, source_tier_map
     sources = load_sources()
-    assert len(sources) == 5, (
-        f"expected 5 sources; got {len(sources)}. Radar-5A must not "
-        f"modify sources_registry.py."
+    assert len(sources) == 7, (
+        f"expected 7 sources; got {len(sources)}. Registry size is "
+        f"the Radar-2 5 Tier-B + A2.3 2 WP-JSON Tier-B."
     )
     tier_map = source_tier_map()
     for name, tier in tier_map.items():
@@ -702,13 +712,20 @@ def test_tier_a_registry_remains_empty_after_radar_5a():
         f"a Tier-A candidate was added to the registry: "
         f"{registered_names & candidate_names}"
     )
-    print("PASS test_tier_a_registry_remains_empty_after_radar_5a")
+    print("PASS test_tier_a_registry_remains_empty_after_radar_5a "
+          "(registry size = 7; all B tier; no Tier-A candidates promoted)")
 
 
 def test_radar_5a_does_not_modify_existing_tier_b_sources():
-    """The 5 Tier-B sources must be unchanged in registry."""
+    """The 5 original Tier-B RSS sources must remain in the registry.
+
+    A2.3 added 2 NEW sources (Kwong Wah Yit Poh, Guang Ming Daily)
+    alongside the original 5. The original 5 must still be present
+    and their registry entries unchanged. This test asserts the
+    original 5 names are a subset of the current registered names.
+    """
     from radar.sources_registry import REGISTERED_SOURCES
-    expected_names = {
+    expected_original_names = {
         "BBC News Asia",
         "Channel News Asia (Asia section)",
         "CodeBlue",
@@ -716,10 +733,12 @@ def test_radar_5a_does_not_modify_existing_tier_b_sources():
         "Borneo Post",
     }
     actual_names = {s.name for s in REGISTERED_SOURCES}
-    assert actual_names == expected_names, (
-        f"registered sources changed: {actual_names} vs {expected_names}"
+    missing = expected_original_names - actual_names
+    assert not missing, (
+        f"original Tier-B sources missing from registry: {missing}"
     )
-    print("PASS test_radar_5a_does_not_modify_existing_tier_b_sources")
+    print("PASS test_radar_5a_does_not_modify_existing_tier_b_sources "
+          "(5 original Tier-B sources preserved; 2 new sources added in A2.3)")
 
 
 # ----------------------------------------------------------------------------

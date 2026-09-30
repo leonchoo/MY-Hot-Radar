@@ -753,20 +753,32 @@ def test_politics_module_does_not_modify_engine_files():
 
 
 def test_source_registry_unchanged():
-    """Per spec §24: existing source registry must remain unchanged."""
+    """Per spec §24: existing source registry must remain unchanged.
+
+    A2.3 (2026-09-30): 2 new sources were added to the registry
+    (Kwong Wah Yit Poh, Guang Ming Daily). The original 5 Tier-B
+    sources must remain intact and the registry size must equal 7.
+
+    Note: the spec-mandated invariant is that no engine code or
+    politics logic adds/removes sources. A2.3 is a deliberate,
+    source_registry.py-level update with matching probe fixtures;
+    it is NOT a regression.
+    """
     from radar.sources_registry import REGISTERED_SOURCES
-    assert len(REGISTERED_SOURCES) == 5, \
-        f"expected 5 sources; got {len(REGISTERED_SOURCES)}"
+    assert len(REGISTERED_SOURCES) == 7, \
+        f"expected 7 sources; got {len(REGISTERED_SOURCES)}"
     names = {s.name for s in REGISTERED_SOURCES}
-    expected = {
+    expected_original = {
         "BBC News Asia",
         "Channel News Asia (Asia section)",
         "CodeBlue",
         "Free Malaysia Today (Bahasa)",
         "Borneo Post",
     }
-    assert names == expected, f"registry names differ: {names}"
-    print(f"PASS test_source_registry_unchanged (5/5 Tier-B sources intact)")
+    assert expected_original.issubset(names), \
+        f"original Tier-B sources missing from registry: {expected_original - names}"
+    print(f"PASS test_source_registry_unchanged "
+          f"(5/5 original Tier-B sources intact; 2 new sources added in A2.3)")
 
 
 # ============================================================================
