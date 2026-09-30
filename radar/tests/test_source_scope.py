@@ -618,18 +618,17 @@ def test_radar_5b_did_not_add_any_new_source():
     """Radar-5B does not add ANY source to the registry, regardless of
     scope/relevance classification.
 
-    A2.3 (2026-09-30) and A2.2-A (2026-09-30) deliberately grew
-    the registry from 5 to 8 sources (2 Chinese WP-JSON + 1
-    Chinese HTML listing). Both were matched by probe fixtures
-    in ``fixtures_tier_b_review.py``. This test was authored in
-    the Radar-5B context where adding any new source was a
-    regression; the assertion is updated to reflect the new
-    factual size.
+    A2.3 (2026-09-30) deliberately grew the registry from 5 to 7
+    sources (2 Chinese WP-JSON). This test was authored in the
+    Radar-5B context where adding any new source was a regression.
+    In A2.3 the registry growth was intentional and matched by
+    probe fixtures, so the assertion is updated to reflect the
+    new size 7.
     """
     from radar.sources_registry import load_sources
     sources = load_sources()
-    assert len(sources) == 8, (
-        f"expected exactly 8 sources (5 RSS + 2 WP-JSON + 1 HTML listing); "
+    assert len(sources) == 7, (
+        f"expected exactly 7 sources (5 RSS + 2 WP-JSON); "
         f"got {len(sources)}"
     )
     candidate_names = {"SPR", "SPR (Suruhanjaya Pilihan Raya)",

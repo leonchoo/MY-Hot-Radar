@@ -32,16 +32,17 @@ from radar.momentum import attach_momentum
 # --- Source registry ------------------------------------------------------
 
 def test_registry_nonempty():
-    """Registry must contain between 3 and 8 sources.
+    """Registry must contain between 3 and 7 sources.
 
     History:
       - Radar-2 cap: 3-5 sources.
-      - A2.3 (2026-09-30): cap raised to 7 (5 RSS + 2 WP-JSON).
-      - A2.2-A (2026-09-30): cap raised to 8 (+1 HTML listing).
+      - A2.3 (2026-09-30): 2 Chinese WP-JSON sources added; total
+        grew to 7. The cap was raised to 7 in this test to reflect
+        the new factual state.
     """
     sources = load_sources()
-    assert 3 <= len(sources) <= 8, \
-        f"expected 3-8 sources; got {len(sources)}"
+    assert 3 <= len(sources) <= 7, \
+        f"expected 3-7 sources; got {len(sources)}"
     print(f"PASS test_registry_nonempty ({len(sources)} sources)")
 
 
