@@ -77,6 +77,9 @@ def _build_adapter(source: Source, *, category: Category | None = None):
 
     if source.type in (SourceType.RSS, SourceType.NEWS_SITE):
         return RSSAdapter(source, category=category or _default_category_for(source))
+    if source.type == SourceType.WP_JSON:
+        from .sources.wp_json import WpJsonAdapter
+        return WpJsonAdapter(source, category=category or _default_category_for(source))
     if source.type == SourceType.PUBLIC_SOCIAL:
         return PublicSocialAdapter(source, category=category or _default_category_for(source))
     raise FetchError(f"{source.name}: no adapter available for source type {source.type}")

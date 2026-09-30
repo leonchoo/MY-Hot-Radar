@@ -35,6 +35,13 @@ class SourceType(str, Enum):
     OFFICIAL_SOURCE = "OFFICIAL_SOURCE"
     PUBLIC_SOCIAL = "PUBLIC_SOCIAL"
     SEARCH_RESULT = "SEARCH_RESULT"
+    WP_JSON = "WP_JSON"  # WordPress JSON API (/wp-json/wp/v2/posts).
+                              # Added in A2.1 for Chinese sources
+                              # Kwong Wah (www.kwongwah.com.my) and
+                              # Guang Ming (guangming.com.my). A2.2
+                              # may add HTML_LISTING separately for
+                              # Sin Chew / China Press. See
+                              # docs/CHINESE_WP_JSON_A21_IMPLEMENTATION.md.
 
 
 class SourceTier(str, Enum):
