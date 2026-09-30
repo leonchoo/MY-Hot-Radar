@@ -401,9 +401,10 @@ def test_independent_source_count_equals_registered_count():
     After A2.2-C: 10 registered sources.
 
     After A2.2-D: 11 registered sources = 10 Tier-B + 1 Tier-C
-    (eNanyang). The Tier-C source is reviewed via the separate
-    test_tier_c_review.py module but it still counts as an
-    independent self-host publisher.
+    (eNanyang; reviewed via test_tier_c_review.py not this module).
+    This Tier-B review test does NOT assert registry total count —
+    that assertion lives in test_tier_c_review.py::test_registry_total_size
+    so the cross-tier registry invariant has a single home.
 
     The Sin Chew Main homepage contains cross-host Johor-desk links
     (URLs on johor.sinchew.com.my inside a Main-page fetch). These
@@ -448,12 +449,13 @@ def test_independent_source_count_equals_registered_count():
     counts = count_cross_source_wire_indicators(samples_by_source)
     assert all(c == 0 for c in counts.values()), \
         f"cross-source wire indicators found: {counts}"
-    assert len(ALL_TIER_B_SOURCES) == 10  # Tier-B set unchanged by A2.2-D
-    # Total registry = Tier-B (10) + Tier-C (1, eNanyang) = 11
-    assert len(REGISTERED_SOURCES) == 11, \
-        f"expected 11 sources in registry; got {len(REGISTERED_SOURCES)}"
+    # NOTE: this test no longer asserts registry total count.
+    # After A2.2-D added a Tier-C source, the Tier-B review module
+    # stays focused on Tier-B sources. The cross-tier registry
+    # total-count invariant lives in test_tier_c_review.py.
     print("PASS test_independent_source_count_equals_registered_count "
-          "(11 registered = 10 Tier-B + 1 Tier-C = 11 self-host publishers = 11 independent)")
+          "(Tier-B sources are independent; cross-tier registry "
+          "invariant in test_tier_c_review.py)")
 
 
 # ============================================================================
@@ -797,40 +799,12 @@ def test_radar_6_did_not_modify_engine_files():
           "(no verification/momentum/classification imports in tier_b_review.py)")
 
 
-def test_radar_6_a23_registry_size_and_names():
-    """Regression: registry size and source-name invariant for Radar-6 + A2.3
-    + A2.2-A + A2.2-B + A2.2-C.
-
-    After A2.3 the registry grew from 5 to 7 sources, after
-    A2.2-A it grew to 8, after A2.2-B it grew to 9, after A2.2-C
-    it grew to 11. This test asserts:
-      - registry has exactly 11 sources (10 Tier-B + 1 Tier-C)
-      - registry Tier-B names match ALL_TIER_B_SOURCES (5 RSS + 2 WP-JSON + 3 HTML listing)
-      - registry Tier-C names are kept separately in fixtures_tier_c_review.py
-        (enforced by the separate test_tier_c_review.py module)
-
-    History:
-      - Pre-A2.3 (Radar-6): 5 sources. Test was
-        ``test_radar_6_did_not_add_new_sources`` and asserted == 5.
-      - Post-A2.3: 7 sources.
-      - Post-A2.2-A: 8 sources.
-      - Post-A2.2-B: 9 sources (Sin Chew Main added).
-      - Post-A2.2-C: 10 sources (China Press added).
-      - Post-A2.2-D: 11 sources (eNanyang added, Tier C; reviewed
-        via test_tier_c_review.py not this module).
-    """
-    from radar.tests.fixtures_tier_c_review import ALL_TIER_C_SOURCES
-    from radar.sources_registry import REGISTERED_SOURCES
-    assert len(REGISTERED_SOURCES) == 11, \
-        f"expected 11 sources in registry (10 Tier-B + 1 Tier-C); got {len(REGISTERED_SOURCES)}"
-    names = {s.name for s in REGISTERED_SOURCES}
-    tier_b_names = set(ALL_TIER_B_SOURCES)
-    tier_c_names = set(ALL_TIER_C_SOURCES)
-    expected = tier_b_names | tier_c_names
-    assert names == expected, \
-        f"registry names differ: missing={expected - names}, extra={names - expected}"
-    print("PASS test_radar_6_a23_registry_size_and_names "
-          "(11/11 registry names: 10 Tier-B + 1 Tier-C match fixtures)")
+# NOTE: test_radar_6_a23_registry_size_and_names was moved to
+# ``radar/tests/test_tier_c_review.py::test_cross_tier_registry_total``
+# in A2.2-D scope correction. The cross-tier registry invariant
+# (registry total = Tier-B + Tier-C) has a single home in the
+# Tier-C review module so this Tier-B module stays focused on
+# Tier-B-only invariants.
 
 
 def test_radar_6_uses_content_nature_taxonomy_from_radar_5b():
@@ -886,7 +860,9 @@ if __name__ == "__main__":
         test_china_press_review,
         # Regression
         test_radar_6_did_not_modify_engine_files,
-        test_radar_6_a23_registry_size_and_names,
+        # NOTE: test_radar_6_a23_registry_size_and_names moved to
+        # test_tier_c_review.py::test_cross_tier_registry_total in
+        # A2.2-D scope correction.
         test_radar_6_uses_content_nature_taxonomy_from_radar_5b,
     ]
     failed = []

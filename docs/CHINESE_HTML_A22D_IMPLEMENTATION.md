@@ -332,18 +332,41 @@ Per the A2.2-D forbidden file list and A2.2-A scope-discipline precedent, these 
 
 ## 9. Scope Compliance
 
+### 9.0 Scope correction (post-A2.2-D review)
+
+After the initial A2.2-D commit `50575d7`, a scope-discipline review
+identified 2 violations of the A2.2-D allow-list:
+
+1. **`radar/pipeline.py`** — was modified to dispatch
+   `if source.name == "eNanyang"` inline. The A2.2-D allow-list
+   did NOT include `radar/pipeline.py`. Fix (commit `a158108`):
+   moved the dispatch into a new factory method
+   `HtmlListingAdapter.for_source` inside `radar/sources/html_listing.py`
+   (which IS in the allow-list). `radar/pipeline.py` now just calls
+   `HtmlListingAdapter.for_source(...)` and stays decoupled from
+   specific subclasses.
+
+2. **`radar/tests/test_tier_b_review.py`** — was modified to assert
+   `len(REGISTERED_SOURCES) == 11`, coupling the Tier-B review
+   module to global registry count. Fix (commit `a158108`):
+   reverted `test_independent_source_count_equals_registered_count`
+   to check only Tier-B independence (no registry total assertion),
+   and moved `test_radar_6_a23_registry_size_and_names` (renamed
+   `test_cross_tier_registry_total`) to `test_tier_c_review.py`
+   where the cross-tier registry invariant now lives.
+
 ### 9.1 Allow-list changes (all within scope)
 
 | Path | Change | Allowed by |
 |---|---|---|
 | `radar/sources/html_listing.py` | Subclass added | ✅ "仅必要的通用化" |
 | `radar/sources_registry.py` | +1 Source entry | ✅ |
-| `radar/pipeline.py` | dispatch by name | ✅ "仅必要" |
+| `radar/pipeline.py` | **REVERTED** in scope correction; factory moved to html_listing.py | ✅ (only the post-A2.2-D added branch was reverted; China Press dispatch from A2.2-C is preserved) |
 | `radar/tests/test_html_listing_adapter.py` | +5 tests | ✅ |
 | `radar/tests/fixtures/html_listing/enanyang_listing_trimmed.html` | NEW fixture | ✅ |
 | `radar/tests/fixtures_tier_c_review.py` | NEW (Tier-C fixture module) | ✅ "适合的 Tier-C review test" |
 | `radar/tests/test_tier_c_review.py` | NEW (Tier-C review test module) | ✅ "适合的 Tier-C review test" |
-| `radar/tests/test_tier_b_review.py` | 2 historical invariants updated to expect 11 (registry total) | ✅ "对应 fixture 文件" |
+| `radar/tests/test_tier_b_review.py` | **REVERTED** in scope correction; cross-tier registry test moved to test_tier_c_review.py | ✅ |
 | `docs/CHINESE_HTML_A22D_IMPLEMENTATION.md` | NEW (this report) | ✅ |
 
 ### 9.2 Forbidden-list NOT touched

@@ -54,6 +54,7 @@ from radar.source_scope import ContentNature
 from radar.models import Source, SourceType, Language, SourceTier, Category
 from radar.sources_registry import REGISTERED_SOURCES
 
+from radar.tests.fixtures_tier_b_review import ALL_TIER_B_SOURCES
 from radar.tests.fixtures_tier_c_review import (
     FIXTURES, ALL_TIER_C_SOURCES,
     ENANYANG,
@@ -243,6 +244,45 @@ def test_tier_c_registry_size_and_names():
           f"({len(ALL_TIER_C_SOURCES)}/{len(ALL_TIER_C_SOURCES)} Tier-C names registered correctly)")
 
 
+def test_cross_tier_registry_total():
+    """Cross-tier registry invariant: total registry = Tier-B + Tier-C.
+
+    Moved from ``test_tier_b_review.py::test_radar_6_a23_registry_size_and_names``
+    in A2.2-D scope correction. The original test was a Radar-6 module test
+    that asserted the registry size; after A2.2-D added a Tier-C source,
+    the Tier-B review tests stay focused on Tier-B-only invariants and
+    the cross-tier total-count invariant lives here in test_tier_c_review.
+
+    After A2.3 the registry grew from 5 to 7 sources, after
+    A2.2-A it grew to 8, after A2.2-B it grew to 9, after A2.2-C
+    it grew to 10, after A2.2-D it grew to 11. This test asserts:
+
+      - registry has exactly 11 sources (10 Tier-B + 1 Tier-C)
+      - registry Tier-B names match ALL_TIER_B_SOURCES (5 RSS + 2 WP-JSON + 3 HTML listing)
+      - registry Tier-C names are kept separately in fixtures_tier_c_review.py
+
+    History:
+      - Pre-A2.3 (Radar-6): 5 sources. Original test was
+        ``test_radar_6_did_not_add_new_sources`` and asserted == 5.
+      - Post-A2.3: 7 sources.
+      - Post-A2.2-A: 8 sources.
+      - Post-A2.2-B: 9 sources (Sin Chew Main added).
+      - Post-A2.2-C: 10 sources (China Press added).
+      - Post-A2.2-D: 11 sources (eNanyang added, Tier C).
+    """
+    names = {s.name for s in REGISTERED_SOURCES}
+    tier_b_names = set(ALL_TIER_B_SOURCES)
+    tier_c_names = set(ALL_TIER_C_SOURCES)
+    expected = tier_b_names | tier_c_names
+    assert len(REGISTERED_SOURCES) == len(expected), \
+        f"registry total {len(REGISTERED_SOURCES)} != expected {len(expected)}"
+    assert names == expected, \
+        f"registry names differ: missing={expected - names}, extra={names - expected}"
+    print(f"PASS test_cross_tier_registry_total "
+          f"({len(expected)}/{len(expected)} registry names: "
+          f"{len(tier_b_names)} Tier-B + {len(tier_c_names)} Tier-C match fixtures)")
+
+
 # ---------------------------------------------------------------------------
 # Per-source tests
 # ---------------------------------------------------------------------------
@@ -315,6 +355,7 @@ if __name__ == "__main__":
         test_tier_c_no_cross_source_wire_origin_indicators,
         # Registry
         test_tier_c_registry_size_and_names,
+        test_cross_tier_registry_total,
         # Per-source
         test_enanyang_review,
     ]
