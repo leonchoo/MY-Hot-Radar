@@ -81,7 +81,18 @@ def _build_adapter(source: Source, *, category: Category | None = None):
         from .sources.wp_json import WpJsonAdapter
         return WpJsonAdapter(source, category=category or _default_category_for(source))
     if source.type == SourceType.HTML_LISTING:
-        from .sources.html_listing import HtmlListingAdapter
+        from .sources.html_listing import (
+            HtmlListingAdapter,
+            ChinaPressHtmlListingAdapter,
+        )
+        # China Press uses a structurally different URL/title/timestamp
+        # pattern (see A2.2-C). Dispatch to the dedicated subclass so
+        # Sin Chew A2.2-A + A2.2-B regression stays green on the parent
+        # HtmlListingAdapter class.
+        if source.name == "China Press":
+            return ChinaPressHtmlListingAdapter(
+                source, category=category or _default_category_for(source)
+            )
         return HtmlListingAdapter(source, category=category or _default_category_for(source))
     if source.type == SourceType.PUBLIC_SOCIAL:
         return PublicSocialAdapter(source, category=category or _default_category_for(source))

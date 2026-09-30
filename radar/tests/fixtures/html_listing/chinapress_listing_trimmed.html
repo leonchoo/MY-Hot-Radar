@@ -1,0 +1,1465 @@
+<!--
+  Fixture for HtmlListingAdapter tests (A2.2-C — China Press / 中国报).
+
+  Live-captured 2026-09-30 from https://www.chinapress.com.my/ at
+  sha12=217737f02a55, ~76 KB body. Content includes real article
+  cards, real breaking-news ticker, and synthetic test structure
+  for parser edge cases.
+
+  Real article titles (from live 2026-09-30, all in /20260930/{slug}/ form):
+    1. 新闻抢鲜报｜2026-9-30 (lead story)
+    2. 今日国际30秒｜猎鹰展翅引关注
+    3. 年长者买投资保险 国行拟强制录音录像
+    4. 末季营业额升12% MCE控股派息5仙
+    5. 泰航行李危机 员工诉苦：没休息、没饭吃
+    6. 西蒂哈丝玛辞世｜哀悼西蒂哈丝玛逝世 内阁祝敦马早日康复
+    7. 身高168体重不到50公斤 赵丽颖最新身体现况曝光
+    8. 2026名古屋亚运｜分挫日韩女钩 中国决战印度
+    9. 2026名古屋亚运｜ 大马再添3铜累积6金4银12铜排第11 中国150金稳夺总冠军
+    10. 星狮控股换帅 塔朗古普塔接任CEO
+
+  Synthetic test structure (NOT real — explicitly marked):
+    - /category/news nav link (must be REJECTED)
+    - /tag/malaysia nav link (must be REJECTED)
+    - ?p=9999999 ticker URL (must be REJECTED — advertorial exclusion)
+    - ?p=8888888 ticker URL (must be REJECTED — advertorial exclusion)
+    - /20260930/not-a-number/ slug (must be REJECTED — non-numeric id)
+    - synthetic-dup-link-anchor-text img alt (must be IGNORED — dedupe by URL)
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="initial-scale=1, minimum-scale=1" />
+    <link rel="profile" href="https://gmpg.org/xfn/11" />
+    <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/favicon-194x194.png" sizes="194x194">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta property="fb:app_id" content="179670249110775" />
+    <meta property="fb:pages" content="100366473389140" />
+    <meta name="format-detection" content="telephone=no">
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    <link rel="preconnect" href="https://www.google-analytics.com">
+        <title>马来西亚最新最快头条中文新闻网 | 中国报 China Press</title>
+    <meta name="description" content="马来西亚最具影响力中文媒体《中国报》。全天候即时更新大马今日头：马来西亚最新消息、社会突发、财经、娱乐、体育及全球华人焦点新闻，为您提供最快、最客观的权威报道。">
+                        <script type="application/ld+json">{"@context":"https:\/\/schema.org","@type":"WebPage","headline":"\u9a6c\u6765\u897f\u4e9a\u6700\u65b0\u6700\u5feb\u5934\u6761\u4e2d\u6587\u65b0\u95fb\u7f51 | \u4e2d\u56fd\u62a5 China Press","description":"\u9a6c\u6765\u897f\u4e9a\u6700\u5177\u5f71\u54cd\u529b\u4e2d\u6587\u5a92\u4f53\u300a\u4e2d\u56fd\u62a5\u300b\u3002\u5168\u5929\u5019\u5373\u65f6\u66f4\u65b0\u5927\u9a6c\u4eca\u65e5\u5934\uff1a\u9a6c\u6765\u897f\u4e9a\u6700\u65b0\u6d88\u606f\u3001\u793e\u4f1a\u7a81\u53d1\u3001\u8d22\u7ecf\u3001\u5a31\u4e50\u3001\u4f53\u80b2\u53ca\u5168\u7403\u534e\u4eba\u7126\u70b9\u65b0\u95fb\uff0c\u4e3a\u60a8\u63d0\u4f9b\u6700\u5feb\u3001\u6700\u5ba2\u89c2\u7684\u6743\u5a01\u62a5\u9053\u3002","mainEntityOfPage":{"@type":"WebPage","id":"https:\/\/www.chinapress.com.my\/"},"image":{"@type":"ImageObject","url":"https:\/\/www.chinapress.com.my\/public_v3\/resources\/images\/default_image.png"},"author":{"@type":"Organization","name":"\u4e2d\u570b\u5831","email":"newscentre@chinapress.com.my","logo":{"@type":"ImageObject","url":"https:\/\/www.chinapress.com.my\/public_v3\/resources\/images\/main_icon.svg"}},"publisher":{"@type":"Organization","name":"\u4e2d\u570b\u5831","email":"newscentre@chinapress.com.my","logo":{"@type":"ImageObject","url":"https:\/\/www.chinapress.com.my\/public_v3\/resources\/images\/main_icon.svg"}}}</script>
+            <meta property="og:url" content="https://www.chinapress.com.my/" />
+        <meta property="og:title" content="马来西亚最新最快头条中文新闻网 | 中国报 China Press" />
+    <meta property="og:description" content="马来西亚最具影响力中文媒体《中国报》。全天候即时更新大马今日头：马来西亚最新消息、社会突发、财经、娱乐、体育及全球华人焦点新闻，为您提供最快、最客观的权威报道。" />
+    <meta property="og:image" content="https://www.chinapress.com.my/public_v3/resources/images/default_image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="中国报 China Press 马来西亚中文报 1946年创刊 官方标志" />
+    <meta property="og:site_name" content="中国报 China Press" />
+        <meta property="og:type" content="website" />
+    <meta property="article:author" content="https://www.facebook.com/ChinaPressMY" />
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@mychinapress">
+    <meta name="twitter:title" content="马来西亚最新最快头条中文新闻网 | 中国报 China Press">
+    <meta name="twitter:description" content="马来西亚最具影响力中文媒体《中国报》。全天候即时更新大马今日头：马来西亚最新消息、社会突发、财经、娱乐、体育及全球华人焦点新闻，为您提供最快、最客观的权威报道。">
+    <meta name="twitter:image" content="https://www.chinapress.com.my/public_v3/resources/images/default_image.png">
+        <script>
+        var theme_script_ver = "171869974";
+        var theme_style_ver = "1720691885";
+        var theme_site_id = "MAINSITE";
+        var theme_mode = "prod";
+    </script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XYK48F9ZPK"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('set',{
+        'custom_map' : {
+            'dimension1': 'dimension_1'
+        }
+    });
+
+    if (!isNaN(parseInt(localStorage.getItem('user-id'))) && (parseInt(localStorage.getItem('user-id')) > 0)) {
+        gtag('config', 'G-XYK48F9ZPK', {
+            'user_id': localStorage.getItem('user-id'),
+                        'dimension_1': 'web',
+            'groups' : 'default'
+        });
+    } else {
+        gtag('config', 'G-XYK48F9ZPK', {
+            'dimension_1': 'web',
+                        'groups' : 'default'
+        });
+    }
+
+    
+    function sendCurrentPageGa(){
+        gtag('event', 'page_view', {
+            'send_to': [
+                'default'
+            ]
+        });
+            }
+</script><!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+   m[i].l=1*new Date();
+   for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+   ym(95595818, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true,
+        webvisor:true
+   });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/95595818" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->            <link rel="stylesheet" href="/public_v3/resources/lib/swiper/swiper-bundle.min.css?v=12">
+            <link rel="stylesheet" href="/public_v3/resources/lib/ticker/news-ticker.min.css">
+            <link rel="stylesheet" href="/public_v3/resources/styles/common.css?v=1720691885">
+            <link rel="stylesheet" href="/public_v3/resources/styles/desktop/style.css?v=1720691885">
+            <link rel="stylesheet" href="/public_v3/resources/styles/desktop/home-init.css?v=1720691885">
+            <script src="/public_v3/resources/lib/jquery.js"></script>
+            <script src="/public_v3/resources/lib/swiper/swiper-bundle.min.js?v=12"></script>
+            <script src="/public_v3/resources/lib/jquery.s2t.js"></script>
+            <script src="/public_v3/resources/lib/ticker/news-ticker.min.js"></script>
+            <script src="/public_v3/resources/scripts/dfp/render.js?v=171869974"></script>
+            <script src="/public_v3/resources/scripts/common.js?v=171869974"></script>
+            <script src="/public_v3/resources/scripts/desktop/init.js?v=171869974"></script>
+            <script src="/public_v3/resources/scripts/desktop/home-init.js?v=171869974"></script>
+            <link rel="preload" href="/public_v3/resources/styles/desktop/style-defer.css?v=1720691885" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript>
+            <link rel="stylesheet" href="/public_v3/resources/styles/desktop/style-defer.css?v=1720691885">
+        </noscript>
+            <link rel="preload" href="/public_v3/resources/styles/desktop/home-defer.css?v=1720691885" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript>
+            <link rel="stylesheet" href="/public_v3/resources/styles/desktop/home-defer.css?v=1720691885">
+        </noscript>
+    
+    <script type='text/javascript'>
+	var googletag = googletag || {};
+	googletag.cmd = googletag.cmd || [];
+	(function() {
+		var gads = document.createElement('script');
+		gads.async = true;
+		gads.type = 'text/javascript';
+		var useSSL = 'https:' == document.location.protocol;
+		gads.src = (useSSL ? 'https:' : 'http:') +
+		'//www.googletagservices.com/tag/js/gpt.js';
+		var node = document.getElementsByTagName('script')[0];
+		node.parentNode.insertBefore(gads, node);
+	})();
+	var membershipInitAds = false;
+</script><script type='text/javascript'>
+		var adsSlots = [];
+		var adsSlotsWithElementId = [];
+
+        googletag.cmd.push(function() {
+		        googletag.pubads().disableInitialLoad();
+		});
+</script>
+            <script type='text/javascript'>
+     googletag.cmd.push(function() {
+        googletag.pubads().addEventListener('slotRenderEnded', function (event) {
+                var id = event.slot.getSlotElementId();
+                console.log(id);
+                if(document.getElementsByClassName('home').length > 0){
+                    if (!event.isEmpty && id == "R2_L") {
+                      $(".homepage-subsites-widget-content.current").addClass("ads-loaded");
+                    }
+                    else if(!event.isEmpty && id == "R1_L") {
+                      $(".home-react-ads-wrapper").addClass("ads-loaded");
+                      if(typeof adjustCatSwiperSlideSize !== "undefined" && adjustCatSwiperSlideSize !== null)
+                        adjustCatSwiperSlideSize();
+                    }
+                    else if(event.isEmpty && id == "R1_L") {
+                      $(".home-react-ads-wrapper").removeClass("ads-loaded");
+                      if(typeof adjustCatSwiperSlideSize !== "undefined" && adjustCatSwiperSlideSize !== null)
+                        adjustCatSwiperSlideSize();
+                    }
+                }
+
+                if(document.getElementsByClassName('article').length > 0){
+                  if(event.isEmpty && (id.includes("//OTP//REWARDED")||id.includes("//OTP//REWARDEDCP"))) {
+                    var customrewarded = false;
+                    if($("#post-" + rewardedSlotArticleId).attr("data-custom-rewarded") == 1) customrewarded = true;
+                    if(document.getElementsByClassName('mobile-web').length > 0) customrewarded = true;
+
+                    if(customrewarded) {
+                      if(id.includes("EXCLUSIVE")) {
+                        append_define_rewarded_ads("/14415562/CP//WEB//OTP//NewREWARDED(NewEXCLUSIVENEWS)");
+                        sendRewardedGA("RewardedNotDisplayed", "exclusive_rewarded_unavailable");
+                      }
+                      else {
+                        append_define_rewarded_ads("/14415562/CP//WEB//OTP//NewREWARDEDCP");
+                        sendRewardedGA("RewardedNotDisplayed", "rewarded_unavailable");
+                      }
+                    }
+                    else {
+                      if(id.includes("EXCLUSIVE")) {
+                        dismissPaywall(rewardedSlotArticleId);
+                        sendRewardedGA("RewardedAdNotDisplayed", "exclusive_rewarded_unavailable");
+                      }
+                      else {
+                        dismissPaywall(rewardedSlotArticleId);
+                        sendRewardedGA("RewardedAdNotDisplayed", "rewarded_unavailable");
+                      }
+                    }
+                  }
+                  else if(event.isEmpty && (id.includes("NewREWARDED")||id.includes("NEWREWARDEDCP"))) {
+                    if(id.includes("EXCLUSIVE")) {
+                      dismissPaywall(rewardedSlotArticleId);
+                      sendRewardedGA("RewardedAdNotDisplayed", "exclusive_rewarded_unavailable");
+                    }
+                    else {
+                      dismissPaywall(rewardedSlotArticleId);
+                      sendRewardedGA("RewardedAdNotDisplayed", "rewarded_unavailable");
+                    }
+
+                  }
+                  
+                  if(id == "PL_M") {
+                    nav_banner = $(".primary_article").offset().top - $(".article-page-share-bar").outerHeight();
+                  }
+
+                  if (document.getElementById('fifa_widget_lz')) {
+                    if(!event.isEmpty && id.includes("PL")) {
+                      var sliderHeight = $(".wc2026-widget-header").height() + $(".wc2026-widget-card-teams").height() + 20;
+                      $("#wc2026-widget-ads").css("top", sliderHeight + "px");
+                      var adBannerHeight = $("#wc2026-widget-ads").height();
+                      $(".wc2026-widget-slide.swiper-slide .wc2026-widget-card").css("padding-bottom", adBannerHeight + "px");
+                    }
+                  }
+                }
+
+                if(document.getElementById('post_rank_widget_lz') != null || document.getElementById('vertical_cat_hotpost_lz') != null){
+                  if (id == "HP_L") {
+                    var has_mgid_ads = false;
+                    if ($(".side_mgid_ads_panel").length) {
+                      var side_mgid_ads_panel_shadowRoot = $(".side_mgid_ads_panel").find("div[data-type='_mgwidget']")[0].shadowRoot;
+                      has_mgid_ads = $(side_mgid_ads_panel_shadowRoot).find(".mgbox").children().length > 0;
+                      setupMgidAdsLoadedObserver();
+                    }
+
+                    if (has_mgid_ads && $("#custom_reels_widget_list .reel-item").length === 0 && $("body.article").length){
+                      $("#post_rank_widget_lz").trigger("sticky_kit:detach");
+                      $("#vertical_site_hotpost_lz").trigger("sticky_kit:detach");
+                      $("#vertical_site_hotvideo_lz").trigger("sticky_kit:detach");
+                      $("#vertical_cat_hotpost_lz").trigger("sticky_kit:detach");
+                      $(".side_hp_ads_panel").trigger("sticky_kit:detach");
+                      if(!$(".registered-sticky").length){
+                        $(".side_mgid_ads_panel").stick_in_parent({offset_top:$("header").height(),inner_scrolling:true});
+                      }
+                    }
+                    else if (!event.isEmpty && $(".side_hp_ads_panel").length && $("#custom_reels_widget_list .reel-item").length === 0 && $("body.article").length){
+                      $("#post_rank_widget_lz").trigger("sticky_kit:detach");
+                      $("#vertical_site_hotpost_lz").trigger("sticky_kit:detach");
+                      $("#vertical_site_hotvideo_lz").trigger("sticky_kit:detach");
+                      $("#vertical_cat_hotpost_lz").trigger("sticky_kit:detach");
+                      $(".side_mgid_ads_panel").trigger("sticky_kit:detach");
+                      if(!$(".registered-sticky").length){
+                        $(".side_hp_ads_panel").stick_in_parent({offset_top:$("header").height(),inner_scrolling:false});
+                      }
+                    }
+                  }
+                  if (id == "R2_L") {
+                    if (!event.isEmpty && $(".side_rect_ads_panel").length && $("body.category").length){
+                      $("#post_rank_widget_lz").trigger("sticky_kit:detach");
+                      $("#vertical_site_hotpost_lz").trigger("sticky_kit:detach");
+                      $("#vertical_site_hotvideo_lz").trigger("sticky_kit:detach");
+                      $("#vertical_pinkbiz_latestevent_lz").trigger("sticky_kit:detach");
+                      if($("#main_cat_childposts_lz").height() < $(".cat-page-6-4-frame > div:nth-child(2)").height()) {}
+                      else {
+                        stickyHpFn($(".side_rect_ads_panel")[0], $($(".side_rect_ads_panel")[0]).parent());
+                      }
+                    }
+                  }
+                }
+
+                if(document.getElementsByClassName('hot-post-rect-ads-row').length > 0){
+                    if (event.isEmpty && id == "R1_L") {
+                                    $(".hot-post-rect-ads-row").addClass("noadsloaded");
+                    }
+                }
+
+                if(document.getElementsByClassName('page-article-audio-list').length > 0){
+                    if (!event.isEmpty && id.indexOf("ML_L_") >= 0) {
+                      setTimeout(() => {
+                        var parent_div = $('#'+id).closest('.article-audio-podcast-listing');
+                        var all_items = parent_div.children().filter(function () {
+                            return $(this).is('.article-audio-podcast-item') || ($(this).is('.article-audio-podcast-item-ads') && $(this).width() > 0 && $(this).css('display') !== "none");
+                        });
+                        var currentIndex = all_items.index($('#'+id));
+                        var adsCount = $('#'+id).prevAll('.article-audio-podcast-item-ads').filter(function () {
+                            return $(this).width() > 0 && $(this).css('display') !== "none";
+                        }).length;
+                        var targetIndex = 16;
+                        if (adsCount == 1) {
+                            targetIndex -= 1;
+                        } else if (adsCount == 0) {
+                            targetIndex -= 2;
+                        } else {
+                            return;
+                        }
+
+                        if (targetIndex >= all_items.length) {
+                          $('#'+id).appendTo(parent_div);
+                        } else {
+                          $('#'+id).insertAfter(all_items.eq(targetIndex));
+                        }
+                      }, 1000);
+                    }
+                }
+
+                var overlayslots = ["Overlay_Bottom_L","Overlay_Bottom_M"];
+                if(event.isEmpty == false){
+                  if ((!event.slot.getOutOfPage()) && (overlayslots.includes(id) == false) && (id.includes("/") == false) && (id.includes("ats-insert_ads-") == false)){
+                    if($('#' + id).length > 0){
+                      $('#' + id).prepend('<p class="ads-header">ADVERTISEMENT</p>');
+                    }
+                  }
+
+                  if($("body.article").length) {
+                    const atsBottomLoaded = setInterval(function(){
+                      if ($(".ats-overlay-bottom-wrapper-rendered").length){
+                        let ats_bottom = 115;
+                        if ($(window).width() <= 767) ats_bottom = 85;
+                        $("#floating_open_in_app_icon").css("bottom", ats_bottom+"px");
+                      }
+                      else {
+                        $("#floating_open_in_app_icon").css("bottom", "5px");
+                      }
+                    }, 2000);
+                  }
+
+                  if((event.slot.getOutOfPage()) && (id.includes("WebInterstitial"))) {
+                    if($('#' + id).length > 0){
+                      $('#' + id).css("max-width", "100% !important");
+                    }
+                  }
+                }
+        });
+    });
+</script><script type='text/javascript'>
+     googletag.cmd.push(function() {
+               
+    	let ADSSLOT_PL_L =  googletag.defineSlot('/14415562/CP//Web//HP//728x90//PL', [[728, 90], [970, 90], [970, 250]], 'PL_L').addService(googletag.pubads());
+
+		adsSlots.push(ADSSLOT_PL_L);
+               		adsSlotsWithElementId['PL_L'] = ADSSLOT_PL_L;
+                let interstitialSlot = googletag.defineOutOfPageSlot('/14415562/CP//Web//HP//OTP//WebInterstitial',googletag.enums.OutOfPageFormat.INTERSTITIAL);
+        if (interstitialSlot) {
+            interstitialSlot.addService(googletag.pubads());
+            adsSlots.push(interstitialSlot);
+        }
+        let ADSSLOT_OTP_L = googletag.defineOutOfPageSlot('/14415562/CP//Web//HP//OTP//Overlay//Bottom','OTP_L').addService(googletag.pubads());
+
+		adsSlotsWithElementId['OTP_L'] = ADSSLOT_OTP_L;
+		adsSlots.push(ADSSLOT_OTP_L);
+   
+    	let ADSSLOT_Overlay_Bottom_L =  googletag.defineSlot('/14415562/CP//Web//HP//1x1//Overlay//Bottom', [1, 1], 'Overlay_Bottom_L').addService(googletag.pubads());
+
+		adsSlots.push(ADSSLOT_Overlay_Bottom_L);
+               		adsSlotsWithElementId['Overlay_Bottom_L'] = ADSSLOT_Overlay_Bottom_L;
+        
+            googletag.pubads().enableSingleRequest();
+            googletag.pubads().setTargeting('aff', ['bnkfince', 'cars', 'fooddin', 'econnws', 'home', 'lfstyl', 'mdaent', 'shprs', 'sprtsfit', 'tech']).setTargeting('ag', ['18-24', '25-34', '35-44', '45-54', '55-64', '65above']).setTargeting('g', ['female', 'male', 'unknown'])
+            .setTargeting('interest_group', [ 'ENTERTAINMENT - MOVIE & TV', 'BANKING', 'FINANCE', 'BEAUTY', 'COMPUTERS & ELECTRONICS', 'GAMING', 'HEALTH', 'HOLIDAY & CELEBRATIONS', 'PARENTING', 'PETS & ANIMALS', 'SOCIAL MEDIA', 'SPORTS', 'BOOKS & LITERATURE', 'HOME & LIVING', 'SHOPPING', 'ENTERTAINMENT', 'HOBBIES & LEISURE', 'JOBS', 'NEWS', 'FOOD & BEVERAGE', 'VISUAL ARTS & DESIGN', 'BUSINESS', 'EDUCATION', 'FAMILY & LIFESTYLE' ]);
+            googletag.pubads().collapseEmptyDivs(true);
+            
+        });
+
+</script>    <script>
+    var mywheels_counter_api_url = "https://mywheels.my/front-ajx.php";
+</script>        <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ieysojl8pl");
+</script>        <script>
+    class MembershipQueue {
+        static #instance = null;
+        #enable = false;
+        #user = {};
+        #profile = {};
+        #items = [];
+        #running = false;
+
+        constructor() {
+            if (!MembershipQueue.instance) {
+                this.#initMembership();
+                MembershipQueue.instance = this;
+            }
+
+            return MembershipQueue.instance;
+        }
+
+        static getInstance() {
+            if (!MembershipQueue.#instance) {
+                MembershipQueue.#instance = new MembershipQueue();
+            }
+
+            return MembershipQueue.#instance;
+        }
+
+        async #initMembership() {
+            this.#running = true;
+
+            try {
+                this.#user = await fetch(`https://sso.chinapress.com.my/isUserLogged`, {
+                    method: 'GET',
+                    credentials: 'include'
+                }).then(response => {
+                    return response.json()
+                }).then(data => {
+                    return data;
+                }).catch(() => {
+                    return {};
+                });
+            } catch (error) {
+
+            }
+
+            if (this.#user.is_auth == true) {
+                this.#profile = await fetch(`https://sso.chinapress.com.my/getUserDetails`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        "Authorization": `Bearer ${this.#user.access_token}`,
+                        "Accept": "application/json"
+                    }
+                }).then(response => {
+                    return response.json()
+                }).then(data => {
+                    return data;
+                }).catch(() => {
+                    return {};
+                });
+            }
+
+            let userJson = JSON.stringify({
+                user: this.#user,
+                profile: this.#profile
+            });
+            // let userJson = JSON.stringify(this.#user);
+
+            if (typeof webkit !== 'undefined' && webkit.messageHandlers.myInterface) {
+                webkit.messageHandlers.myInterface.postMessage(userJson);
+            } else if (typeof AppInterface !== 'undefined') {
+                AppInterface.sendUser(userJson);
+            }
+
+            this.#run();
+        }
+
+        static enqueue(callback) {
+            MembershipQueue.getInstance().push(callback);
+
+            if (!MembershipQueue.getInstance().isRuning()) {
+                MembershipQueue.getInstance().#run();
+            }
+        }
+
+        static getUserId() {
+            return MembershipQueue.getInstance().userId();
+        }
+
+        static getUserMembershipPlan() {
+            return MembershipQueue.getInstance().userMembershipPlan();
+        }
+
+        static getUserCanSubscribeTrial() {
+            return MembershipQueue.getInstance().userCanSubscribeTrial();
+        }
+
+        static getUserName() {
+            return MembershipQueue.getInstance().userName();
+        }
+
+        static getUserEmail() {
+            return MembershipQueue.getInstance().userEmail();
+        }
+
+        static getUserAvatar() {
+            return MembershipQueue.getInstance().userAvatar();
+        }
+
+        static start() {
+            return MembershipQueue.getInstance().enableService();
+        }
+
+        userId() {
+            return this.#user.user_id;
+        }
+
+        userMembershipPlan() {
+            return this.#user.membership_plan;
+        }
+
+        userCanSubscribeTrial() {
+            return this.#user.can_subscribe_trial;
+        }
+
+        userName() {
+            return this.#profile.name;
+        }
+
+        userEmail() {
+            return this.#profile.email;
+        }
+
+        userAvatar() {
+            return this.#profile.avatar;
+        }
+
+        async #run() {
+            if (this.#enable) {
+                this.#running = true;
+
+                while (this.#items.length > 0) {
+                    const callback = this.#items.shift();
+
+                    try {
+                        await callback(this.#user);
+                    } catch (error) {
+                        console.error('Error processing item:', error);
+                    }
+                }
+
+                this.#running = false;
+            }
+        }
+
+        push(callback) {
+            this.#items.push(callback);
+        }
+
+        isRuning() {
+            return this.#running;
+        }
+
+        enableService(status = true) {
+            this.#enable = true;
+            this.#run();
+        }
+    }
+    MembershipQueue.start();
+</script>    <script async preferred-sources-control="manual" src="https://news.google.com/swg/js/v1/publisher.js"></script>    
+</head>
+
+<body  class="home">
+        <div id="fb-root"></div>
+<script>
+        var botPattern = "(googlebot\/|bot|APIs-Google|Googlebot|Googlebot-Mobile|Googlebot-Image|Google favicon|Mediapartners-Google|Googlebot-News|Googlebot-Video)";
+        var re = new RegExp(botPattern, 'i');
+        var userAgent = navigator.userAgent;
+        var rewardAdsFBPlayer = null;
+        window.customFbPlayers = window.customFbPlayers || [];
+        if (!re.test(userAgent)) {
+            window.fbAsyncInit = function() {
+                FB.init({
+                    appId: '179670249110775',
+                    autoLogAppEvents: true,
+                    xfbml: true,
+                    version: 'v15.0'
+                });
+
+                var mainFBPlayer = null;
+               
+                FB.Event.subscribe('xfbml.ready', function(msg) {
+                   
+                    if (msg.type === 'video' ) {
+                        if (msg.id.startsWith("custom-fb-video-")) {
+                            window.customFbPlayers.push(msg.instance);
+                        }
+                        else if (msg.id !== 'reward-ads-video-player'){
+                            mainFBPlayer = msg.instance;
+                            mainFBPlayer.play();
+                        }
+                        else{
+                            rewardAdsFBPlayer = msg.instance;
+                            rewardAdsFBPlayer.play();
+                            //rewardedStartCountdown if defined
+                            if (typeof rewardedStartCountdown === "function") {
+                                rewardedStartCountdown();   
+                            }
+
+                            rewardAdsFBPlayer.subscribe('finishedPlaying', function(e) {
+                                if (typeof onFacebookPlayerFinished === "function") {
+                                    onFacebookPlayerFinished();
+                                }
+                            });
+                        }
+                        
+                    }
+                });
+            };
+
+            (function(d, s, id) {
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if (d.getElementById(id))
+                    return;
+                js = d.createElement(s);
+                js.id = id;
+                js.src = "//connect.facebook.net/zh_CN/sdk.js";
+                fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));
+        } 
+    </script>
+    <header class="main-header">
+            <div class="position-relative-frame">
+        <img alt="bg" class="main-header-bg" src="/public_v3/resources/images/header-bg.svg?full" width="100%" height="100%" />
+        <div class="main-header-row-1">
+            <a href="https://www.chinapress.com.my" class="header-cp-logo">
+                                    <img alt="中国报" src="/public_v3/resources/images/main_icon.svg" width=82 height=36 />
+                            </a>
+            <div class="google-add-preferred-source-btn-wrapper">
+    <div google-add-preferred-source-btn data-lang="zh-CN"></div>
+    <div onclick="closeGoogleAddPreferredSourceBtn()" class="google_add_preferred_source_btn_icon_x"><span>x</span></div>
+</div>
+<script>
+    initGoogleAddPreferredSourceBtn();
+</script>            <div class="main-header-row-1-right">
+                <div class="main-header-search-wrapper">
+                    <form method="get" name="Form" id="searchform" action="/">
+                        <input type="text" id="s" name="s" aria-label="Search" placeholder="搜索新闻" autocomplete="off">
+                        <span class="search-icon"><img alt="搜索" src="/public_v3/resources/images/search.svg" width=12 height=12 onclick='document.getElementById("searchform").submit();' /></span>
+                    </form>
+                    <div id="main-header-search-popular" class="main-header-search-popular">
+                        <div id="site-search-suggestion"></div>
+                        <div class="main-header-search-popular-header">
+                        热门搜索
+                        </div>
+                        <div class="main-header-search-popular-item-containers" id="main-header-search-popular-item-containers1">
+                            
+                        </div>
+                        <div class="main-header-search-popular-header">
+                        大事件
+                        </div>
+                        <div class="main-header-search-popular-item-containers" id="main-header-search-popular-item-containers2">
+                            
+                        </div>
+				    </div>
+                </div>
+                <img class="main-header-chinese-conversion" alt="简" src="/public_v3/resources/images/simplified.svg" width=26 height=24 data-curr-lang="simplified" onclick="switchChinese()" />
+                <div class="main-header-download-app">
+                    <img alt="APP" src="/public_v3/resources/images/smartphone.svg" width=11 height=18 />
+                </div>
+                                <div class="main-header-button-wrapper" id="main-header-login-btn">
+                    <div class="main-header-button main-header-button-login" id="main-header-login-btn-div">
+                        登入
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="main-header-row-2">
+            <div id="main-header-nav-wrapper" class="main-header-nav-wrapper">
+                <div class="pm-qiangxiankan menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-649419"><a href="https://www.chinapress.com.my/">抢鲜</a></div> 
+<div class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3905722"><a href="https://www.chinapress.com.my/%e6%9c%80%e7%83%ad%e6%96%b0%e9%97%bb/">最热</a></div> 
+<div class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2596921"><a href="https://www.chinapress.com.my/category/%e4%bc%9a%e5%91%98/">会员</a></div> 
+<div class="pm-society menu-item menu-item-type-taxonomy menu-item-object-category menu-item-158"><a href="https://www.chinapress.com.my/category/%e7%a4%be%e4%bc%9a/">社会</a></div> 
+<div class="pm-local menu-item menu-item-type-taxonomy menu-item-object-category menu-item-160"><a href="https://www.chinapress.com.my/category/%e5%9c%b0%e6%96%b9/">地方</a></div> 
+<div class="pm-official menu-item menu-item-type-taxonomy menu-item-object-category menu-item-151"><a href="https://www.chinapress.com.my/category/%e5%ae%98%e6%96%b9/">国内</a></div> 
+<div class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-1265597"><a href="https://www.chinapress.com.my/category/%e6%94%bf%e6%b2%bb/">政治</a></div> 
+<div class="pm-international menu-item menu-item-type-taxonomy menu-item-object-category menu-item-165"><a href="https://www.chinapress.com.my/category/%e5%9b%bd%e9%99%85/">国际</a></div> 
+<div class="pm-economic menu-item menu-item-type-taxonomy menu-item-object-category menu-item-166"><a href="https://www.chinapress.com.my/category/%e8%b4%a2%e7%bb%8f/">财经</a></div> 
+<div class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-170"><a href="https://www.chinapress.com.my/category/%e7%b2%89%e7%ba%a2%e7%a4%be/">女商圈</a></div> 
+<div class="pm-entertainment menu-item menu-item-type-taxonomy menu-item-object-category menu-item-174"><a href="https://www.chinapress.com.my/category/%e5%a8%b1%e4%b9%90/">娱乐</a></div> 
+<div class="pm-advertorial menu-item menu-item-type-custom menu-item-object-custom menu-item-440883"><a href="https://www.chinapress.com.my/市场脉搏/">市场脉搏</a></div> 
+<div class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-791390"><a href="https://www.chinapress.com.my/category/%e9%a3%9f%e7%8e%a9%e5%92%96/">食玩咖</a></div> 
+<div class="pm-sports menu-item menu-item-type-taxonomy menu-item-object-category menu-item-179"><a href="https://www.chinapress.com.my/category/%e4%bd%93%e8%82%b2/">体育</a></div> 
+<div class="pm-lifestyle menu-item menu-item-type-taxonomy menu-item-object-category menu-item-186"><a href="https://www.chinapress.com.my/category/%e7%94%9f%e6%b4%bb/">副刊</a></div> 
+<div class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-791391"><a title="看大家怎么说" href="https://www.chinapress.com.my/category/%e5%a4%a7%e8%ae%b2%e5%a0%82/">大讲堂</a></div> 
+<div class="pm-tequ menu-item menu-item-type-taxonomy menu-item-object-category menu-item-192"><a href="https://www.chinapress.com.my/category/%e7%89%b9%e5%8c%ba/">特区</a></div> 
+<div class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1712533"><a href="https://www.chinapress.com.my/4d/">财神到</a></div> 
+<div class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1672442"><a href="https://www.chinapress.com.my/%e5%91%8a%e5%88%ab%e5%bc%8f/">告别式</a></div> 
+<div class="pm-advertorial menu-item menu-item-type-taxonomy menu-item-object-category menu-item-3136726"><a href="https://www.chinapress.com.my/category/bif/">BIF</a></div> 
+<div class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-4243971"><a href="https://www.chinapress.com.my/category/%e5%9f%8e%e4%b8%ad%e7%83%ad%e8%af%9d/">城中热话</a></div> 
+<div class="menu-item menu-item-type-custom menu-item-object-custom menu-item-5010663"><a href="https://80th.chinapress.com.my/">80有你</a></div> 
+            </div>
+            <div class="main-header-more-menu">
+                <div class="main-header-more-menu-button" onclick="moreMenu();">
+                    更多
+                </div>
+            </div>
+                            <div class="main-header-button-wrapper first-right-button">
+                    <div class="main-header-button main-header-audio-button">
+                        <a href="/article-audio-list/">
+                            <img alt="audio" src="/public_v3/resources/images/audionews_header_icon_v3.png" width=112 height=31 />
+                        </a>
+                    </div>
+                </div>
+                        <div class="main-header-button-wrapper main-header-chilliboomtv-button-wrapper">
+                <div class="main-header-button main-header-chilliboomtv-button">
+                    <a href="https://chiliboomtv.chinapress.com.my/" >
+                        <img alt="cptv" src="/public_v3/resources/images/chiliboom_header_icon_v2.1.png" width=112 height=31 />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="main-header-subcat-ticker-row-full-width ">
+        <div class="main-header-subcat-ticker-row">
+            <div class="main-header-subcat-col">
+                                    <div class="main-header-subcat-wrapper">
+                        <div class="main-header-subcat " id="main-header-subcat-swiper">
+                                                                <div id="sub-menu-item-4899655" class="sub-menu-item sub-menu-item-4899655">
+                                        <a href="https://80th.chinapress.com.my/" target="">80有你</a>
+                                    </div>
+                                                                <div id="sub-menu-item-4796328" class="sub-menu-item sub-menu-item-4796328">
+                                        <a href="https://www.chinapress.com.my/wp-content/uploads/yearbook/中國報80週年年鑒-V2.pdf" target="_blank">80年鉴</a>
+                                    </div>
+                                                                <div id="sub-menu-item-3906139" class="sub-menu-item sub-menu-item-3906139">
+                                        <a href="https://www.chinapress.com.my/category/%e4%bd%93%e8%82%b2/" target="">体育</a>
+                                    </div>
+                                                                <div id="sub-menu-item-3906015" class="sub-menu-item sub-menu-item-3906015">
+                                        <a href="https://www.chinapress.com.my/category/%e7%94%9f%e6%b4%bb/" target="">副刊</a>
+                                    </div>
+                                                                <div id="sub-menu-item-3905719" class="sub-menu-item sub-menu-item-3905719">
+                                        <a href="https://www.chinapress.com.my/category/%e8%bd%a6%e5%8a%a8%e5%8a%9b/" target="">车天地</a>
+                                    </div>
+                                                                <div id="sub-menu-item-3906019" class="sub-menu-item sub-menu-item-3906019">
+                                        <a href="https://jobmacha.my/zh" target="">JobMacha</a>
+                                    </div>
+                                                                <div id="sub-menu-item-4934810" class="sub-menu-item sub-menu-item-4934810">
+                                        <a href="https://www.chinapress.com.my/category/%e5%9f%8e%e4%b8%ad%e7%83%ad%e8%af%9d/" target="">城中热话</a>
+                                    </div>
+                                                                <div id="sub-menu-item-4934811" class="sub-menu-item sub-menu-item-4934811">
+                                        <a href="https://www.chinapress.com.my/%e5%91%8a%e5%88%ab%e5%bc%8f/" target="">告别式</a>
+                                    </div>
+                                                    </div>
+                    </div>
+                            </div>
+            <div class="main-header-ticker-col">
+                <div class="bn-breaking-news" id="headerTicker">
+    <div class="bn-label">快讯</div>
+    <div class="bn-news">
+        <ul>
+                        <li>
+                <a href="https://www.chinapress.com.my/?p=5147972">机场直透快铁 ERL 明年起涨价                       <span class="separator"> | </span>
+                </a>
+            </li>
+                        <li>
+                <a href="https://www.chinapress.com.my/?p=5148707">暴雨后突发水灾 新山交通大乱                    <span class="separator"> | </span>
+                </a>
+            </li>
+                        <li>
+                <a href="https://www.chinapress.com.my/20260930/%e5%8d%88%e5%90%8e%e7%8b%82%e9%a3%8e%e6%9a%b4%e9%9b%a8-%e6%a0%91%e5%80%92%e7%a0%b8%e6%88%bf%e5%8f%88%e5%8e%8b%e8%bd%a6/">午后狂风暴雨 树倒砸房又压车                    <span class="separator"> | </span>
+                </a>
+            </li>
+                        <li>
+                <a href="https://mywheels.my/20260930/amg%e7%ba%af%e7%94%b5%e7%8c%9b%e5%85%bd%e9%99%8d%e4%b8%b4%e5%a4%a7%e9%a9%ac%ef%bc%81-%e5%85%a8%e6%96%b0%e5%8d%83%e5%8c%b9%e9%a9%ac%e5%8a%9bamg-gt-4-door-coupe%e9%a2%84%e5%94%ae%e4%bb%b7rm1290000/" target="_blank" >AMG纯电猛兽降临大马！ 全新千匹马力AMG GT 4-Door Coupe预售价RM1,290,000                    <span class="separator"> | </span>
+                </a>
+            </li>
+                        <li>
+                <a href="https://www.chinapress.com.my/article-audio-list/">倍敏说新闻｜奇案解码（第五十五集）大学讲师变悍匪 抢警枪 打劫 杀人 无恶不作                    <span class="separator"> | </span>
+                </a>
+            </li>
+                        <li>
+                <a href="https://www.chinapress.com.my/?p=5130281">HONOR X9e Pro刷新中端手机天花板 5个行业第一将对手甩在身后                    <span class="separator"> | </span>
+                </a>
+            </li>
+                        <li>
+                <a href="https://www.chinapress.com.my/20260930/%e5%89%8d%e5%8a%a9%e7%90%86%e8%b5%b7%e8%af%89%e5%ae%89%e5%8d%8e%e6%80%a7%e4%be%b5%ef%bd%9c%e9%ab%98%e5%ba%ad%e5%85%88%e5%ae%a15%e9%a1%b9%e5%88%9d%e6%ad%a5%e9%97%ae%e9%a2%98-%e5%87%86%e6%9f%a5%e5%8a%a9/">前助理起诉安华性侵｜高庭先审5项初步问题 准查助理是否身在现场                    <span class="separator"> | </span>
+                </a>
+            </li>
+                        <li>
+                <a href="https://www.chinapress.com.my/?p=4894395">《有你同行》 唱出《中国报》80年故事                    <span class="separator"> | </span>
+                </a>
+            </li>
+                        <li>
+                <a href="https://www.chinapress.com.my/?p=5129784">GREENS® GREENSTOPIA® 4.0登场 从健康生活延伸至肌肤护理                    <span class="separator"> | </span>
+                </a>
+            </li>
+                        <li>
+                <a href="https://www.chinapress.com.my/?p=5128102">汇聚国际美业力量 Cosmobeauté Malaysia与beautyexpo 29/9 KLCC举办                    <span class="separator"> | </span>
+                </a>
+            </li>
+                        <li>
+                <a href="https://www.chinapress.com.my/20260930/%e7%be%8e%e9%a3%9f%e5%8d%9a%e4%b8%bb%e6%8e%a7%e9%81%ad%e6%b1%a1%e8%94%91%e6%82%a3%e7%b2%be%e7%a5%9e%e7%97%85-%e5%bf%a7%e8%a2%ab%e5%bc%ba%e5%88%b6%e5%ae%89%e6%8e%92%e8%bf%9b%e6%88%92%e7%96%97%e6%9c%ba/">美食博主控遭污蔑患精神病 忧被强制安排进戒疗机构                    <span class="separator"> | </span>
+                </a>
+            </li>
+                        <li>
+                <a href="https://www.chinapress.com.my/?p=5113665">32青商群英耀槟城 中总卓越青商楷模奖 表扬创新与领导力量                    <span class="separator"> | </span>
+                </a>
+            </li>
+                    </ul>
+    </div>
+</div>            </div>
+        </div>
+    </div>            </header>
+
+    <script type="text/javascript" src="https://platform-api.sharethis.com/js/sharethis.js#property=62f6231953f05f0019e8a20a&product=inline-share-buttons" async="async"></script>
+<script>
+    var home_catid = 82;
+</script>
+    <div class="homepage-headline-first-post">
+        <h1 class="homepage-headline-keyword">今日头条</h1>
+                    <a href="https://www.chinapress.com.my/20260930/%e6%96%b0%e9%97%bb%e6%8a%a2%e9%b2%9c%e6%8a%a5%ef%bd%9c2026-9-30-%e8%bd%bf%e8%bd%a6%e6%b3%a1%e6%b0%b4-%e4%ba%a4%e9%80%9a%e5%a4%a7%e4%b9%b1-%e6%96%b0%e5%b1%b1%e5%a4%9a%e5%8c%ba/">
+                <div class="post-cover-image-frame">
+                    <img src="https://www.chinapress.com.my/wp-content/uploads/2025/12/20251228-Chinapress-121-黄介琳.jpg" alt="新闻抢鲜报｜2026-9-30 —— 轿车泡水 交通大乱 新山多区成“黄泥水世界” ● 没升降机回不到组屋4楼 瘫痪爸与女 以车为家"/>
+                </div>
+            </a>
+                            <div class="post-cover-image-shadow-text">
+                    <a href="https://www.chinapress.com.my/20260930/%e6%96%b0%e9%97%bb%e6%8a%a2%e9%b2%9c%e6%8a%a5%ef%bd%9c2026-9-30-%e8%bd%bf%e8%bd%a6%e6%b3%a1%e6%b0%b4-%e4%ba%a4%e9%80%9a%e5%a4%a7%e4%b9%b1-%e6%96%b0%e5%b1%b1%e5%a4%9a%e5%8c%ba/">
+                        <h1>新闻抢鲜报｜2026-9-30 —— 轿车泡水 交通大乱 新山多区成“黄泥水世界” ● 没升降机回不到组屋4楼 瘫痪爸与女 以车为家</h1>
+                    </a>
+                </div>
+                        </div>
+            <div class="home-headline-slider-wrapper">
+            <div class="swiper home-headline-slider" id="homeheadlineslider">
+                <div class="swiper-wrapper">
+                            <div class="swiper-slide">
+                    <div class="homepage-headline-post border-curve-frame">
+                                            <a href="https://www.chinapress.com.my/20260930/%e8%a5%bf%e8%92%82%e5%93%88%e4%b8%9d%e7%8e%9b%e8%be%9e%e4%b8%96%ef%bd%9c%e5%93%80%e6%82%bc%e8%a5%bf%e8%92%82%e5%93%88%e4%b8%9d%e7%8e%9b%e9%80%9d%e4%b8%96-%e5%86%85%e9%98%81%e7%a5%9d%e6%95%a6%e9%a9%ac/">
+                            <div class="post-cover-image-frame">
+                                <img src="https://www.chinapress.com.my/wp-content/uploads/2026/09/20260930-sploo35aa-fahmi--500x261.jpg" alt="西蒂哈丝玛辞世｜哀悼西蒂哈丝玛逝世 内阁祝敦马早日康复"/>
+                            </div>
+                        </a>
+                        <div class="post-cover-image-shadow-text">
+                            <a href="https://www.chinapress.com.my/20260930/%e8%a5%bf%e8%92%82%e5%93%88%e4%b8%9d%e7%8e%9b%e8%be%9e%e4%b8%96%ef%bd%9c%e5%93%80%e6%82%bc%e8%a5%bf%e8%92%82%e5%93%88%e4%b8%9d%e7%8e%9b%e9%80%9d%e4%b8%96-%e5%86%85%e9%98%81%e7%a5%9d%e6%95%a6%e9%a9%ac/">
+                                <h1>西蒂哈丝玛辞世｜哀悼西蒂哈丝玛逝世 内阁祝敦马早日康复</h1>
+                            </a>
+                            <div class="post-meta">
+                                <img height=10 width=10 alt="time" src="/public_v3/resources/images/time.svg"/>
+                                <div data-datestr="2026-09-30 20:44:23" data-pdatetime="2026-09-30T20:44:23+08:00" class="post_date_meta" ></div>
+                                <img height=10 width=10 alt="view" src="/public_v3/resources/images/eye.svg"/>
+                                <div data-pid="5149115"  class="post_view_meta post_view_5149115"></div>
+                            </div>
+                        </div>
+                        <!--                             <div class="cat-label">
+                                <a href="https://www.chinapress.com.my/category/%e5%ae%98%e6%96%b9/">
+                                    国内                                </a>
+                            </div>
+                         -->
+                                        </div>
+                </div>
+                        <div class="swiper-slide">
+                    <div class="homepage-headline-post border-curve-frame">
+                                            <a href="https://www.chinapress.com.my/20260930/%e6%9c%ab%e5%ad%a3%e8%90%a5%e4%b8%9a%e9%a2%9d%e5%8d%8712-mce%e6%8e%a7%e8%82%a1%e6%b4%be%e6%81%af5%e4%bb%99/">
+                            <div class="post-cover-image-frame">
+                                <img src="https://www.chinapress.com.my/wp-content/uploads/2026/09/20260930-sploo34-mce--500x261.jpg" alt="末季营业额升12% MCE控股派息5仙"/>
+                            </div>
+                        </a>
+                        <div class="post-cover-image-shadow-text">
+                            <a href="https://www.chinapress.com.my/20260930/%e6%9c%ab%e5%ad%a3%e8%90%a5%e4%b8%9a%e9%a2%9d%e5%8d%8712-mce%e6%8e%a7%e8%82%a1%e6%b4%be%e6%81%af5%e4%bb%99/">
+                                <h1>末季营业额升12% MCE控股派息5仙</h1>
+                            </a>
+                            <div class="post-meta">
+                                <img height=10 width=10 alt="time" src="/public_v3/resources/images/time.svg"/>
+                                <div data-datestr="2026-09-30 20:37:11" data-pdatetime="2026-09-30T20:37:11+08:00" class="post_date_meta" ></div>
+                                <img height=10 width=10 alt="view" src="/public_v3/resources/images/eye.svg"/>
+                                <div data-pid="5149111"  class="post_view_meta post_view_5149111"></div>
+                            </div>
+                        </div>
+                        <!--                             <div class="cat-label">
+                                <a href="https://www.chinapress.com.my/category/%e8%b4%a2%e7%bb%8f/">
+                                    财经                                </a>
+                            </div>
+                         -->
+                                        </div>
+                </div>
+                        <div class="swiper-slide">
+                    <div class="homepage-headline-post border-curve-frame">
+                                            <a href="https://www.chinapress.com.my/20260930/%e4%bb%8a%e6%97%a5%e5%9b%bd%e9%99%8530%e7%a7%92%ef%bd%9c%e7%8c%8e%e9%b9%b0%e5%b1%95%e7%bf%85%e5%bc%95%e5%85%b3%e6%b3%a8/">
+                            <div class="post-cover-image-frame">
+                                <img src="https://www.chinapress.com.my/wp-content/uploads/2026/09/20260930CPKK12b-500x261.jpg" alt="今日国际30秒｜猎鹰展翅引关注"/>
+                            </div>
+                        </a>
+                        <div class="post-cover-image-shadow-text">
+                            <a href="https://www.chinapress.com.my/20260930/%e4%bb%8a%e6%97%a5%e5%9b%bd%e9%99%8530%e7%a7%92%ef%bd%9c%e7%8c%8e%e9%b9%b0%e5%b1%95%e7%bf%85%e5%bc%95%e5%85%b3%e6%b3%a8/">
+                                <h1>今日国际30秒｜猎鹰展翅引关注</h1>
+                            </a>
+                            <div class="post-meta">
+                                <img height=10 width=10 alt="time" src="/public_v3/resources/images/time.svg"/>
+                                <div data-datestr="2026-09-30 16:38:18" data-pdatetime="2026-09-30T16:38:18+08:00" class="post_date_meta" ></div>
+                                <img height=10 width=10 alt="view" src="/public_v3/resources/images/eye.svg"/>
+                                <div data-pid="5148690"  class="post_view_meta post_view_5148690"></div>
+                            </div>
+                        </div>
+                        <!--                             <div class="cat-label">
+                                <a href="https://www.chinapress.com.my/category/%e5%9b%bd%e9%99%85/">
+                                    国际                                </a>
+                            </div>
+                         -->
+                                        </div>
+                </div>
+                        <div class="swiper-slide">
+                    <div class="homepage-headline-post border-curve-frame">
+                                            <a href="https://www.chinapress.com.my/20260930/%e5%b9%b4%e9%95%bf%e8%80%85%e4%b9%b0%e6%8a%95%e8%b5%84%e4%bf%9d%e9%99%a9-%e5%9b%bd%e8%a1%8c%e6%8b%9f%e5%bc%ba%e5%88%b6%e5%bd%95%e9%9f%b3%e5%bd%95%e5%83%8f/">
+                            <div class="post-cover-image-frame">
+                                <img src="https://www.chinapress.com.my/wp-content/uploads/2026/09/20260930CPYC39a-insurance-500x261.jpg" alt="年长者买投资保险 国行拟强制录音录像"/>
+                            </div>
+                        </a>
+                        <div class="post-cover-image-shadow-text">
+                            <a href="https://www.chinapress.com.my/20260930/%e5%b9%b4%e9%95%bf%e8%80%85%e4%b9%b0%e6%8a%95%e8%b5%84%e4%bf%9d%e9%99%a9-%e5%9b%bd%e8%a1%8c%e6%8b%9f%e5%bc%ba%e5%88%b6%e5%bd%95%e9%9f%b3%e5%bd%95%e5%83%8f/">
+                                <h1>年长者买投资保险 国行拟强制录音录像</h1>
+                            </a>
+                            <div class="post-meta">
+                                <img height=10 width=10 alt="time" src="/public_v3/resources/images/time.svg"/>
+                                <div data-datestr="2026-09-30 20:36:12" data-pdatetime="2026-09-30T20:36:12+08:00" class="post_date_meta" ></div>
+                                <img height=10 width=10 alt="view" src="/public_v3/resources/images/eye.svg"/>
+                                <div data-pid="5149109"  class="post_view_meta post_view_5149109"></div>
+                            </div>
+                        </div>
+                        <!--                             <div class="cat-label">
+                                <a href="https://www.chinapress.com.my/category/%e8%b4%a2%e7%bb%8f/">
+                                    财经                                </a>
+                            </div>
+                         -->
+                                        </div>
+                </div>
+                        <div class="swiper-slide">
+                    <div class="homepage-headline-post border-curve-frame">
+                                            <a href="https://www.chinapress.com.my/20260930/%e8%ba%ab%e9%ab%98168%e4%bd%93%e9%87%8d%e4%b8%8d%e5%88%b050%e5%85%ac%e6%96%a4-%e8%b5%b5%e4%b8%bd%e9%a2%96%e6%9c%80%e6%96%b0%e8%ba%ab%e4%bd%93%e7%8e%b0%e5%86%b5%e6%9b%9d%e5%85%89/">
+                            <div class="post-cover-image-frame">
+                                <img src="https://www.chinapress.com.my/wp-content/uploads/2026/09/en0930ks10xx-500x261.jpg" alt="身高168体重不到50公斤 赵丽颖最新身体现况曝光"/>
+                            </div>
+                        </a>
+                        <div class="post-cover-image-shadow-text">
+                            <a href="https://www.chinapress.com.my/20260930/%e8%ba%ab%e9%ab%98168%e4%bd%93%e9%87%8d%e4%b8%8d%e5%88%b050%e5%85%ac%e6%96%a4-%e8%b5%b5%e4%b8%bd%e9%a2%96%e6%9c%80%e6%96%b0%e8%ba%ab%e4%bd%93%e7%8e%b0%e5%86%b5%e6%9b%9d%e5%85%89/">
+                                <h1>身高168体重不到50公斤 赵丽颖最新身体现况曝光</h1>
+                            </a>
+                            <div class="post-meta">
+                                <img height=10 width=10 alt="time" src="/public_v3/resources/images/time.svg"/>
+                                <div data-datestr="2026-09-30 20:36:00" data-pdatetime="2026-09-30T20:36:00+08:00" class="post_date_meta" ></div>
+                                <img height=10 width=10 alt="view" src="/public_v3/resources/images/eye.svg"/>
+                                <div data-pid="5148716"  class="post_view_meta post_view_5148716"></div>
+                            </div>
+                        </div>
+                        <!--                             <div class="cat-label">
+                                <a href="https://www.chinapress.com.my/category/%e5%a8%b1%e4%b9%90/">
+                                    娱乐                                </a>
+                            </div>
+                         -->
+                                        </div>
+                </div>
+                        <div class="swiper-slide">
+                    <div class="homepage-headline-post border-curve-frame">
+                                            <a href="https://www.chinapress.com.my/20260930/2026%e5%90%8d%e5%8f%a4%e5%b1%8b%e4%ba%9a%e8%bf%90%ef%bd%9c-%e5%a4%a7%e9%a9%ac%e5%86%8d%e6%b7%bb2%e9%93%9c%e7%b4%af%e7%a7%af6%e9%87%914%e9%93%b611%e9%93%9c%e6%8e%92%e7%ac%ac11-%e4%b8%ad%e5%9b%bd149/">
+                            <div class="post-cover-image-frame">
+                                <img src="https://www.chinapress.com.my/wp-content/uploads/2026/09/JPN21_29092026_VELODROMaaa-500x261.jpg" alt="2026名古屋亚运｜ 大马再添3铜累积6金4银12铜排第11  中国150金稳夺总冠军"/>
+                            </div>
+                        </a>
+                        <div class="post-cover-image-shadow-text">
+                            <a href="https://www.chinapress.com.my/20260930/2026%e5%90%8d%e5%8f%a4%e5%b1%8b%e4%ba%9a%e8%bf%90%ef%bd%9c-%e5%a4%a7%e9%a9%ac%e5%86%8d%e6%b7%bb2%e9%93%9c%e7%b4%af%e7%a7%af6%e9%87%914%e9%93%b611%e9%93%9c%e6%8e%92%e7%ac%ac11-%e4%b8%ad%e5%9b%bd149/">
+                                <h1>2026名古屋亚运｜ 大马再添3铜累积6金4银12铜排第11  中国150金稳夺总冠军</h1>
+                            </a>
+                            <div class="post-meta">
+                                <img height=10 width=10 alt="time" src="/public_v3/resources/images/time.svg"/>
+                                <div data-datestr="2026-09-30 20:33:42" data-pdatetime="2026-09-30T20:33:42+08:00" class="post_date_meta" ></div>
+                                <img height=10 width=10 alt="view" src="/public_v3/resources/images/eye.svg"/>
+                                <div data-pid="5148641"  class="post_view_meta post_view_5148641"></div>
+                            </div>
+                        </div>
+                        <!--                             <div class="cat-label">
+                                <a href="https://www.chinapress.com.my/category/%e4%bd%93%e8%82%b2/">
+                                    体育                                </a>
+                            </div>
+                         -->
+                                        </div>
+                </div>
+                        <div class="swiper-slide">
+                    <div class="homepage-headline-post border-curve-frame">
+                                            <a href="https://www.chinapress.com.my/20260930/%e6%98%9f%e7%8b%ae%e6%8e%a7%e8%82%a1%e6%8d%a2%e5%b8%85-%e5%a1%94%e6%9c%97%e5%8f%a4%e6%99%ae%e5%a1%94%e6%8e%a5%e4%bb%bbceo/">
+                            <div class="post-cover-image-frame">
+                                <img src="https://www.chinapress.com.my/wp-content/uploads/2026/09/image-215-500x261.png" alt="星狮控股换帅 塔朗古普塔接任CEO"/>
+                            </div>
+                        </a>
+                        <div class="post-cover-image-shadow-text">
+                            <a href="https://www.chinapress.com.my/20260930/%e6%98%9f%e7%8b%ae%e6%8e%a7%e8%82%a1%e6%8d%a2%e5%b8%85-%e5%a1%94%e6%9c%97%e5%8f%a4%e6%99%ae%e5%a1%94%e6%8e%a5%e4%bb%bbceo/">
+                                <h1>星狮控股换帅 塔朗古普塔接任CEO</h1>
+                            </a>
+                            <div class="post-meta">
+                                <img height=10 width=10 alt="time" src="/public_v3/resources/images/time.svg"/>
+                                <div data-datestr="2026-09-30 20:32:42" data-pdatetime="2026-09-30T20:32:42+08:00" class="post_date_meta" ></div>
+                                <img height=10 width=10 alt="view" src="/public_v3/resources/images/eye.svg"/>
+                                <div data-pid="5149106"  class="post_view_meta post_view_5149106"></div>
+                            </div>
+                        </div>
+                        <!--                             <div class="cat-label">
+                                <a href="https://www.chinapress.com.my/category/%e8%b4%a2%e7%bb%8f/">
+                                    财经                                </a>
+                            </div>
+                         -->
+                                        </div>
+                </div>
+                        <div class="swiper-slide">
+                    <div class="homepage-headline-post border-curve-frame">
+                                            <a href="https://www.chinapress.com.my/20260930/2026%e5%90%8d%e5%8f%a4%e5%b1%8b%e4%ba%9a%e8%bf%90%ef%bd%9c%e5%88%86%e6%8c%ab%e6%97%a5%e9%9f%a9%e5%a5%b3%e9%92%a9-%e4%b8%ad%e5%9b%bd%e5%86%b3%e6%88%98%e5%8d%b0%e5%ba%a6/">
+                            <div class="post-cover-image-frame">
+                                <img src="https://www.chinapress.com.my/wp-content/uploads/2026/09/sp260930_Womenhockey-203548-500x261.jpg" alt="2026名古屋亚运｜分挫日韩女钩 中国决战印度"/>
+                            </div>
+                        </a>
+                        <div class="post-cover-image-shadow-text">
+                            <a href="https://www.chinapress.com.my/20260930/2026%e5%90%8d%e5%8f%a4%e5%b1%8b%e4%ba%9a%e8%bf%90%ef%bd%9c%e5%88%86%e6%8c%ab%e6%97%a5%e9%9f%a9%e5%a5%b3%e9%92%a9-%e4%b8%ad%e5%9b%bd%e5%86%b3%e6%88%98%e5%8d%b0%e5%ba%a6/">
+                                <h1>2026名古屋亚运｜分挫日韩女钩 中国决战印度</h1>
+                            </a>
+                            <div class="post-meta">
+                                <img height=10 width=10 alt="time" src="/public_v3/resources/images/time.svg"/>
+                                <div data-datestr="2026-09-30 20:31:00" data-pdatetime="2026-09-30T20:31:00+08:00" class="post_date_meta" ></div>
+                                <img height=10 width=10 alt="view" src="/public_v3/resources/images/eye.svg"/>
+                                <div data-pid="5149117"  class="post_view_meta post_view_5149117"></div>
+                            </div>
+                        </div>
+                        <!--                             <div class="cat-label">
+                                <a href="https://www.chinapress.com.my/category/%e4%bd%93%e8%82%b2/">
+                                    体育                                </a>
+                            </div>
+                         -->
+                                        </div>
+                </div>
+                        <div class="swiper-slide">
+                    <div class="homepage-headline-post border-curve-frame">
+                                            <a href="https://www.chinapress.com.my/20260930/%e6%b3%b0%e8%88%aa%e8%a1%8c%e6%9d%8e%e5%8d%b1%e6%9c%ba-%e5%91%98%e5%b7%a5%e8%af%89%e8%8b%a6%ef%bc%9a%e6%b2%a1%e4%bc%91%e6%81%af%e3%80%81%e6%b2%a1%e9%a5%ad%e5%90%83/">
+                            <div class="post-cover-image-frame">
+                                <img src="https://www.chinapress.com.my/wp-content/uploads/2026/09/20260930-sploo33-thai--500x261.jpg" alt="泰航行李危机 员工诉苦：没休息、没饭吃"/>
+                            </div>
+                        </a>
+                        <div class="post-cover-image-shadow-text">
+                            <a href="https://www.chinapress.com.my/20260930/%e6%b3%b0%e8%88%aa%e8%a1%8c%e6%9d%8e%e5%8d%b1%e6%9c%ba-%e5%91%98%e5%b7%a5%e8%af%89%e8%8b%a6%ef%bc%9a%e6%b2%a1%e4%bc%91%e6%81%af%e3%80%81%e6%b2%a1%e9%a5%ad%e5%90%83/">
+                                <h1>泰航行李危机 员工诉苦：没休息、没饭吃</h1>
+                            </a>
+                            <div class="post-meta">
+                                <img height=10 width=10 alt="time" src="/public_v3/resources/images/time.svg"/>
+                                <div data-datestr="2026-09-30 20:29:27" data-pdatetime="2026-09-30T20:29:27+08:00" class="post_date_meta" ></div>
+                                <img height=10 width=10 alt="view" src="/public_v3/resources/images/eye.svg"/>
+                                <div data-pid="5149100"  class="post_view_meta post_view_5149100"></div>
+                            </div>
+                        </div>
+                        <!--                             <div class="cat-label">
+                                <a href="https://www.chinapress.com.my/category/%e5%9b%bd%e9%99%85/">
+                                    国际                                </a>
+                            </div>
+                         -->
+                                        </div>
+                </div>
+                        </div><!--swiper-wrapper-->
+                
+            </div><!--homeheadlineslider-->
+        <div class="swiper-button-next  homepage-headline-swiper-next"></div>
+        <div class="swiper-button-prev homepage-headline-swiper-prev"></div>
+        <div class="swiper-pagination-wrapper">
+            <div class="swiper-pagination homepage-headline-swiper-pagination"></div>
+        </div>
+    </div><!--home-headline-slider-wrapper -->
+            <script>
+                var headline_exclude_id = '5148956,5148690';
+                var headline_exclude_id_count = 2;
+        </script>
+       
+<div id="PL_L" style="text-align:center;min-height:250px;" class="ads-frame" >
+</div>
+<script>
+        googletag.cmd.push(function() { 
+            if(typeof adsSlotsWithElementId['PL_L'] !== "undefined"){
+                googletag.display('PL_L'); 
+                            }
+        });
+</script><div class="lz_load_panel" data-lz-loaded=0 data-lz-loading=0 data-lz-url="/home/desktop/page2/" data-lz-fn="home_page_2_cb"></div>
+<div id="home_page_3" class="lz_load_panel" data-lz-loaded=0  data-lz-loading=0 data-lz-url="/home/desktop/page3/" data-lz-fn="home_page_3_cb"></div> 
+<div id="home_page_4" class="lz_load_panel" data-lz-loaded=0  data-lz-loading=0 data-lz-url="/home/desktop/page4/" data-lz-fn="home_page_4_cb"></div>
+<div id="home_page_5" class="lz_load_panel" data-lz-loaded=0  data-lz-loading=0 data-lz-url="/home/desktop/page5/" data-lz-fn="home_page_5_cb" ></div>
+<div id="OTP_L" style="text-align:center;" class="ads-frame otp" >
+</div>
+<script>
+        googletag.cmd.push(function() { 
+            if(typeof adsSlotsWithElementId['OTP_L'] !== "undefined"){
+                googletag.display('OTP_L'); 
+                            }
+        });
+</script><div id="Overlay_Bottom_L" style="text-align:center;" class="ads-frame otp" >
+</div>
+<script>
+        googletag.cmd.push(function() { 
+            if(typeof adsSlotsWithElementId['Overlay_Bottom_L'] !== "undefined"){
+                googletag.display('Overlay_Bottom_L'); 
+                            }
+        });
+</script>    
+            <div class="main-footer">
+    <div class="lz_load_panel" data-lz-loaded=0 data-lz-loading=0 data-lz-url="/layout/desktop/footer-content/" ></div>
+</div>
+<script>
+if (typeof membershipFn === 'undefined') {
+	var membershipFn = [];
+}
+async function getTrialPlan() {
+		try {
+			let trialKey = 'trial-plan'
+			let ttlMinute = 5;
+
+			const cachedData = localStorage.getItem(trialKey);
+
+			if (cachedData) {
+				const { data, timestamp } = JSON.parse(cachedData);
+				const currentTime = new Date().getTime();
+				if (currentTime - timestamp < ttlMinute * 60 * 1000) {
+					return data;
+				}
+			}
+
+			const response = await fetch('https://api-membership.chinapress.com.my/api/memberships/getTrialMembershipPackageDetails');
+			const newData = await response.json();
+
+			if (newData.type !== "success") {
+				throw new Error(newData.message)
+			}
+
+			const currentTime = new Date().getTime();
+			const dataToCache = {
+				data: newData.data,
+				timestamp: currentTime
+			};
+
+			localStorage.setItem(trialKey, JSON.stringify(dataToCache));
+
+			return dataToCache.data;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+document.addEventListener("DOMContentLoaded", function(event) { 
+	(function() {
+		runMembershipFn = function(user = {}) {
+			let user_id = null;
+			let membership_plan = null;
+			let can_subscribe_trial = null;
+
+			if(user.membership_plan){
+				user_id = user.id;
+				membership_plan = user.membership_plan;
+				can_subscribe_trial = user.can_subscribe_trial;
+			}
+
+			googletag.cmd.push(function() {
+								if (['vip-monthly','vip-annually'].includes(membership_plan)) {
+					googletag.pubads().setTargeting('Subscription', ['VIP']);
+				}
+				
+				if (typeof setAdsTargetingKeywords === "function") { 
+						setAdsTargetingKeywords();
+				}
+
+				if (typeof setAdsTargetingPlatform === "function") { 
+						setAdsTargetingPlatform();
+				}
+
+				googletag.enableServices();
+			});
+
+			googletag.cmd.push(function() {
+				membershipFn.forEach(fn => {
+					fn(user_id, membership_plan, can_subscribe_trial);
+				});
+			});
+
+						if (!['vip-monthly','vip-annually'].includes(membership_plan)) {
+				var jsScript = document.createElement("script");
+				jsScript.type = "application/javascript";
+				jsScript.src = '//anymind360.com/js/6263/ats.js';
+
+				let disableAnymind = new URLSearchParams(window.location.search).get('disable_anymind');
+  				if (disableAnymind != null && disableAnymind == 1){
+					googletag.cmd.push(function() {
+						googletag.pubads().refresh(adsSlots);
+					});
+				}
+				else {
+					document.body.appendChild(jsScript);
+				}
+
+									var jsScript2 = document.createElement("script");
+					jsScript2.type = "application/javascript";
+					jsScript2.src = 'https://jsc.mgid.com/site/985581.js';
+					document.body.appendChild(jsScript2);
+							} else {
+				googletag.cmd.push(function() {
+					googletag.pubads().refresh(adsSlots);
+				});
+			}
+						membershipInitAds = true;
+
+			load_floating_slide_in();
+
+			if (typeof matomoAnalyticScript == 'function') {
+				matomoAnalyticScript(user_id);
+			}
+
+			if (typeof etix == 'function') {
+				etix(user_id, membership_plan, can_subscribe_trial);
+			}
+		}
+
+		$.ajax({
+			url : `https://sso.chinapress.com.my/isUserLogged`,
+			type : 'GET',
+			xhrFields : {
+				withCredentials : true
+			},
+			success: function(response) {
+				if(response.is_auth == true){
+					runMembershipFn(
+						{
+							id : response.user_id,
+							name: response.name,
+							token : response.access_token,
+							membership_plan : response.membership_plan,
+							can_subscribe_trial : response.can_subscribe_trial
+						}
+					);
+				}else{
+					runMembershipFn();
+				}
+			},
+		}).fail(function() { runMembershipFn(); });
+	})();
+});
+
+membershipFn.push(async function(user_id, membership_plan, can_subscribe_trial) {
+	var lock = true;
+	var bodyelement = document.getElementsByTagName('body')[0];
+	
+	if (document.getElementById("main-header-login-btn-div")) {
+		if (user_id) {
+			addClassToElement(bodyelement, "memberloggedin");
+			addClassToElement(document.getElementById("main-header-login-btn-div"), "member");
+	
+			if (membership_plan && ['vip-monthly','vip-annually'].includes(membership_plan)) {
+				lock = false;
+				document.getElementById("main-header-login-btn-div").innerHTML   = '<image alt="VIP" src="/public_v3/resources/images/VIP-icon.png" style="cursor: pointer;"></image>';
+			}
+			else{
+				document.getElementById("main-header-login-btn-div").innerHTML   = '<image alt="会员" src="/public_v3/resources/images/user-check-solid.svg" style="cursor: pointer;"></image>';
+			}
+
+			document.getElementById("main-header-login-btn-div").setAttribute("onmouseover","member_hover()");
+		document.getElementById("main-header-login-btn-div").setAttribute("onmouseleave","member_mouse_leave()");
+	
+		}
+		else{
+			document.getElementById("main-header-login-btn-div").innerHTML  = '登入';
+			document.getElementById("main-header-login-btn-div").setAttribute("onclick","loginpage(false,false,true)");
+		}
+
+		
+
+	}
+
+	if (lock) {
+		addClassToElement(bodyelement, "locked");
+					if (typeof setOnclickPurchaseBtn === 'function'){
+				try {
+					// let trialPlan = await getTrialPlan();
+					if (typeof setOnclickPurchaseBtn === 'function'){
+						setOnclickPurchaseBtn((user_id !== null), (can_subscribe_trial == true));
+						if(typeof secondArticleCbFn !== "undefined"){
+							secondArticleCbFn.push(function(){
+								setOnclickPurchaseBtn((user_id !== null), (can_subscribe_trial == true));
+							});
+						}
+					}
+				} catch (error) {
+					error
+				}
+			}
+			} else {
+		addClassToElement(bodyelement, "lock-released");
+	}
+
+	if (lock && document.getElementById("showheroes-player")) {
+		var jsScript = document.createElement("script");
+		jsScript.setAttribute("data-wid", "auto");
+		jsScript.setAttribute("type", "text/javascript");
+		jsScript.setAttribute("src", "https://content.viralize.tv/display/?zid=AAFLE4ss21AN_t2t");
+
+		document.getElementById("showheroes-player").appendChild(jsScript);
+	}
+
+});
+
+
+function addClassToElement(bodyelement, classnametoadd) {
+	classarr = bodyelement.className.split(" ");
+	if (classarr.indexOf(classnametoadd) == -1) {
+		bodyelement.className += " " + classnametoadd;
+	}
+}
+
+function loginpage(payment = false, isTrial = false, profileUrl = false){
+	let stringQuery = '';
+
+	let option = {};
+
+    option.source_url = encodeURI(window.location.href);
+	option.require_payment = payment;
+	option.device = 'Web';
+	option.title = encodeURI('');
+	option.category = '';
+
+
+	if (payment && isTrial) {
+		option.is_trial = isTrial;
+	}
+
+	if (typeof webkit !== 'undefined' && webkit.messageHandlers.myInterface) {
+		option.device = 'IOS';
+	} else if (typeof AppInterface !== 'undefined') {
+		if (typeof AppInterfaceHuawei !== 'undefined') {
+			option.device = 'HarmonyOS';
+		} else {
+			option.device = 'Android';
+		}
+	}
+
+	if (option != null) {
+        stringQuery = '?' + $.param(option);
+    }
+	
+	let url = `https://sso.chinapress.com.my/login`;
+
+	if (profileUrl) {
+		url = `https://membership.chinapress.com.my`;
+	}
+	
+	window.location.href = `${url}${stringQuery}`;
+}
+
+function logoutpage(){
+
+	$.ajax({
+		url : `https://sso.chinapress.com.my/isUserLogged`,
+		type : 'GET',
+		xhrFields : {
+			withCredentials : true
+		},
+		success: function(response) {
+			if(response.is_auth == true){
+				$.ajax({
+					url: `https://sso.chinapress.com.my/user/logout`,
+					type: "POST",
+					contentType: 'application/json',
+					processData: false,
+					xhrFields : {
+						withCredentials : true
+					},
+					beforeSend: function(xhr) {
+						xhr.setRequestHeader("Authorization", `Bearer ${response.access_token}`);
+						xhr.setRequestHeader("Accept", "application/json");
+					},
+					complete: function() {
+						location.reload();
+					}
+				});
+			} else {
+				location.reload();
+			}
+		},
+	});
+}
+
+function profilepage(){
+	let option = {};
+
+	option.url = encodeURI(window.location.href);
+
+	option.mobile = 0;
+
+	window.open('https://membership.chinapress.com.my/profile', '_self');
+}
+
+function member_hover(){
+	if(!$("#profile_hover").length)
+		$("#main-header-login-btn-div").append(
+			`<div class="profile-hover" id="profile_hover">
+				<div onclick="profilepage()">会员主页</div>
+				<div onclick="logoutprompt()">登出</div>
+			</div>`
+		);
+}
+
+function member_mouse_leave(){
+	if($("#profile_hover").length){
+		$("#profile_hover").remove();
+	}
+}
+
+function logoutprompt(){
+	if(!$("#logout-prompt-wrapper").length)
+	$("body").append(
+		`<div id="logout-prompt-wrapper" class="logout-prompt-wrapper">
+			<div class="logout-prompt-dialog">
+				<div>确定退出会员？</div>
+				<div>
+					<span>一旦退出您将无法：</span>
+					<span>• 接受最新优惠/活动讯息</span>
+					<span>• 专享/畅览会员文（VIP用户）</span>
+					<span>• 减少强制广告（VIP用户）</span>
+				</div>
+				<div class="logout-prompt-confirm-buttons">
+					<span onclick="logoutpage()">是</span>
+					<span onclick="closelogoutprompt()">否</span>
+				</div>
+			</div>
+		</div>
+		`
+	);
+}
+
+
+function closelogoutprompt(){
+	$("#logout-prompt-wrapper").remove();
+}
+
+</script><div id="cookies-box" class="cookies-container"></div>            <script src="/public_v3/resources/scripts/desktop/init-defer.js?v=171869974" defer></script>
+            <script src="/public_v3/resources/scripts/sticky.js" defer></script>
+            <script src="/public_v3/resources/scripts/desktop/home-defer.js?v=171869974" defer></script>
+         
+<div id="bottom-scroll" class="bottom-scroll">
+                        <a onclick="floatingIconClicked('https://www.chinapress.com.my/asian-games-2026/', 'asiangame2026')">
+                        <img alt="" src="https://www.chinapress.com.my/wp-content/uploads/2026/09/asian-game.png" width="50px" />
+            </a>
+    	<a onclick="floatingIconClicked('https://jobmacha.my/zh', 'JobMacha Clicks')">
+        <img alt="" src="/public_v3/resources/images/jobmach_icon.png" width="45px">
+    </a>    <div id="scroll-up" onclick="backToTop()" class="scroll-up">
+            <img alt="up" src="/public_v3/resources/images/up-arrow.png" width=45 height=45 />
+    </div>
+</div><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a433571d4ce56bb7',t:'MTc5MDc3MjQ4OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+<nav>
+  <!-- Synthetic: must be REJECTED (category nav) -->
+  <a href="https://www.chinapress.com.my/category/news">新闻分类</a>
+  <a href="https://www.chinapress.com.my/tag/malaysia">标签</a>
+
+  <!-- Synthetic: must be REJECTED (?p=NNN ticker URL) -->
+  <a href="https://www.chinapress.com.my/?p=9999999">Fake ticker article</a>
+  <a href="https://www.chinapress.com.my/?p=8888888">Another fake ticker</a>
+
+  <!-- Synthetic: must be REJECTED (non-numeric id) -->
+  <a href="https://www.chinapress.com.my/20260930/not-a-number/">bad slug</a>
+</nav>
+
+<footer>
+  <!-- Synthetic: a duplicate clean URL with synthetic alt text
+       (must DEDUPE to the real title from the live h1) -->
+  <img src="https://example.com/synthetic.jpg"
+       alt="synthetic-dup-link-anchor-text"
+       title="dup-link-anchor-text"/>
+</footer>
+</body>
+
+</html>

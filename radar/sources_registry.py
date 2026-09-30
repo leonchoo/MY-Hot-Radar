@@ -21,6 +21,7 @@ History:
   A2.3 (2026-09-30): 2 WP-JSON sources added (Chinese). Total: 7.
   A2.2-A (2026-09-30): 1 HTML listing source added (Sin Chew Johor). Total: 8.
   A2.2-B (2026-09-30): 1 HTML listing source added (Sin Chew Main). Total: 9.
+  A2.2-C (2026-09-30): 1 HTML listing source added (China Press). Total: 10.
 
 Current mix:
 
@@ -33,6 +34,7 @@ Current mix:
   Malaysian Chinese news (WP-JSON)            Guang Ming Daily    Tier B
   Malaysian Chinese Johor news (HTML)         Sin Chew Johor desk Tier B
   Malaysian Chinese main news (HTML)          Sin Chew Main       Tier B
+  Malaysian Chinese national news (HTML)      China Press / 中国报 Tier B
 
 Tier justifications (also carried in each Source's `notes`):
 
@@ -62,14 +64,25 @@ Tier justifications (also carried in each Source's `notes`):
     Tier B. Joined in A2.2-B. Same publisher as Sin Chew Johor;
     the cross-host Johor links in Main's homepage are deduped
     against the Johor desk's homepage fetch.
+  China Press / 中国报           - established Malaysian Chinese daily
+    (since 1946). Custom-CMS HTML; ~10 clean /YYYYMMDD/{slug}/
+    articles on the homepage, all with real news titles and 9/10
+    carrying absolute timestamps (data-pdatetime, ISO 8601 +08:00
+    → UTC Z). WordPress-style URL paths but WP-JSON is disabled
+    (404); RSS endpoint /feed/ 301s to error404. The homepage
+    also has a mixed-quality breaking-news ticker (?p=NNN URLs
+    include sponsored advertorial: HONOR, GREENS, Cosmobeauté);
+    these are EXPLICITLY EXCLUDED by the adapter to avoid
+    advertorial contamination. Tier B. Joined in A2.2-C.
 
 We deliberately do NOT register (per probe results):
   - The Star, NST, Malay Mail, Malaysiakini, FMT English, Astro Awani,
     The Edge: their public RSS endpoints return 404 or SSL errors at
     this time. Re-probe before considering them.
   - BERNAMA / PMO / Sarawakvoice: SSL / 403 / 404 at this time.
-  - China Press / eNanyang: HTML-listing sources requiring
-    a separate HTML adapter (deferred to future batches).
+  - eNanyang: HTML-listing source requiring a separate
+    HTML adapter (deferred to a future batch). China Press was
+    joined in A2.2-C.
   - Sin Chew subdomains other than Johor (sarawak, sabah, ...):
     already covered by Sin Chew Main's homepage which links to
     them. Adding individual subdomain sources would duplicate
@@ -262,6 +275,52 @@ REGISTERED_SOURCES: List[Source] = [
                "Sin Chew regional subdomains (sarawak, sabah, "
                "metro, etc.) are NOT separately registered — they "
                "are reachable through this source's homepage."),
+    ),
+
+    # ---- 10. Malaysia (Chinese, HTML listing) — A2.2-C ----------------------
+    # China Press / 中国报 — established Malaysian Chinese daily
+    # (since 1946). WordPress-style URL paths (/YYYYMMDD/{slug}/)
+    # but WP-JSON is disabled (404) and RSS endpoint /feed/ 301s
+    # to error404. Custom-CMS HTML homepage.
+    #
+    # Live-verified 2026-09-30 (https://www.chinapress.com.my/,
+    # sha12=184362a22be3): 10 clean /YYYYMMDD/{slug}/ articles
+    # per fetch with real Chinese titles; 9 of 10 carry absolute
+    # timestamps via <div data-pdatetime="ISO_8601+08:00"> which
+    # the adapter converts to UTC ISO Z. The 7 ?p=NNN ticker URLs
+    # on the homepage mix real news with sponsored advertorial
+    # (HONOR X9e Pro, GREENS GREENSTOPIA, Cosmobeauté Malaysia) and
+    # are EXPLICITLY EXCLUDED by the adapter's URL filter to avoid
+    # advertorial contamination.
+    #
+    # Tier B — established national outlet, not Tier A. Discovery
+    # audit flagged China Press as NEEDS_FURTHER_VALIDATION; the
+    # A2.2-C validation pass (live fetch + 3-fetch stability +
+    # adapter extraction + fixture roundtrip) clears the flag.
+    Source(
+        name="China Press",
+        type=SourceType.HTML_LISTING,
+        url="https://www.chinapress.com.my/",
+        reliability=4,
+        country="MY",
+        languages=[Language.ZH],
+        tier=SourceTier.B,
+        notes=("Custom-CMS HTML listing page. Chinese. National "
+               "Malaysian Chinese daily (中国报, since 1946). "
+               "~10 clean /YYYYMMDD/{percent-encoded-slug}/ "
+               "articles on the homepage with real news titles; "
+               "9 of 10 carry absolute timestamps "
+               "(data-pdatetime ISO 8601 +08:00 → UTC Z). "
+               "Joined registry in A2.2-C (2026-09-30). "
+               "WordPress-style URL paths but WP-JSON is disabled; "
+               "RSS endpoint /feed/ 301s to error404. Homepage "
+               "ticker ?p=NNN URLs are EXCLUDED by the adapter "
+               "because the homepage ticker mixes real news with "
+               "sponsored advertorial (HONOR, GREENS, Cosmobeauté) "
+               "at the HTML level. Cross-language dedup works via "
+               "the A1 Chinese place-name aliases (马来西亚 / "
+               "新加坡 / 吉隆坡 / 柔佛 / 新山 / 马新 / 新马). "
+               "Sin Chew subdomains are NOT separately registered."),
     ),
 ]
 

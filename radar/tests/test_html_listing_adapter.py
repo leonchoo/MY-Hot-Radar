@@ -55,9 +55,12 @@ from radar.normalize import (
     tokens,
 )
 from radar.sources.html_listing import (
+    ChinaPressHtmlListingAdapter,
     HtmlListingAdapter,
     _is_article_url,
     _strip_html,
+    _is_chinapress_article_url,
+    _coerce_chinapress_datetime,
 )
 
 
@@ -68,6 +71,7 @@ from radar.sources.html_listing import (
 FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures" / "html_listing"
 TRIMMED_FIXTURE = FIXTURES_DIR / "sinchew_johor_listing_trimmed.html"
 TRIMMED_FIXTURE_MAIN = FIXTURES_DIR / "sinchew_main_listing_trimmed.html"
+TRIMMED_FIXTURE_CHINAPRESS = FIXTURES_DIR / "chinapress_listing_trimmed.html"
 
 
 def _make_source(
@@ -126,6 +130,37 @@ def _load_fixture_main() -> str:
             f"Re-run the probe script to regenerate it."
         )
     return TRIMMED_FIXTURE_MAIN.read_text(encoding="utf-8")
+
+
+def _make_source_chinapress(
+    name: str = "China Press",
+    url: str = "https://www.chinapress.com.my/",
+) -> Source:
+    return Source(
+        name=name,
+        type=SourceType.HTML_LISTING,
+        url=url,
+        reliability=4,
+        country="MY",
+        languages=[Language.ZH],
+        tier=SourceTier.B,
+        notes="A2.2-C test fixture",
+    )
+
+
+def _make_adapter_chinapress() -> ChinaPressHtmlListingAdapter:
+    return ChinaPressHtmlListingAdapter(
+        _make_source_chinapress(), category=Category.MALAYSIA
+    )
+
+
+def _load_fixture_chinapress() -> str:
+    if not TRIMMED_FIXTURE_CHINAPRESS.exists():
+        raise FileNotFoundError(
+            f"fixture missing: {TRIMMED_FIXTURE_CHINAPRESS}. "
+            f"Re-run the probe script to regenerate it."
+        )
+    return TRIMMED_FIXTURE_CHINAPRESS.read_text(encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------
@@ -544,6 +579,117 @@ def test_articles_are_sorted_for_determinism():
 # Runner
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# A2.2-C — China Press adapter tests
+# ---------------------------------------------------------------------------
+#
+# China Press uses a structurally different listing-page format than
+# Sin Chew (see A2.2-C implementation report §4):
+#
+#   * URL pattern: /YYYYMMDD/{percent-encoded-slug}/  (NOT /news/YYYYMMDD/{section}/{id})
+#   * Title location: <h1>TITLE</h1> inside a sibling <a> anchor  (NOT <h2 class="title">)
+#   * Timestamp source: <div data-pdatetime="ISO_8601+08:00">  (NOT relative-time strings)
+#
+# These tests verify the ChinaPressHtmlListingAdapter subclass handles
+# all of these correctly, with the adapter-specific URL filter
+# (excludes ?p=NNN ticker URLs, /CP/ ad-asset URLs, and pure-ASCII slugs).
+
+
+def test_chinapress_fixture_parses_to_10_stories():
+    """The trimmed China Press fixture yields exactly 10 stories."""
+    adapter = _make_adapter_chinapress()
+    stories = adapter._parse_listing(_load_fixture_chinapress())
+    urls = {s.url for s in stories}
+    assert len(stories) == len(urls) == 10, (
+        f"expected 10 unique stories; got {len(stories)} stories, {len(urls)} URLs"
+    )
+    for s in stories:
+        assert isinstance(s, Story)
+        assert s.title
+        assert s.url
+        assert s.language == Language.ZH
+        assert s.source_type == SourceType.HTML_LISTING
+    print(f"PASS test_chinapress_fixture_parses_to_10_stories (10 stories, all zh)")
+
+
+def test_chinapress_extracts_absolute_timestamp_from_data_pdatetime():
+    """A2.2-C: <div data-pdatetime="ISO_8601+08:00"> -> published_at UTC Z."""
+    import re as _re
+    adapter = _make_adapter_chinapress()
+    stories = adapter._parse_listing(_load_fixture_chinapress())
+    with_dt = [s for s in stories if s.published_at is not None]
+    assert len(with_dt) == 9, (
+        f"expected 9 stories with absolute timestamps; got {len(with_dt)}"
+    )
+    iso_z_pat = _re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+    for s in with_dt:
+        assert iso_z_pat.match(s.published_at), (
+            f"published_at must be UTC ISO Z; got {s.published_at!r}"
+        )
+    print(f"PASS test_chinapress_extracts_absolute_timestamp_from_data_pdatetime "
+          f"(9/10 absolute UTC ISO Z timestamps)")
+
+
+def test_chinapress_url_filter_excludes_ticker_and_ad_urls():
+    """A2.2-C: _is_chinapress_article_url filters ?p=NNN, /CP/ ad assets, pure-ASCII slugs."""
+    assert _is_chinapress_article_url(
+        "https://www.chinapress.com.my/20260930/%e5%b9%b4%e9%95%bf%e8%80%85/"
+    )
+    assert _is_chinapress_article_url(
+        "https://www.chinapress.com.my/20260930/amg%e7%ba%af%e7%94%b5"
+    )
+    assert not _is_chinapress_article_url("https://www.chinapress.com.my/?p=5147972")
+    assert not _is_chinapress_article_url(
+        "https://www.chinapress.com.my/20260930/not-a-number/"
+    )
+    assert not _is_chinapress_article_url(
+        "https://www.chinapress.com.my/14415562/CP//WEB//OTP//Ad"
+    )
+    assert not _is_chinapress_article_url(
+        "https://example.com/20260930/%e5%b9%b4%e9%95%bf%e8%80%85/"
+    )
+    assert not _is_chinapress_article_url("")
+    print("PASS test_chinapress_url_filter_excludes_ticker_and_ad_urls "
+          "(7 cases checked: 2 ACCEPT + 5 REJECT)")
+
+
+def test_chinapress_datetime_coercion():
+    """A2.2-C: _coerce_chinapress_datetime converts ISO 8601 +08:00 to UTC ISO Z."""
+    result = _coerce_chinapress_datetime("2026-09-30T20:33:42+08:00")
+    assert result == "2026-09-30T12:33:42Z", f"+08:00 to UTC failed; got {result!r}"
+    assert _coerce_chinapress_datetime("2026-09-30T12:33:42Z") == "2026-09-30T12:33:42Z"
+    assert _coerce_chinapress_datetime("not a date") is None
+    assert _coerce_chinapress_datetime("") is None
+    assert _coerce_chinapress_datetime("2026-09-30T04:33:42-04:00") == "2026-09-30T08:33:42Z"
+    print("PASS test_chinapress_datetime_coercion")
+
+
+def test_chinapress_extracted_stories_have_no_advertorial():
+    """A2.2-C: extracted URLs must NOT contain ?p=, /CP/, /cp/."""
+    adapter = _make_adapter_chinapress()
+    stories = adapter._parse_listing(_load_fixture_chinapress())
+    for s in stories:
+        assert "?p=" not in s.url, f"ticker URL leaked: {s.url}"
+        assert "/CP/" not in s.url and "/cp/" not in s.url, f"ad URL leaked: {s.url}"
+        assert "chinapress.com.my" in s.url, f"non-self-host URL: {s.url}"
+    print(f"PASS test_chinapress_extracted_stories_have_no_advertorial "
+          f"(all {len(stories)} URLs are clean)")
+
+
+def test_chinapress_sinchew_regression():
+    """A2.2-C: Sin Chew Johor regression — parent HtmlListingAdapter unaffected."""
+    johor_adapter = _make_adapter()
+    johor_stories = johor_adapter._parse_listing(_load_fixture())
+    assert len(johor_stories) >= 6, (
+        f"Johor desk should still yield >=6 stories; got {len(johor_stories)}"
+    )
+    for s in johor_stories:
+        assert "johor.sinchew.com.my" in s.url
+        assert s.published_at is None
+    print(f"PASS test_chinapress_sinchew_regression ({len(johor_stories)} Johor stories, "
+          f"all None timestamps — parent unaffected)")
+
+
 def _run_all() -> int:
     """Run every test in this file; return 0 on success, 1 on failure."""
     tests = [
@@ -577,6 +723,13 @@ def _run_all() -> int:
         test_sinchew_main_rejects_ads_and_categories,
         test_sinchew_main_dedup_real_title_wins_over_synthetic_anchor_text,
         test_sinchew_main_johor_desk_backward_compat,
+        # A2.2-C tests
+        test_chinapress_fixture_parses_to_10_stories,
+        test_chinapress_extracts_absolute_timestamp_from_data_pdatetime,
+        test_chinapress_url_filter_excludes_ticker_and_ad_urls,
+        test_chinapress_datetime_coercion,
+        test_chinapress_extracted_stories_have_no_advertorial,
+        test_chinapress_sinchew_regression,
     ]
     failed = 0
     for t in tests:
@@ -592,7 +745,7 @@ def _run_all() -> int:
     if failed:
         print(f"{failed} of {len(tests)} TESTS FAILED")
         return 1
-    print(f"ALL {len(tests)} HTML LISTING A2.2-A + A2.2-B TESTS PASSED")
+    print(f"ALL {len(tests)} HTML LISTING A2.2-A + A2.2-B + A2.2-C TESTS PASSED")
     return 0
 
 

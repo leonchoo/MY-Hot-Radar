@@ -59,6 +59,7 @@ from __future__ import annotations
 
 import hashlib
 import re
+from datetime import datetime, timezone
 from html import unescape
 from typing import List, Optional
 from urllib.parse import urljoin
@@ -403,4 +404,272 @@ class HtmlListingAdapter(SourceAdapter):
         return stories
 
 
-__all__ = ["HtmlListingAdapter", "_strip_html", "_is_article_url"]
+# ============================================================================
+# China Press adapter — added in A2.2-C
+# ============================================================================
+#
+# China Press / 中国报 (https://www.chinapress.com.my/) is a Malaysian
+# Chinese newspaper using a custom-CMS HTML homepage. Unlike Sin Chew,
+# it has:
+#
+#   - Article URL pattern: /YYYYMMDD/{percent-encoded-Chinese-slug}/
+#     (NOT /news/YYYYMMDD/{section}/{id}). The slug contains the
+#     percent-encoded Chinese title.
+#   - Title source: <h1>TITLE</h1> in a sibling anchor (Sin Chew uses
+#     <h2 class="title"> and <a class="internalLink" data-title>).
+#   - Absolute timestamp: <div data-pdatetime="2026-09-30T20:33:42+08:00">
+#     inside a <div class="post-meta"> block following each article
+#     card. Sin Chew has only relative-time strings.
+#   - Mixed-quality ticker: <a href="?p=NNN"> items include real news,
+#     sponsored advertorial (HONOR, GREENS, Cosmobeauté), and editorial.
+#     We DELIBERATELY EXCLUDE the ?p=NNN pattern to avoid advertorial
+#     contamination. The 12 clean /YYYYMMDD/{slug}/ articles per
+#     homepage are all genuine news.
+#
+# This is a SUBCLASS of HtmlListingAdapter that overrides the parsing
+# strategy entirely. Sin Chew regression MUST stay green; we verify
+# this in test_html_listing_adapter.py.
+
+# China Press URL filtering. We DELIBERATELY EXCLUDE:
+#
+#   - The WordPress-style ?p=NNN URLs (homepage ticker mixes real
+#     news with sponsored advertorial at the HTML level).
+#   - URLs containing "/CP/" or "/cp/" (China Press internal ad-asset
+#     URLs with old date prefixes like "/14415562/CP/").
+#   - Pure-ASCII slugs without percent-encoded bytes (real article
+#     slugs always contain percent-encoded UTF-8, e.g. "%e5%8d%88").
+#
+# The actual rejection logic lives in _is_chinapress_article_url().
+
+# <h1>TITLE</h1> in a clean form.
+_H1_TITLE_RE = re.compile(r"<h1[^>]*>([^<]+)</h1>")
+
+# <div class="post_date_meta" data-pdatetime="ISO_TS">
+_DATETIME_RE = re.compile(
+    r'data-pdatetime="([^"]+)"'
+)
+
+# <img src="..." alt="TITLE"/> — fallback for cards where the h1 is
+# missing or placeheld.
+_IMG_ALT_RE = re.compile(
+    r'<img[^>]+alt="([^"]+)"'
+)
+
+
+def _is_chinapress_article_url(url: str) -> bool:
+    """Return True iff ``url`` is a China Press clean article URL.
+
+    Accepts absolute and relative forms. Rejects:
+
+      - Non-chinapress.com.my hosts.
+      - The ``?p=NNN`` ticker URLs (mixed news + advertorial).
+      - URLs containing ``/CP/`` or ``/cp/`` (China Press internal
+        ad-asset URLs with old date prefixes like ``/14415562/CP/``).
+      - Pure-ASCII slugs without any percent-encoded bytes (real
+        article slugs always contain percent-encoded UTF-8, e.g.
+        ``%e5%8d%88`` for ``午``).
+    """
+    if not url:
+        return False
+    # Reject ?p=NNN explicitly (anywhere).
+    if "?" in url:
+        return False
+    # Reject ad-asset URLs (whole-URL check).
+    for kw in ("/CP/", "/cp/"):
+        if kw in url:
+            return False
+    parsed = url
+    if parsed.startswith("http://") or parsed.startswith("https://"):
+        # Must point at China Press (single host).
+        if "chinapress.com.my" not in parsed:
+            return False
+        # Find the first /YYYYMMDD/ segment.
+        m = re.search(r"/(\d{8})/", parsed)
+        if not m:
+            return False
+        parsed = parsed[m.start():]
+    # Slug must contain at least one percent-encoded byte.
+    m = re.match(r"/\d{8}/([^/]+)/?$", parsed)
+    if not m:
+        return False
+    slug = m.group(1)
+    if not re.search(r"%[0-9a-fA-F]{2}", slug):
+        return False
+    return True
+
+
+def _coerce_chinapress_datetime(iso_str: str) -> Optional[str]:
+    """Convert China Press's ISO 8601 ``data-pdatetime`` to UTC ISO Z.
+
+    China Press emits ``"2026-09-30T20:33:42+08:00"`` (Asia/KL).
+    The cluster pipeline requires UTC ISO 8601 with ``Z`` suffix
+    (see WpJsonAdapter._coerce_published_at for the canonical
+    convention). Returns None on parse failure (fail-closed).
+    """
+    if not iso_str:
+        return None
+    try:
+        dt = datetime.fromisoformat(iso_str)
+    except (ValueError, TypeError):
+        return None
+    if dt.tzinfo is None:
+        # Naive datetime — assume UTC and append Z. China Press
+        # always emits timezone-aware so this branch is unreachable
+        # in practice; we keep it defensive.
+        return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+    # Convert to UTC.
+    dt_utc = dt.astimezone(timezone.utc)
+    # Truncate to seconds and append Z.
+    return dt_utc.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+class ChinaPressHtmlListingAdapter(HtmlListingAdapter):
+    """Parse the China Press / 中国报 homepage into Story objects.
+
+    Live-verified 2026-09-30:
+      - https://www.chinapress.com.my/ returned HTTP 200
+      - 12 clean /YYYYMMDD/{slug}/ articles
+      - 9 with absolute timestamps (data-pdatetime)
+      - 10 with extractable titles via <h1>, 1 fallback via <img alt>
+      - WP-JSON / RSS / sitemap all unavailable (404 or HTML fallback)
+      - Homepage ticker ?p=NNN URLs deliberately excluded (mixed quality)
+
+    This is a SUBCLASS of HtmlListingAdapter so the Sin Chew A2.2-A +
+    A2.2-B regression stays green. The parent class's Phase 1/2/3
+    walks are not used here — we replace them with:
+
+      - Phase 4 (h1 walk): for each <h1>TITLE</h1>, find the nearest
+        preceding clean article URL (within 2000 chars).
+      - Phase 4b (img-alt fallback): for clean URLs without a
+        nearby h1, use the <img alt="..."> as title.
+      - Phase 5 (timestamp walk): for each accepted URL+title, walk
+        forward to find the next data-pdatetime div.
+    """
+
+    def _parse_listing(self, html: str) -> List[Story]:
+        """Parse China Press HTML into deduplicated Stories.
+
+        Strategy (deterministic, offline-safe):
+
+          1. Phase 4: walk all <h1> blocks. For each non-placeholder
+             h1, find the nearest preceding clean article URL. Capture
+             (url, title).
+          2. Phase 4b: for clean URLs not yet captured, walk forward
+             from the URL to find an <img alt="TITLE"> as title
+             fallback.
+          3. Phase 5: for each accepted (url, title), walk forward to
+             find the next <div data-pdatetime="ISO"> and convert to
+             UTC ISO Z.
+          4. Filter every URL through _is_chinapress_article_url
+             (rejects nav, category, and ?p=NNN ticker URLs).
+          5. Deduplicate by canonical URL.
+          6. Emit one Story per unique URL, sorted for determinism.
+
+        Per spec rule: ``?p=NNN`` URLs are EXCLUDED because the
+        homepage ticker mixes real news with sponsored advertorial
+        at the HTML level.
+        """
+        base = self.source.url
+
+        # candidates: canonical_url -> dict(title, published_at)
+        candidates: dict = {}
+
+        # Phase 4: h1 walk.
+        seen_urls: set = set()
+        for h1_m in _H1_TITLE_RE.finditer(html):
+            title = h1_m.group(1).strip()
+            if not title or title == "今日头条":
+                continue
+            # Find the nearest preceding clean URL within 2000 chars.
+            start = h1_m.start()
+            pre = html[max(0, start - 2000):start]
+            url_matches = re.findall(
+                r'href="(https?://www\.chinapress\.com\.my/\d{8}/[^"/]+/?)"',
+                pre,
+            )
+            if not url_matches:
+                continue
+            url = url_matches[-1]  # closest preceding
+            if url in seen_urls:
+                continue
+            seen_urls.add(url)
+            if not _is_chinapress_article_url(url):
+                continue
+            # Phase 5: find the next data-pdatetime after this h1.
+            after = html[h1_m.end():h1_m.end() + 1500]
+            dt_m = _DATETIME_RE.search(after)
+            published_at = (
+                _coerce_chinapress_datetime(dt_m.group(1))
+                if dt_m else None
+            )
+            candidates[url] = {
+                "title": title,
+                "published_at": published_at,
+            }
+
+        # Phase 4b: img-alt fallback for clean URLs not yet captured.
+        for url in set(re.findall(
+            r'href="(https?://www\.chinapress\.com\.my/\d{8}/[^"/]+/?)"',
+            html,
+        )):
+            if url in candidates:
+                continue
+            if not _is_chinapress_article_url(url):
+                continue
+            # Skip "audio list" and other non-article sections.
+            if "article-audio-list" in url:
+                continue
+            # Find the URL position; if it occurs multiple times use
+            # the first. Look forward 1500 chars for an alt attribute.
+            idx = html.find(url)
+            if idx == -1:
+                continue
+            forward = html[idx:idx + 1500]
+            alt_m = _IMG_ALT_RE.search(forward)
+            if not alt_m:
+                continue
+            title = alt_m.group(1).strip()
+            if not title or title == "今日头条":
+                continue
+            dt_m = _DATETIME_RE.search(forward)
+            published_at = (
+                _coerce_chinapress_datetime(dt_m.group(1))
+                if dt_m else None
+            )
+            candidates[url] = {
+                "title": title,
+                "published_at": published_at,
+            }
+
+        # Emit Stories in URL-sorted order.
+        stories: List[Story] = []
+        for url in sorted(candidates.keys()):
+            entry = candidates[url]
+            title = _strip_html(entry["title"]) or entry["title"]
+            stories.append(
+                Story(
+                    id=_make_story_id(url),
+                    title=title,
+                    summary="",
+                    url=url,
+                    source=self.source.name,
+                    source_type=SourceType.HTML_LISTING,
+                    published_at=entry["published_at"],
+                    discovered_at=Story.__dataclass_fields__["discovered_at"]
+                    .default_factory(),
+                    category=self._category,
+                    language=Language.ZH,
+                    country=self.source.country,
+                )
+            )
+        return stories
+
+
+__all__ = [
+    "HtmlListingAdapter",
+    "ChinaPressHtmlListingAdapter",
+    "_strip_html",
+    "_is_article_url",
+    "_is_chinapress_article_url",
+    "_coerce_chinapress_datetime",
+]
