@@ -20,6 +20,7 @@ History:
   Radar-2 (2026-09-29): 5 RSS sources.
   A2.3 (2026-09-30): 2 WP-JSON sources added (Chinese). Total: 7.
   A2.2-A (2026-09-30): 1 HTML listing source added (Sin Chew Johor). Total: 8.
+  A2.2-B (2026-09-30): 1 HTML listing source added (Sin Chew Main). Total: 9.
 
 Current mix:
 
@@ -31,6 +32,7 @@ Current mix:
   Malaysian Chinese news (WP-JSON)            Kwong Wah Yit Poh   Tier B
   Malaysian Chinese news (WP-JSON)            Guang Ming Daily    Tier B
   Malaysian Chinese Johor news (HTML)         Sin Chew Johor desk Tier B
+  Malaysian Chinese main news (HTML)          Sin Chew Main       Tier B
 
 Tier justifications (also carried in each Source's `notes`):
 
@@ -49,14 +51,29 @@ Tier justifications (also carried in each Source's `notes`):
     Tier B. Joined in A2.3.
   Guang Ming Daily (光明日报)    - established Malaysian Chinese daily;
     WordPress backend, public /wp-json endpoint. Tier B. Joined in A2.3.
+  Sin Chew Johor desk (星洲日报柔佛版) - established Penang-based
+    Chinese daily (since 1910); Johor microsite with custom-CMS
+    HTML. ~16-40 dated article URLs on the homepage. Tier B.
+    Joined in A2.2-A.
+  Sin Chew Main (星洲日报)       - the Sin Chew Daily homepage;
+    established Malaysian Chinese daily (since 1910). Custom-CMS
+    HTML; ~90 article URLs on the homepage spanning 21 sections
+    and 11 hostnames (metro, sarawak, sabah, johor, ...).
+    Tier B. Joined in A2.2-B. Same publisher as Sin Chew Johor;
+    the cross-host Johor links in Main's homepage are deduped
+    against the Johor desk's homepage fetch.
 
 We deliberately do NOT register (per probe results):
   - The Star, NST, Malay Mail, Malaysiakini, FMT English, Astro Awani,
     The Edge: their public RSS endpoints return 404 or SSL errors at
     this time. Re-probe before considering them.
   - BERNAMA / PMO / Sarawakvoice: SSL / 403 / 404 at this time.
-  - Sin Chew / China Press / eNanyang: HTML-listing sources requiring
-    a separate HTML adapter (deferred to A2.2 / future batches).
+  - China Press / eNanyang: HTML-listing sources requiring
+    a separate HTML adapter (deferred to future batches).
+  - Sin Chew subdomains other than Johor (sarawak, sabah, ...):
+    already covered by Sin Chew Main's homepage which links to
+    them. Adding individual subdomain sources would duplicate
+    stories.
   - Any source that requires auth, paywall bypass, or CAPTCHA.
 """
 
@@ -194,16 +211,57 @@ REGISTERED_SOURCES: List[Source] = [
         tier=SourceTier.B,
         notes=("Custom-CMS HTML listing page. Chinese. Johor-focused "
                "microsite under Sin Chew Daily (星洲日报). "
-               "~16-38 dated article URLs on the homepage. "
+               "~16-40 dated article URLs on the homepage. "
                "Joined registry in A2.2-A (2026-09-30). "
                "Listing page only carries relative time strings, "
                "so published_at=None by default. "
                "Cross-language dedup works via the A1 Chinese "
                "place-name aliases (马来西亚 / 新加坡 / 吉隆坡 / "
                "柔佛 / 新山 / 马新 / 新马). "
-               "Sin Chew Main (https://www.sinchew.com.my/) is a "
-               "separate source requiring its own HTML adapter; "
-               "deferred to a future batch."),
+               "Sin Chew Main (https://www.sinchew.com.my/) was "
+               "joined as a separate Tier-B source in A2.2-B "
+               "(2026-09-30); cross-host Johor links in the Main "
+               "homepage dedupe against this desk's fetch."),
+    ),
+
+    # ---- 9. Malaysia (Chinese, HTML listing) — A2.2-B ----------------------
+    # Sin Chew Main / 星洲日报 — the Sin Chew Daily homepage. Established
+    # Malaysian Chinese daily (since 1910). WP-JSON, RSS, and sitemap
+    # all return 404; the homepage is a custom-CMS HTML page with
+    # ~90 dated article URLs spanning 21 sections (metro, sarawak,
+    # sabah, johor, sports, international, ...) and 11 hostnames
+    # (metro.sinchew.com.my, eastcoast.sinchew.com.my, ...).
+    # HtmlListingAdapter's generalized Phase-2 walk (<a class=
+    # "internalLink" data-title="..." href="...">) is the workhorse;
+    # Sin Chew Main does NOT expose <h2 class="title"> cards (unlike
+    # the Johor desk). The listing page only carries relative time
+    # strings ("2小时前", "3天前") so published_at is None by default.
+    # Cross-host Johor links in the Main homepage dedupe against the
+    # Sin Chew Johor desk fetch via the dedup pipeline's URL-based
+    # canonicalization. Tier B — established national outlet, not Tier A.
+    Source(
+        name="Sin Chew Main",
+        type=SourceType.HTML_LISTING,
+        url="https://www.sinchew.com.my/",
+        reliability=4,
+        country="MY",
+        languages=[Language.ZH],
+        tier=SourceTier.B,
+        notes=("Custom-CMS HTML listing page. Chinese. Sin Chew "
+               "Daily's national homepage (星洲日报). ~90 dated "
+               "article URLs on the homepage spanning 21 sections "
+               "and 11 hostnames (metro, sarawak, sabah, johor, "
+               "sports, ...). Joined registry in A2.2-B (2026-09-30). "
+               "Listing page only carries relative time strings, "
+               "so published_at=None by default. Same publisher as "
+               "the Johor desk (joined A2.2-A); cross-host Johor "
+               "links in the Main homepage dedupe against the Johor "
+               "desk's fetch. Cross-language dedup works via the A1 "
+               "Chinese place-name aliases (马来西亚 / 新加坡 / "
+               "吉隆坡 / 柔佛 / 新山 / 马新 / 新马). "
+               "Sin Chew regional subdomains (sarawak, sabah, "
+               "metro, etc.) are NOT separately registered — they "
+               "are reachable through this source's homepage."),
     ),
 ]
 

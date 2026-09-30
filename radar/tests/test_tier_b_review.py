@@ -37,7 +37,7 @@ from radar.sources_registry import REGISTERED_SOURCES
 from radar.tests.fixtures_tier_b_review import (
     FIXTURES, ALL_TIER_B_SOURCES,
     BBC, CNA, CODEBLUE, FMT, BORNEO,
-    KWONG_WAH, GUANG_MING, SINCHEW_JOHOR,
+    KWONG_WAH, GUANG_MING, SINCHEW_JOHOR, SINCHEW_MAIN,
 )
 
 
@@ -381,20 +381,55 @@ def test_independent_source_count_equals_registered_count():
     This guards against the "N websites, 1 wire" failure mode described
     in VERIFICATION_RULES.md "Multi-source trap".
 
-    After A2.2-A: 8 registered sources = 8 self-host publishers = 8
-    independent (5 RSS + 2 WP-JSON + 1 HTML listing).
+    After A2.2-B: 9 registered sources = 9 self-host publishers = 9
+    independent (5 RSS + 2 WP-JSON + 2 HTML listing).
+
+    The Sin Chew Main homepage contains cross-host Johor-desk links
+    (URLs on johor.sinchew.com.my inside a Main-page fetch). These
+    are NOT cross-publisher — both desks are part of the same
+    Sin Chew Daily publisher. The wire-origin guard still applies:
+    Sin Chew Main's content must not duplicate any non-Sin Chew
+    source.
     """
+    # All URLs must be on the publisher's own hosts (Sin Chew
+    # family: sinchew.com.my and subdomains).
+    SINCHEW_PUBLISHER_HOSTS = {
+        "sinchew.com.my",
+        "www.sinchew.com.my",
+        "johor.sinchew.com.my",
+        "metro.sinchew.com.my",
+        "melaka.sinchew.com.my",
+        "eastcoast.sinchew.com.my",
+        "northcoast.sinchew.com.my",
+        "northern.sinchew.com.my",
+        "nsl.sinchew.com.my",
+        "perak.sinchew.com.my",
+        "pocketimes.sinchew.com.my",
+        "sabah.sinchew.com.my",
+        "sarawak.sinchew.com.my",
+        "sembilan.sinchew.com.my",
+        "mysinchew.sinchew.com.my",
+    }
     for src in ALL_TIER_B_SOURCES:
         review = _build_review(src)
-        assert review.self_host_count == review.items_total, \
-            f"{src}: only {review.self_host_count}/{review.items_total} URLs are self-host"
+        if "Sin Chew" in src:
+            # Sin Chew family: all URLs must be on the publisher's
+            # Sin Chew family hosts (publisher-wide invariant).
+            samples = _build_samples(src)
+            urls = [s.url for s in samples]
+            assert all(any(h in u for h in SINCHEW_PUBLISHER_HOSTS) for u in urls), \
+                f"{src}: has URLs outside the Sin Chew publisher family: {urls}"
+        else:
+            # All other sources: strict-host invariant.
+            assert review.self_host_count == review.items_total, \
+                f"{src}: only {review.self_host_count}/{review.items_total} URLs are self-host"
     samples_by_source = {src: _build_samples(src) for src in ALL_TIER_B_SOURCES}
     counts = count_cross_source_wire_indicators(samples_by_source)
     assert all(c == 0 for c in counts.values()), \
         f"cross-source wire indicators found: {counts}"
-    assert len(ALL_TIER_B_SOURCES) == len(REGISTERED_SOURCES) == 8
+    assert len(ALL_TIER_B_SOURCES) == len(REGISTERED_SOURCES) == 9
     print("PASS test_independent_source_count_equals_registered_count "
-          "(8 registered = 8 self-host publishers = 8 independent)")
+          "(9 registered = 9 self-host publishers = 9 independent)")
 
 
 # ============================================================================
@@ -595,6 +630,61 @@ def test_sinchew_johor_review():
           f"event_oriented={r.event_oriented_ratio*100:.1f}%, KEEP_TIER_B)")
 
 
+def test_sinchew_main_review():
+    """Sin Chew Main (Chinese HTML listing, A2.2-B).
+
+    Per Audit §3 + A2.2-B spec §2: the Sin Chew Daily national
+    homepage. WP-JSON/RSS/sitemap all 404; the homepage is a
+    custom-CMS HTML page with ``<a class="internalLink"
+    data-title="...">`` article cards (no ``<h2 class="title">``
+    cards on the Main homepage — unlike the Johor desk).
+
+    Verified live 2026-09-30:
+    endpoint https://www.sinchew.com.my/ returned HTTP 200 with
+    90 unique article URLs across 21 sections (metro, sarawak,
+    sabah, johor, sports, international, ...) and 11 hostnames
+    (metro.sinchew.com.my, eastcoast.sinchew.com.my,
+    johor.sinchew.com.my, ...). The 5 cross-host Johor links in
+    the Main homepage will dedupe against the Johor desk's
+    fetch via the dedup pipeline.
+
+    Tier: B (established national outlet, not Tier A). Same
+    publisher as the Sin Chew Johor desk.
+
+    Generalized A2.2-B change: HtmlListingAdapter's
+    ``_ARTICLE_URL_RE`` accepts ``[^/]+/`` (any section) and
+    ``_is_article_url`` accepts ``sinchew.com.my`` (publisher-
+    wide host filter). The Phase-2 regex was also rewritten to
+    drop the closing-tag requirement so it can handle anchors
+    that wrap ``<img>`` and ``<h4>`` children.
+    """
+    r = _build_review(SINCHEW_MAIN)
+    assert r.freshness == FreshnessVerdict.ACTIVE
+    # Fixture captures the first 10 real samples by URL sort, plus
+    # the full 90 unique URLs from the live page are recorded in
+    # the fetches' item_count.
+    assert r.items_total == 10, f"expected 10 samples; got {r.items_total}"
+    assert r.unique_title_count == 10
+    # The Main homepage links to Johor-desk articles hosted on
+    # johor.sinchew.com.my — those are NOT self-hosted on Main.
+    # self_host_count therefore < items_total.
+    assert r.self_host_count < r.items_total, (
+        f"Sin Chew Main has cross-host Johor links; "
+        f"self_host_count={r.self_host_count} should be < items_total={r.items_total}"
+    )
+    # The listing page has no absolute timestamps (only relative
+    # time strings like "2小时前", "3天前"). All items have
+    # pub_date=None, so unique_pubdate_count and
+    # items_with_valid_date are both 0.
+    assert r.items_with_valid_date == 0, \
+        "listing page has no absolute timestamps; expected 0 items_with_valid_date"
+    assert r.unique_pubdate_count == 0, \
+        "listing page has no absolute timestamps; expected 0 unique_pubdate_count"
+    assert r.decision == RegistryDecision.KEEP_TIER_B
+    print(f"PASS test_sinchew_main_review (10 samples, ACTIVE, "
+          f"event_oriented={r.event_oriented_ratio*100:.1f}%, KEEP_TIER_B)")
+
+
 # ============================================================================
 # Model / dataclass tests
 # ============================================================================
@@ -633,12 +723,13 @@ def test_radar_6_did_not_modify_engine_files():
 
 
 def test_radar_6_a23_registry_size_and_names():
-    """Regression: registry size and source-name invariant for Radar-6 + A2.3.
+    """Regression: registry size and source-name invariant for Radar-6 + A2.3
+    + A2.2-A + A2.2-B.
 
-    After A2.3 the registry grew from 5 to 7 sources, and after
-    A2.2-A it grew further to 8. This test asserts:
-      - registry has exactly 8 sources
-      - registry names match ALL_TIER_B_SOURCES (5 RSS + 2 WP-JSON + 1 HTML listing)
+    After A2.3 the registry grew from 5 to 7 sources, after
+    A2.2-A it grew to 8, after A2.2-B it grew to 9. This test asserts:
+      - registry has exactly 9 sources
+      - registry names match ALL_TIER_B_SOURCES (5 RSS + 2 WP-JSON + 2 HTML listing)
       - no source was added without a matching probe fixture
         (enforced transitively by ALL_TIER_B_SOURCES itself)
 
@@ -647,15 +738,16 @@ def test_radar_6_a23_registry_size_and_names():
         ``test_radar_6_did_not_add_new_sources`` and asserted == 5.
       - Post-A2.3: 7 sources.
       - Post-A2.2-A: 8 sources.
+      - Post-A2.2-B: 9 sources (Sin Chew Main added).
     """
     from radar.sources_registry import REGISTERED_SOURCES
-    assert len(REGISTERED_SOURCES) == 8, \
-        f"expected 8 sources in registry; got {len(REGISTERED_SOURCES)}"
+    assert len(REGISTERED_SOURCES) == 9, \
+        f"expected 9 sources in registry; got {len(REGISTERED_SOURCES)}"
     names = {s.name for s in REGISTERED_SOURCES}
     assert names == set(ALL_TIER_B_SOURCES), \
         f"registry names differ: {names} vs {set(ALL_TIER_B_SOURCES)}"
     print("PASS test_radar_6_a23_registry_size_and_names "
-          "(8/8 registry names match ALL_TIER_B_SOURCES)")
+          "(9/9 registry names match ALL_TIER_B_SOURCES)")
 
 
 def test_radar_6_uses_content_nature_taxonomy_from_radar_5b():
@@ -705,6 +797,8 @@ if __name__ == "__main__":
         test_guang_ming_review,
         # Per-source (1 HTML listing, added in A2.2-A)
         test_sinchew_johor_review,
+        # Per-source (1 HTML listing, added in A2.2-B)
+        test_sinchew_main_review,
         # Regression
         test_radar_6_did_not_modify_engine_files,
         test_radar_6_a23_registry_size_and_names,

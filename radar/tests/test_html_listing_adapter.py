@@ -67,6 +67,7 @@ from radar.sources.html_listing import (
 
 FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures" / "html_listing"
 TRIMMED_FIXTURE = FIXTURES_DIR / "sinchew_johor_listing_trimmed.html"
+TRIMMED_FIXTURE_MAIN = FIXTURES_DIR / "sinchew_main_listing_trimmed.html"
 
 
 def _make_source(
@@ -85,8 +86,28 @@ def _make_source(
     )
 
 
+def _make_source_main(
+    name: str = "Sin Chew Main",
+    url: str = "https://www.sinchew.com.my/",
+) -> Source:
+    return Source(
+        name=name,
+        type=SourceType.HTML_LISTING,
+        url=url,
+        reliability=4,
+        country="MY",
+        languages=[Language.ZH],
+        tier=SourceTier.B,
+        notes="A2.2-B test fixture",
+    )
+
+
 def _make_adapter() -> HtmlListingAdapter:
     return HtmlListingAdapter(_make_source(), category=Category.MALAYSIA)
+
+
+def _make_adapter_main() -> HtmlListingAdapter:
+    return HtmlListingAdapter(_make_source_main(), category=Category.MALAYSIA)
 
 
 def _load_fixture() -> str:
@@ -96,6 +117,15 @@ def _load_fixture() -> str:
             f"Re-run the probe script to regenerate it."
         )
     return TRIMMED_FIXTURE.read_text(encoding="utf-8")
+
+
+def _load_fixture_main() -> str:
+    if not TRIMMED_FIXTURE_MAIN.exists():
+        raise FileNotFoundError(
+            f"fixture missing: {TRIMMED_FIXTURE_MAIN}. "
+            f"Re-run the probe script to regenerate it."
+        )
+    return TRIMMED_FIXTURE_MAIN.read_text(encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------
@@ -517,6 +547,7 @@ def test_articles_are_sorted_for_determinism():
 def _run_all() -> int:
     """Run every test in this file; return 0 on success, 1 on failure."""
     tests = [
+        # A2.2-A tests
         test_valid_html_listing_returns_stories,
         test_multiple_article_cards_collected,
         test_valid_article_url_accepted,
@@ -538,6 +569,14 @@ def _run_all() -> int:
         test_fail_closed_on_wrong_source_type,
         test_live_fixture_present,
         test_articles_are_sorted_for_determinism,
+        # A2.2-B tests
+        test_sinchew_main_fixture_parses_to_8_stories,
+        test_sinchew_main_accepts_arbitrary_sections,
+        test_sinchew_main_accepts_publisher_wide_hosts,
+        test_sinchew_main_phase2_handles_inner_tag_anchors,
+        test_sinchew_main_rejects_ads_and_categories,
+        test_sinchew_main_dedup_real_title_wins_over_synthetic_anchor_text,
+        test_sinchew_main_johor_desk_backward_compat,
     ]
     failed = 0
     for t in tests:
@@ -553,8 +592,176 @@ def _run_all() -> int:
     if failed:
         print(f"{failed} of {len(tests)} TESTS FAILED")
         return 1
-    print(f"ALL {len(tests)} HTML LISTING A2.2-A TESTS PASSED")
+    print(f"ALL {len(tests)} HTML LISTING A2.2-A + A2.2-B TESTS PASSED")
     return 0
+
+
+# ============================================================================
+# A2.2-B — Sin Chew Main generalization tests
+# ============================================================================
+#
+# These tests verify the A2.2-B generalizations to the adapter:
+#   1. URL regex accepts arbitrary sections (not just /johor/)
+#   2. Host filter accepts the entire sinchew.com.my publisher family
+#   3. Phase-2 regex matches anchors that wrap <img> / <h4> children
+#
+# The A2.2-A tests above continue to pass because the Johor pattern
+# is a strict subset of the generalized pattern.
+
+def test_sinchew_main_fixture_parses_to_8_stories():
+    """The Sin Chew Main trimmed fixture produces exactly 8 stories.
+
+    7 real Sin Chew Main articles (international, nation, melaka,
+    yl sections) + 1 real cross-host Johor-desk article hosted on
+    johor.sinchew.com.my = 8 distinct URLs.
+    """
+    adapter = _make_adapter_main()
+    stories = adapter._parse_listing(_load_fixture_main())
+    urls = {s.url for s in stories}
+    assert len(stories) == len(urls) == 8, \
+        f"expected 8 unique stories; got {len(stories)} stories, {len(urls)} URLs"
+    for s in stories:
+        assert isinstance(s, Story)
+        assert s.title
+        assert s.url
+        assert s.language == Language.ZH
+        assert s.source_type == SourceType.HTML_LISTING
+        assert s.published_at is None  # listing page has no absolute timestamps
+    print(f"PASS test_sinchew_main_fixture_parses_to_8_stories (8 stories, all zh, all None)")
+
+
+def test_sinchew_main_accepts_arbitrary_sections():
+    """A2.2-B: URL regex accepts /news/YYYYMMDD/{section}/{id} for
+    any section, not just /johor/."""
+    # General Sin Chew Main sections.
+    assert _is_article_url("https://www.sinchew.com.my/news/20260930/international/7896179")
+    assert _is_article_url("https://www.sinchew.com.my/news/20260930/nation/7896026")
+    assert _is_article_url("https://www.sinchew.com.my/news/20260930/sports/7895444")
+    assert _is_article_url("https://www.sinchew.com.my/news/20260930/entertainment/7895190")
+    assert _is_article_url("https://www.sinchew.com.my/news/20260930/finance/7895444")
+    assert _is_article_url("https://www.sinchew.com.my/news/20260929/yl/7890680")
+    assert _is_article_url("https://www.sinchew.com.my/news/20260930/sarawak/7889444")
+    # Johor-section URLs on the Johor desk still work (backward compat).
+    assert _is_article_url("https://johor.sinchew.com.my/news/20260930/johor/7895884")
+    print("PASS test_sinchew_main_accepts_arbitrary_sections (8 sections accepted)")
+
+
+def test_sinchew_main_accepts_publisher_wide_hosts():
+    """A2.2-B: host filter accepts any *.sinchew.com.my subdomain.
+
+    Sin Chew Main homepage links to articles hosted on the regional
+    desk subdomains (metro, sarawak, sabah, eastcoast, johor, ...).
+    The adapter must accept these as legitimate Sin Chew articles.
+    """
+    hosts = [
+        "www.sinchew.com.my",
+        "johor.sinchew.com.my",
+        "metro.sinchew.com.my",
+        "melaka.sinchew.com.my",
+        "eastcoast.sinchew.com.my",
+        "sarawak.sinchew.com.my",
+        "sabah.sinchew.com.my",
+        "pocketimes.sinchew.com.my",
+        "mysinchew.sinchew.com.my",
+        "nsl.sinchew.com.my",
+    ]
+    for h in hosts:
+        url = f"https://{h}/news/20260930/section/1234567"
+        assert _is_article_url(url), f"{url} should be accepted (publisher-wide host)"
+    # Negative: non-Sin Chew hosts must still be rejected.
+    assert not _is_article_url("https://example.com/news/20260930/section/1234567")
+    assert not _is_article_url("https://chinapress.com.my/news/20260930/section/1234567")
+    print(f"PASS test_sinchew_main_accepts_publisher_wide_hosts "
+          f"({len(hosts)} subdomains accepted)")
+
+
+def test_sinchew_main_phase2_handles_inner_tag_anchors():
+    """A2.2-B: Phase-2 regex matches <a> anchors that wrap inner
+    tags (<img>, <h4>) — the structure Sin Chew Main actually uses.
+
+    The fixture deliberately puts <img> children inside the
+    internalLink anchors. The previous Phase-2 regex (which
+    required ``[^<]*`` text content between open and close tags)
+    would have rejected these. The new regex only requires the
+    open-tag attributes (class + data-title + href) and ignores
+    the closing tag.
+    """
+    adapter = _make_adapter_main()
+    stories = adapter._parse_listing(_load_fixture_main())
+    # The fixture's 7 real Sin Chew Main articles each have TWO
+    # internalLink anchors (one wrapping <img>, one wrapping <h4>).
+    # Both anchors must contribute to extraction but dedupe to the
+    # same URL.
+    urls = {s.url for s in stories}
+    assert len(urls) == 8, \
+        f"expected 8 distinct URLs (after dedupe); got {len(urls)}"
+    print(f"PASS test_sinchew_main_phase2_handles_inner_tag_anchors "
+          f"(8 URLs after dedup, all from <a> anchors with inner tags)")
+
+
+def test_sinchew_main_rejects_ads_and_categories():
+    """A2.2-B: nav/category/non-numeric-id URLs are still rejected
+    even with the generalized URL regex."""
+    adapter = _make_adapter_main()
+    stories = adapter._parse_listing(_load_fixture_main())
+    urls = {s.url for s in stories}
+    # The fixture has 2 deliberately invalid URLs:
+    #   - /news/20260930/international/not-a-number (non-numeric id)
+    #   - /category/foo (navigation)
+    assert "https://www.sinchew.com.my/news/20260930/international/not-a-number" not in urls, \
+        "non-numeric id should be rejected"
+    assert not any("/category/" in u for u in urls), \
+        "category URLs should be rejected"
+    print(f"PASS test_sinchew_main_rejects_ads_and_categories "
+          f"(all {len(urls)} extracted URLs are valid articles)")
+
+
+def test_sinchew_main_dedup_real_title_wins_over_synthetic_anchor_text():
+    """A2.2-B: when the same article URL appears twice (once as
+    real internalLink with real data-title, once as bare anchor
+    with synthetic anchor text), the real title wins.
+
+    Sin Chew Main's homepage often has a primary article card
+    followed by a related-stories anchor with shorter text. The
+    Phase-2 walk sees the real internalLink first and stores the
+    real title; the bare-anchor walk sees the synthetic text but
+    ``if full in candidates: continue`` skips it.
+    """
+    adapter = _make_adapter_main()
+    stories = adapter._parse_listing(_load_fixture_main())
+    # Find the article with the synthetic dup-link-anchor-text
+    target_url = "https://www.sinchew.com.my/news/20260930/international/7896179"
+    target_story = next((s for s in stories if s.url == target_url), None)
+    assert target_story is not None, \
+        "the article that appears twice (real + dup) should still be emitted"
+    # Real title is "哥哥吸毒频繁闹事 弟鸣枪吓阻变射杀"
+    # Synthetic anchor text is "link text ignored" / "dup-link-anchor-text"
+    assert "哥哥吸毒" in target_story.title, \
+        f"expected the REAL data-title to win over synthetic anchor text; got {target_story.title!r}"
+    assert "dup-link-anchor-text" not in target_story.title, \
+        "synthetic anchor text should NOT appear in title"
+    print(f"PASS test_sinchew_main_dedup_real_title_wins_over_synthetic_anchor_text "
+          f"(title={target_story.title!r})")
+
+
+def test_sinchew_main_johor_desk_backward_compat():
+    """A2.2-A regression: after A2.2-B generalization, Sin Chew
+    Johor desk's URL pattern still parses cleanly.
+
+    The Johor pattern /news/YYYYMMDD/johor/{id} is a strict subset
+    of the generalized /news/YYYYMMDD/{section}/{id} pattern. The
+    host filter ``sinchew.com.my`` accepts both
+    ``johor.sinchew.com.my`` (Johor desk) and ``www.sinchew.com.my``
+    (Main).
+    """
+    adapter = _make_adapter()  # Johor desk adapter
+    stories = adapter._parse_listing(_load_fixture())  # Johor fixture
+    assert len(stories) >= 6, f"Johor desk fixture should still yield >=6 stories; got {len(stories)}"
+    for s in stories:
+        assert "johor.sinchew.com.my" in s.url, \
+            f"Johor desk stories should be on johor.sinchew.com.my; got {s.url}"
+    print(f"PASS test_sinchew_main_johor_desk_backward_compat "
+          f"(A2.2-A Johor desk still works after A2.2-B generalization, {len(stories)} stories)")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,168 @@
+<!--
+  Fixture for HtmlListingAdapter tests (A2.2-B — Sin Chew Main).
+  
+  All 8 article titles are REAL, captured from the live homepage
+  on 2026-09-30 (https://www.sinchew.com.my/, sha12 1b1e7048a855):
+  
+    1. 哥哥吸毒频繁闹事 弟鸣枪吓阻变射杀  (international)
+    2. 美伊和平现曙光？伊朗称已收到华府终结战争回应 传执行顺序成主要分歧  (international)
+    3. 泰国31府与曼谷仍处洪灾 逾百万户受灾24人遇难  (international)
+    4. 泰晤士高教世界大学排名 大马29所大学上榜  (nation)
+    5. 【总编推荐】朱运健：希盟土团谈不拢，国阵国盟笑哈哈  (nation)
+    6. 视频 | 2021甲州选激烈 女性候选人 多角战 独立人士成亮点  (melaka)
+    7. 社论.科技不能取代纸笔，教育方向应调整  (yl)
+    8. 新山男子被控  (johor — cross-host link to johor.sinchew.com.my)
+  
+  Synthetic test structure (not real):
+  
+    - /category/foo  — navigation link, must be REJECTED
+    - /news/20260930/international/not-a-number — non-numeric id, must be REJECTED
+    - "dup-link-anchor-text" — anchor text on a real article URL,
+      used to verify dedup-by-URL (real data-title wins over
+      synthetic anchor text)
+  
+  Time strings ("2小时前", "3小时前", etc.) are real examples from
+  Sin Chew Main's homepage; the adapter emits published_at=None for
+  all of them per spec rule.
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>星洲日报 Sin Chew Daily</title>
+</head>
+<body>
+<header>
+  <nav>
+    <a href="https://www.sinchew.com.my">首页</a>
+    <a href="https://www.sinchew.com.my/news/20260930/nation" class="internalLink" data-title="国内">国内</a>
+    <a href="https://www.sinchew.com.my/news/20260930/international" class="internalLink" data-title="国际">国际</a>
+    <a href="https://www.sinchew.com.my/news/20260930/sports" class="internalLink" data-title="体育">体育</a>
+    <a href="https://www.sinchew.com.my/news/20260930/entertainment" class="internalLink" data-title="娱乐">娱乐</a>
+    <a href="https://www.sinchew.com.my/category/news">新闻分类</a>
+    <a href="https://www.sinchew.com.my/about">关于我们</a>
+  </nav>
+</header>
+<main>
+  <article>
+    <div class="img-frame">
+      <a class="internalLink" data-title="哥哥吸毒频繁闹事 弟鸣枪吓阻变射杀" href="https://www.sinchew.com.my/news/20260930/international/7896179">
+        <img src="https://cdn.sinchew.com.my/wp-content/uploads/2026/09/x.jpg" alt="x"/>
+      </a>
+    </div>
+    <div class="text">
+      <a class="internalLink" data-title="哥哥吸毒频繁闹事 弟鸣枪吓阻变射杀" href="https://www.sinchew.com.my/news/20260930/international/7896179">
+        <h4>哥哥吸毒频繁闹事 弟鸣枪吓阻变射杀</h4>
+      </a>
+    </div>
+    <div class="time">2小时前</div>
+  </article>
+  <article>
+    <div class="img-frame">
+      <a class="internalLink" data-title="美伊和平现曙光？伊朗称已收到华府终结战争回应 传执行顺序成主要分歧" href="https://www.sinchew.com.my/news/20260930/international/7896125">
+        <img src="https://cdn.sinchew.com.my/wp-content/uploads/2026/09/y.jpg" alt="y"/>
+      </a>
+    </div>
+    <div class="text">
+      <a class="internalLink" data-title="美伊和平现曙光？伊朗称已收到华府终结战争回应 传执行顺序成主要分歧" href="https://www.sinchew.com.my/news/20260930/international/7896125">
+        <h4>美伊和平现曙光？伊朗称已收到华府终结战争回应 传执行顺序成主要分歧</h4>
+      </a>
+    </div>
+    <div class="time">2小时前</div>
+  </article>
+  <article>
+    <div class="img-frame">
+      <a class="internalLink" data-title="泰国31府与曼谷仍处洪灾 逾百万户受灾24人遇难" href="https://www.sinchew.com.my/news/20260930/international/7896053">
+        <img src="https://cdn.sinchew.com.my/wp-content/uploads/2026/09/z.jpg" alt="z"/>
+      </a>
+    </div>
+    <div class="text">
+      <a class="internalLink" data-title="泰国31府与曼谷仍处洪灾 逾百万户受灾24人遇难" href="https://www.sinchew.com.my/news/20260930/international/7896053">
+        <h4>泰国31府与曼谷仍处洪灾 逾百万户受灾24人遇难</h4>
+      </a>
+    </div>
+    <div class="time">3小时前</div>
+  </article>
+  <article>
+    <div class="img-frame">
+      <a class="internalLink" data-title="泰晤士高教世界大学排名 大马29所大学上榜" href="https://www.sinchew.com.my/news/20260930/nation/7896026">
+        <img src="https://cdn.sinchew.com.my/wp-content/uploads/2026/09/a.jpg" alt="a"/>
+      </a>
+    </div>
+    <div class="text">
+      <a class="internalLink" data-title="泰晤士高教世界大学排名 大马29所大学上榜" href="https://www.sinchew.com.my/news/20260930/nation/7896026">
+        <h4>泰晤士高教世界大学排名 大马29所大学上榜</h4>
+      </a>
+    </div>
+    <div class="time">4小时前</div>
+  </article>
+  <article>
+    <div class="img-frame">
+      <a class="internalLink" data-title="【总编推荐】朱运健：希盟土团谈不拢，国阵国盟笑哈哈" href="https://www.sinchew.com.my/news/20260930/nation/7895714">
+        <img src="https://cdn.sinchew.com.my/wp-content/uploads/2026/09/b.jpg" alt="b"/>
+      </a>
+    </div>
+    <div class="text">
+      <a class="internalLink" data-title="【总编推荐】朱运健：希盟土团谈不拢，国阵国盟笑哈哈" href="https://www.sinchew.com.my/news/20260930/nation/7895714">
+        <h4>【总编推荐】朱运健：希盟土团谈不拢，国阵国盟笑哈哈</h4>
+      </a>
+    </div>
+    <div class="time">5小时前</div>
+  </article>
+  <article>
+    <div class="img-frame">
+      <a class="internalLink" data-title="视频 | 2021甲州选激烈 女性候选人 多角战 独立人士成亮点" href="https://melaka.sinchew.com.my/news/20260930/melaka/7893194">
+        <img src="https://cdn.sinchew.com.my/wp-content/uploads/2026/09/c.jpg" alt="c"/>
+      </a>
+    </div>
+    <div class="text">
+      <a class="internalLink" data-title="视频 | 2021甲州选激烈 女性候选人 多角战 独立人士成亮点" href="https://melaka.sinchew.com.my/news/20260930/melaka/7893194">
+        <h4>视频 | 2021甲州选激烈 女性候选人 多角战 独立人士成亮点</h4>
+      </a>
+    </div>
+    <div class="time">6小时前</div>
+  </article>
+  <article>
+    <div class="img-frame">
+      <a class="internalLink" data-title="社论.科技不能取代纸笔，教育方向应调整" href="https://www.sinchew.com.my/news/20260929/yl/7890680">
+        <img src="https://cdn.sinchew.com.my/wp-content/uploads/2026/09/d.jpg" alt="d"/>
+      </a>
+    </div>
+    <div class="text">
+      <a class="internalLink" data-title="社论.科技不能取代纸笔，教育方向应调整" href="https://www.sinchew.com.my/news/20260929/yl/7890680">
+        <h4>社论.科技不能取代纸笔，教育方向应调整</h4>
+      </a>
+    </div>
+    <div class="time">1天前</div>
+  </article>
+  <article>
+    <div class="img-frame">
+      <a class="internalLink" data-title="新山男子被控" href="https://johor.sinchew.com.my/news/20260930/johor/7895884">
+        <img src="https://cdn.sinchew.com.my/wp-content/uploads/2026/09/j.jpg" alt="j"/>
+      </a>
+    </div>
+    <div class="text">
+      <a class="internalLink" data-title="新山男子被控" href="https://johor.sinchew.com.my/news/20260930/johor/7895884">
+        <h4>新山男子被控</h4>
+      </a>
+    </div>
+    <div class="time">7小时前</div>
+  </article>
+  <article>
+    <div class="related-stories">
+      <a class="internalLink" data-title="dup-link-anchor-text" href="https://www.sinchew.com.my/news/20260930/international/7896179">link text ignored</a>
+    </div>
+  </article>
+  <article>
+    <div class="ads">
+      <a class="internalLink" data-title="广告" href="https://www.sinchew.com.my/news/20260930/international/not-a-number">ads</a>
+      <a class="internalLink" data-title="not-article" href="https://www.sinchew.com.my/category/foo">cat</a>
+    </div>
+  </article>
+</main>
+<footer>
+  <a href="https://www.sinchew.com.my/privacy">隐私</a>
+  <a href="https://www.sinchew.com.my/contact">联系</a>
+</footer>
+</body>
+</html>

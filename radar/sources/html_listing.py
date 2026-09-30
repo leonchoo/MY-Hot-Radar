@@ -3,13 +3,15 @@ HTML listing source adapter.
 
 Added in A2.2-A to consume custom-CMS HTML pages from sources
 that DO NOT expose RSS, WP-JSON, or a sitemap. Live-verified
-against the Sin Chew Johor desk (``https://johor.sinchew.com.my/``).
+first against the Sin Chew Johor desk
+(``https://johor.sinchew.com.my/``); generalized in A2.2-B to
+also serve Sin Chew Main (``https://www.sinchew.com.my/``).
 
 Why this adapter exists
 -----------------------
 
-Per ``docs/CHINESE_SOURCE_DISCOVERY_AUDIT.md`` §2 the Sin Chew
-Johor desk is "RSS_READY" but a closer probe showed:
+Per ``docs/CHINESE_SOURCE_DISCOVERY_AUDIT.md`` §2 Sin Chew is
+"RSS_READY" but a closer probe shows the family is custom-CMS:
 
   - ``/wp-json/wp/v2/posts``    → 404
   - ``/feed/``                  → 404
@@ -17,14 +19,16 @@ Johor desk is "RSS_READY" but a closer probe showed:
   - ``/rss``                    → 404
   - ``/sitemap.xml``            → 404
 
-The page itself is a 385 KB server-rendered HTML document with
-``<h2 class="title skip-default-style">`` article cards and
-``<a class="internalLink" data-title="...">`` blocks. Article
-URLs follow ``/news/YYYYMMDD/johor/{id}`` (numeric id, 8-digit
-date prefix). Per the discovery audit §3 there are ~38 dated
-article URLs on the homepage; above-the-fold rendering exposes
-6 ``<h2 class="title">`` cards and a further ~10 sidebar /
-related ``<a class="internalLink">`` blocks.
+Both desk pages (Johor microsite + Main homepage) are server-
+rendered HTML documents with ``<a class="internalLink"
+data-title="...">`` blocks. Sin Chew Johor also exposes
+``<h2 class="title skip-default-style">`` article cards. Article
+URLs follow ``/news/YYYYMMDD/{section}/{numeric_id}``.
+
+Sin Chew Main additionally links to Johor-desk articles hosted
+on ``johor.sinchew.com.my`` — the publisher-wide
+``sinchew.com.my`` host filter accepts these and the dedup
+pipeline deduplicates them by URL.
 
 This adapter walks both card families, filters for the strict
 URL pattern, deduplicates, and emits one ``Story`` per article.
@@ -34,7 +38,7 @@ What this adapter deliberately does NOT do
 
   - Parse the homepage navigation (``/category/...``).
   - Visit individual article pages for absolute timestamps —
-    the listing page carries only relative time strings
+    both listing pages carry only relative time strings
     (``16分钟前``, ``2小时前``, ``3月前``), and per the A2.2-A
     spec we treat relative time as ``published_at = None``
     rather than guessing. Filling ``published_at`` from the
@@ -63,20 +67,29 @@ from .base import SourceAdapter, FetchError
 from ..models import Story, Source, SourceType, Category, Language
 
 
-# Strict URL pattern for Sin Chew Johor articles. Anchored to the
-# 8-digit date prefix and a numeric article id. Any URL that does
-# not match is filtered out (categories, tags, ads, etc.).
+# Strict URL pattern for Sin Chew family article URLs. Anchored to
+# the 8-digit date prefix, an arbitrary section segment, and a
+# numeric article id. Any URL that does not match is filtered out
+# (categories, tags, ads, etc.).
+#
+# Generalized in A2.2-B from /johor/ to [^/]+/ so the same
+# adapter can serve both Sin Chew Johor desk articles AND Sin
+# Chew Main / regional desk articles (metro, sports, international,
+# nation, johor, sarawak, ...).
 #
 # Examples that match:
-#   /news/20260930/johor/7895884
-#   /news/20251203/johor/7079996
+#   /news/20260930/johor/7895884              (Sin Chew Johor)
+#   /news/20260930/metro/7894359              (Sin Chew Main)
+#   /news/20260930/international/7896179      (Sin Chew Main)
+#   /news/20260929/yl/7890680                 (Sin Chew Main)
 #
 # Examples that do NOT match:
 #   /category/地方/大柔佛/综合2
-#   /news/20260930 (no /johor/{id})
+#   /news/20260930 (no section + id)
 #   /news/2026-09-30/johor/7895884 (date with dashes)
+#   /news/20260930/international/not-a-number (non-numeric id)
 _ARTICLE_URL_RE = re.compile(
-    r"^/news/\d{8}/johor/\d+/?$"
+    r"^/news/\d{8}/[^/]+/\d+/?$"
 )
 
 # <h2 class="title ..."><a href="...">TITLE</a></h2>
@@ -90,14 +103,23 @@ _H2_TITLE_RE = re.compile(
     re.VERBOSE | re.DOTALL,
 )
 
-# <a class="...internalLink..." data-title="..." href="..."> ...
-# Captures both the data-title attribute and the visible link text.
+# <a class="...internalLink..." data-title="..." href="...">
+# Captures ``data-title`` and the href. We deliberately do NOT
+# require a ``</a>`` close: Sin Chew Main anchors wrap inner
+# tags (``<img>``, ``<h4>``) so a closing-tag match would either
+# fail (if we require no inner tags) or backtrack catastrophically
+# (if we allow inner tags). We only need the data-title attribute
+# for the title; the anchor's link text is irrelevant.
+#
+# Pattern: only the opening tag with the three attributes we
+# care about, no closing tag, no body. Non-greedy ``[^>]+`` to
+# stay within the open tag.
 _INTERNAL_LINK_RE = re.compile(
     r"""<a[^>]+
-        class=["'][^"']*\binternalLink\b[^"']*["'][^>]+
-        data-title=["'](?P<data_title>[^"']+)["'][^>]+
-        href=["'](?P<url>[^"']+)["']
-        [^>]*>(?P<text>[^<]*)</a>""",
+        \bclass=["'][^"']*\binternalLink\b[^"']*["'][^>]+
+        \bdata-title=["'](?P<data_title>[^"']+)["'][^>]+
+        \bhref=["'](?P<url>[^"']+)["']
+        [^>]*>""",
     re.VERBOSE | re.DOTALL,
 )
 
@@ -197,21 +219,28 @@ _ENTITY_NAMED_RE = re.compile(r"&(" + "|".join(_HTML_ENTITIES.keys()) + r");")
 
 
 def _is_article_url(url: str) -> bool:
-    """Return True iff ``url`` is a Sin Chew Johor article URL.
+    """Return True iff ``url`` is a Sin Chew-family article URL.
+
+    Generalized in A2.2-B to accept any Sin Chew family host
+    (``sinchew.com.my`` and its subdomains: johor.sinchew.com.my,
+    metro.sinchew.com.my, melaka.sinchew.com.my, ...).
 
     Rejects:
-      - absolute URLs to other hosts
+      - absolute URLs to non-Sin Chew hosts
       - navigation/category URLs
       - non-numeric article ids
-      - URLs without the ``/news/YYYYMMDD/johor/{id}`` shape
+      - URLs without the ``/news/YYYYMMDD/{section}/{id}`` shape
     """
     if not url:
         return False
     # Accept absolute and relative forms; we will resolve later.
     parsed = url
     if parsed.startswith("http://") or parsed.startswith("https://"):
-        # Must point at the source host (Sin Chew Johor).
-        if "johor.sinchew.com.my" not in parsed:
+        # Must point at the Sin Chew family (publisher-wide filter).
+        # ``sinchew.com.my`` is a substring of all subdomains
+        # (``johor.sinchew.com.my``, ``metro.sinchew.com.my``, ...)
+        # so this single check accepts every section desk.
+        if "sinchew.com.my" not in parsed:
             return False
         # Strip the host prefix.
         i = parsed.find("/news/")
@@ -252,7 +281,17 @@ class HtmlListingAdapter(SourceAdapter):
     """Parse a custom-CMS HTML listing page into Story objects.
 
     Live-verified against:
-      - https://johor.sinchew.com.my/   (Sin Chew Johor desk)
+
+      - ``https://johor.sinchew.com.my/``   (Sin Chew Johor desk, A2.2-A)
+      - ``https://www.sinchew.com.my/``     (Sin Chew Main, A2.2-B)
+
+    Both desk pages share the same ``/news/YYYYMMDD/{section}/{id}``
+    article-URL convention, the same ``<a class="internalLink"
+    data-title="...">`` markup, and the same relative-time-only
+    listing page. Sin Chew Johor additionally exposes
+    ``<h2 class="title skip-default-style">`` cards; Sin Chew
+    Main does not — the Phase-2 (internalLink) walk is the
+    workhorse for Main.
     """
 
     def __init__(self, source: Source, *, category: Category):
@@ -308,16 +347,20 @@ class HtmlListingAdapter(SourceAdapter):
             candidates[full] = clean
 
         # Phase 2: <a class="internalLink" data-title="..."> blocks.
+        # Note: we deliberately ignore the visible link text. Some
+        # Sin Chew Main anchors wrap inner tags (``<img>``,
+        # ``<h4>``), so a closing-tag match would either fail or
+        # backtrack catastrophically. The ``data-title`` attribute
+        # is the authoritative title source for these cards.
         for m in _INTERNAL_LINK_RE.finditer(html):
             url = m.group("url")
             data_title = m.group("data_title")
-            text = m.group("text")
             if not _is_article_url(url):
                 continue
             full = _canonicalize_url(url, base)
             if full in candidates:
                 continue  # already have a (better) title
-            clean = _strip_html(data_title) or _strip_html(text)
+            clean = _strip_html(data_title)
             if not clean:
                 continue
             candidates[full] = clean
