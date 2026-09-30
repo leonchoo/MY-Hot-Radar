@@ -665,11 +665,166 @@ class ChinaPressHtmlListingAdapter(HtmlListingAdapter):
         return stories
 
 
+def _is_enanyang_article_url(url: str) -> bool:
+    """Return True iff ``url`` is an eNanyang / 南洋商报 clean article URL.
+
+    Live-verified 2026-09-30 (https://www.enanyang.my/, A2.2-D probe):
+    eNanyang's article URLs follow the same Sin Chew pattern
+    ``/news/{YYYYMMDD}/{Section}/{numeric_id}`` (the two papers are
+    part of the same Sin Chew publisher family), but the host is
+    ``enanyang.my`` rather than ``sinchew.com.my``. We DELIBERATELY
+    keep this separate from Sin Chew's ``_is_article_url`` so that:
+
+      - the URL pattern can stay identical (it's actually the same
+        WordPress-style permalink structure);
+      - the host filter is publisher-isolated (eNanyang.my is a
+        distinct canonical domain, not a Sin Chew subdomain);
+      - Tier-C registration does not require any change to Sin Chew's
+        URL filter (which would risk breaking A2.2-A + A2.2-B
+        regression).
+
+    Accepts absolute and relative forms. Rejects:
+      - Non-enanyang.my hosts.
+      - /category/... navigation URLs.
+      - /hotpost, /video, /podcast, /stock-price subpages.
+      - URLs that don't match /news/YYYYMMDD/{section}/{numeric id}.
+    """
+    if not url:
+        return False
+    parsed = url
+    if parsed.startswith("http://") or parsed.startswith("https://"):
+        # Must point at eNanyang (canonical host).
+        if "enanyang.my" not in parsed:
+            return False
+        i = parsed.find("/news/")
+        if i == -1:
+            return False
+        parsed = parsed[i:]
+    for prefix in _NAV_PREFIXES:
+        if parsed.startswith(prefix):
+            return False
+    return bool(_ARTICLE_URL_RE.match(parsed))
+
+
+class ENanyangHtmlListingAdapter(HtmlListingAdapter):
+    """Parse the eNanyang / 南洋商报 homepage into Story objects.
+
+    Live-verified 2026-09-30:
+      - https://www.enanyang.my/ returned HTTP 200 (93,679 bytes,
+        byte-identical across 3 consecutive fetches).
+      - 6 unique /news/20260930/{Section}/{numeric_id} article URLs
+        per fetch (4 Finance, 1 International, 1 State).
+      - All titles extracted from <img alt="TITLE"> inside the
+        Swiper carousel; no <h1>/<h2>/<h3> article cards on the
+        homepage.
+      - 0 <time> tags, 0 datetime= attributes, 0 relative time
+        strings — listing page emits published_at=None for all 6
+        stories (per spec rule).
+      - WP-JSON / RSS / sitemap all 404; ``vega.enanyang.my`` is the
+        WordPress CDN host but the JSON API is disabled.
+
+    This is a SUBCLASS of HtmlListingAdapter so the Sin Chew A2.2-A +
+    A2.2-B + China Press A2.2-C regression stays green. The parent
+    class's Phase 1/2/3 walks are not used here — we replace them
+    with a Phase-4b walk (img alt fallback), the same strategy used
+    by ChinaPressHtmlListingAdapter for cards without <h1> titles.
+
+    Tier: **C** (NOT B). Per Chinese Source Discovery Audit, eNanyang
+    was flagged as Tier-C candidate / NEEDS VALIDATION. A2.2-D
+    validation-first probe confirms:
+
+      - Volume 6 is below typical Tier-B threshold (10+ items).
+      - published_at is None for every story (no timestamp data).
+      - 90.5% of homepage URLs are navigation (57/63 are
+        /category/{section}/{subsection} nav links).
+      - Despite being a 100-year-old established national outlet
+        (南洋商报, since 1923), the website implementation is sparse.
+
+    Per the existing SourceTier governance (Tier B for established
+    news outlets, Tier C for niche/borderline outlets), eNanyang is
+    Tier C. Verification engine treats Tier C as a fallback
+    ``Tier C or single lower-tier coverage -> REPORTED`` with
+    confidence 0.30 (vs Tier-B 0.60).
+    """
+
+    def _parse_listing(self, html: str) -> List[Story]:
+        """Parse eNanyang HTML into deduplicated Stories.
+
+        Strategy (deterministic, offline-safe):
+
+          1. Find all clean eNanyang article URLs in the HTML body
+             (filter rejects nav, category, /hotpost, /video, etc.).
+          2. For each URL, walk forward 1500 chars to find an
+             ``<img alt="TITLE">`` as title source.
+          3. If no img alt is found within 1500 chars, drop the URL
+             (no title means no story).
+          4. published_at = None for every story (listing has no
+             timestamp).
+          5. Deduplicate by canonical URL.
+          6. Emit one Story per unique URL, sorted for determinism.
+        """
+        candidates: dict = {}
+        # Find all eNanyang article URLs (absolute or relative).
+        for url in set(re.findall(
+            r'href="((?:https?://)?(?:www\.)?enanyang\.my/news/\d+/[A-Z][a-zA-Z]*/\d+)"',
+            html,
+        )):
+            # Normalize to absolute form for the URL filter.
+            abs_url = url if url.startswith("http") else (
+                f"https://www.enanyang.my{url if url.startswith('/') else '/' + url}"
+            )
+            if not _is_enanyang_article_url(abs_url):
+                continue
+            # Find the URL position; if it occurs multiple times, use
+            # the first occurrence. Look forward 1500 chars for an alt.
+            idx = html.find(url)
+            if idx == -1:
+                idx = html.find(abs_url)
+            if idx == -1:
+                continue
+            forward = html[idx:idx + 1500]
+            alt_m = _IMG_ALT_RE.search(forward)
+            if not alt_m:
+                continue
+            title = alt_m.group(1).strip()
+            if not title:
+                continue
+            candidates[abs_url] = {
+                "title": title,
+                "published_at": None,  # listing page has no timestamps
+            }
+
+        # Emit Stories in URL-sorted order.
+        stories: List[Story] = []
+        for url in sorted(candidates.keys()):
+            entry = candidates[url]
+            title = _strip_html(entry["title"]) or entry["title"]
+            stories.append(
+                Story(
+                    id=_make_story_id(url),
+                    title=title,
+                    summary="",
+                    url=url,
+                    source=self.source.name,
+                    source_type=SourceType.HTML_LISTING,
+                    published_at=entry["published_at"],
+                    discovered_at=Story.__dataclass_fields__["discovered_at"]
+                    .default_factory(),
+                    category=self._category,
+                    language=Language.ZH,
+                    country=self.source.country,
+                )
+            )
+        return stories
+
+
 __all__ = [
     "HtmlListingAdapter",
     "ChinaPressHtmlListingAdapter",
+    "ENanyangHtmlListingAdapter",
     "_strip_html",
     "_is_article_url",
     "_is_chinapress_article_url",
+    "_is_enanyang_article_url",
     "_coerce_chinapress_datetime",
 ]

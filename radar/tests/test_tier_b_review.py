@@ -398,6 +398,13 @@ def test_independent_source_count_equals_registered_count():
     After A2.2-B: 9 registered sources = 9 self-host publishers = 9
     independent (5 RSS + 2 WP-JSON + 2 HTML listing).
 
+    After A2.2-C: 10 registered sources.
+
+    After A2.2-D: 11 registered sources = 10 Tier-B + 1 Tier-C
+    (eNanyang). The Tier-C source is reviewed via the separate
+    test_tier_c_review.py module but it still counts as an
+    independent self-host publisher.
+
     The Sin Chew Main homepage contains cross-host Johor-desk links
     (URLs on johor.sinchew.com.my inside a Main-page fetch). These
     are NOT cross-publisher — both desks are part of the same
@@ -441,9 +448,12 @@ def test_independent_source_count_equals_registered_count():
     counts = count_cross_source_wire_indicators(samples_by_source)
     assert all(c == 0 for c in counts.values()), \
         f"cross-source wire indicators found: {counts}"
-    assert len(ALL_TIER_B_SOURCES) == len(REGISTERED_SOURCES) == 10
+    assert len(ALL_TIER_B_SOURCES) == 10  # Tier-B set unchanged by A2.2-D
+    # Total registry = Tier-B (10) + Tier-C (1, eNanyang) = 11
+    assert len(REGISTERED_SOURCES) == 11, \
+        f"expected 11 sources in registry; got {len(REGISTERED_SOURCES)}"
     print("PASS test_independent_source_count_equals_registered_count "
-          "(10 registered = 10 self-host publishers = 10 independent)")
+          "(11 registered = 10 Tier-B + 1 Tier-C = 11 self-host publishers = 11 independent)")
 
 
 # ============================================================================
@@ -793,11 +803,11 @@ def test_radar_6_a23_registry_size_and_names():
 
     After A2.3 the registry grew from 5 to 7 sources, after
     A2.2-A it grew to 8, after A2.2-B it grew to 9, after A2.2-C
-    it grew to 10. This test asserts:
-      - registry has exactly 10 sources
-      - registry names match ALL_TIER_B_SOURCES (5 RSS + 2 WP-JSON + 3 HTML listing)
-      - no source was added without a matching probe fixture
-        (enforced transitively by ALL_TIER_B_SOURCES itself)
+    it grew to 11. This test asserts:
+      - registry has exactly 11 sources (10 Tier-B + 1 Tier-C)
+      - registry Tier-B names match ALL_TIER_B_SOURCES (5 RSS + 2 WP-JSON + 3 HTML listing)
+      - registry Tier-C names are kept separately in fixtures_tier_c_review.py
+        (enforced by the separate test_tier_c_review.py module)
 
     History:
       - Pre-A2.3 (Radar-6): 5 sources. Test was
@@ -806,15 +816,21 @@ def test_radar_6_a23_registry_size_and_names():
       - Post-A2.2-A: 8 sources.
       - Post-A2.2-B: 9 sources (Sin Chew Main added).
       - Post-A2.2-C: 10 sources (China Press added).
+      - Post-A2.2-D: 11 sources (eNanyang added, Tier C; reviewed
+        via test_tier_c_review.py not this module).
     """
+    from radar.tests.fixtures_tier_c_review import ALL_TIER_C_SOURCES
     from radar.sources_registry import REGISTERED_SOURCES
-    assert len(REGISTERED_SOURCES) == 10, \
-        f"expected 10 sources in registry; got {len(REGISTERED_SOURCES)}"
+    assert len(REGISTERED_SOURCES) == 11, \
+        f"expected 11 sources in registry (10 Tier-B + 1 Tier-C); got {len(REGISTERED_SOURCES)}"
     names = {s.name for s in REGISTERED_SOURCES}
-    assert names == set(ALL_TIER_B_SOURCES), \
-        f"registry names differ: {names} vs {set(ALL_TIER_B_SOURCES)}"
+    tier_b_names = set(ALL_TIER_B_SOURCES)
+    tier_c_names = set(ALL_TIER_C_SOURCES)
+    expected = tier_b_names | tier_c_names
+    assert names == expected, \
+        f"registry names differ: missing={expected - names}, extra={names - expected}"
     print("PASS test_radar_6_a23_registry_size_and_names "
-          "(10/10 registry names match ALL_TIER_B_SOURCES)")
+          "(11/11 registry names: 10 Tier-B + 1 Tier-C match fixtures)")
 
 
 def test_radar_6_uses_content_nature_taxonomy_from_radar_5b():

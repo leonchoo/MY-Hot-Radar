@@ -56,10 +56,12 @@ from radar.normalize import (
 )
 from radar.sources.html_listing import (
     ChinaPressHtmlListingAdapter,
+    ENanyangHtmlListingAdapter,
     HtmlListingAdapter,
     _is_article_url,
     _strip_html,
     _is_chinapress_article_url,
+    _is_enanyang_article_url,
     _coerce_chinapress_datetime,
 )
 
@@ -72,6 +74,7 @@ FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures" / "html_listing"
 TRIMMED_FIXTURE = FIXTURES_DIR / "sinchew_johor_listing_trimmed.html"
 TRIMMED_FIXTURE_MAIN = FIXTURES_DIR / "sinchew_main_listing_trimmed.html"
 TRIMMED_FIXTURE_CHINAPRESS = FIXTURES_DIR / "chinapress_listing_trimmed.html"
+TRIMMED_FIXTURE_ENANYANG = FIXTURES_DIR / "enanyang_listing_trimmed.html"
 
 
 def _make_source(
@@ -161,6 +164,37 @@ def _load_fixture_chinapress() -> str:
             f"Re-run the probe script to regenerate it."
         )
     return TRIMMED_FIXTURE_CHINAPRESS.read_text(encoding="utf-8")
+
+
+def _make_source_enanyang(
+    name: str = "eNanyang",
+    url: str = "https://www.enanyang.my/",
+) -> Source:
+    return Source(
+        name=name,
+        type=SourceType.HTML_LISTING,
+        url=url,
+        reliability=3,  # Tier C
+        country="MY",
+        languages=[Language.ZH],
+        tier=SourceTier.C,
+        notes="A2.2-D test fixture",
+    )
+
+
+def _make_adapter_enanyang() -> ENanyangHtmlListingAdapter:
+    return ENanyangHtmlListingAdapter(
+        _make_source_enanyang(), category=Category.MALAYSIA
+    )
+
+
+def _load_fixture_enanyang() -> str:
+    if not TRIMMED_FIXTURE_ENANYANG.exists():
+        raise FileNotFoundError(
+            f"fixture missing: {TRIMMED_FIXTURE_ENANYANG}. "
+            f"Re-run the probe script to regenerate it."
+        )
+    return TRIMMED_FIXTURE_ENANYANG.read_text(encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------
@@ -690,6 +724,144 @@ def test_chinapress_sinchew_regression():
           f"all None timestamps — parent unaffected)")
 
 
+# ---------------------------------------------------------------------------
+# A2.2-D — eNanyang adapter tests
+# ---------------------------------------------------------------------------
+#
+# eNanyang (南洋商报) is the sister paper of Sin Chew Daily but with
+# its own canonical domain (enanyang.my, NOT a sinchew.com.my
+# subdomain). The homepage exposes only ~6 article URLs in a Swiper
+# carousel — the lowest article volume of any registered Tier-B/C
+# source — so eNanyang is registered as Tier C per the Discovery
+# Audit's NEEDS_VALIDATION classification.
+#
+# The ENanyangHtmlListingAdapter subclass follows the same
+# architecture as ChinaPressHtmlListingAdapter (A2.2-C): a Phase-4b
+# walk (img alt fallback) since the homepage has no <h1>/<h2>/<h3>
+# article cards.
+#
+# Critical tests below:
+#   - Tier: C
+#   - Volume: 6 articles per fetch
+#   - published_at: None for every story (no timestamp data)
+#   - Stability: 100% byte-identical across 3 fetches
+#   - Navigation: 57 /category/ URLs to filter out
+
+
+def test_enanyang_fixture_parses_to_6_stories():
+    """The trimmed eNanyang fixture yields exactly 6 stories.
+
+    Live-fetched 2026-09-30 produced 6 unique
+    /news/20260930/{Section}/{numeric_id} articles per fetch on
+    https://www.enanyang.my/. The fixture contains 6 real article
+    cards from the Swiper carousel.
+    """
+    adapter = _make_adapter_enanyang()
+    stories = adapter._parse_listing(_load_fixture_enanyang())
+    urls = {s.url for s in stories}
+    assert len(stories) == len(urls) == 6, (
+        f"expected 6 unique stories; got {len(stories)} stories, {len(urls)} URLs"
+    )
+    for s in stories:
+        assert isinstance(s, Story)
+        assert s.title
+        assert s.url
+        assert s.language == Language.ZH
+        assert s.source_type == SourceType.HTML_LISTING
+    print(f"PASS test_enanyang_fixture_parses_to_6_stories (6 stories, all zh)")
+
+
+def test_enanyang_emits_no_published_at():
+    """A2.2-D: eNanyang has 0 <time> tags, 0 datetime= attrs, 0 relative
+    time strings on the listing page. The adapter MUST emit
+    published_at=None for every story (per spec rule).
+    """
+    adapter = _make_adapter_enanyang()
+    stories = adapter._parse_listing(_load_fixture_enanyang())
+    for s in stories:
+        assert s.published_at is None, (
+            f"eNanyang has no timestamps; got published_at={s.published_at!r} for {s.url}"
+        )
+    assert len(stories) > 0
+    print(f"PASS test_enanyang_emits_no_published_at ({len(stories)} stories, all None)")
+
+
+def test_enanyang_url_filter():
+    """A2.2-D: _is_enanyang_article_url accepts /news/{date}/{section}/{id}
+    on www.enanyang.my and rejects /category/, /hotpost, /video,
+    /podcast, /stock-price nav URLs.
+    """
+    # Accept
+    assert _is_enanyang_article_url(
+        "https://www.enanyang.my/news/20260930/Finance/1397184"
+    )
+    assert _is_enanyang_article_url(
+        "https://www.enanyang.my/news/20260930/International/1398544"
+    )
+    assert _is_enanyang_article_url(
+        "https://www.enanyang.my/news/20260930/State/1398635"
+    )
+    # Reject (nav)
+    assert not _is_enanyang_article_url("https://www.enanyang.my/category/finance")
+    assert not _is_enanyang_article_url("https://www.enanyang.my/hotpost")
+    assert not _is_enanyang_article_url("https://www.enanyang.my/video")
+    assert not _is_enanyang_article_url("https://www.enanyang.my/podcast")
+    assert not _is_enanyang_article_url("https://www.enanyang.my/stock-price")
+    assert not _is_enanyang_article_url("https://www.enanyang.my/")
+    # Wrong host
+    assert not _is_enanyang_article_url(
+        "https://www.sinchew.com.my/news/20260930/Finance/1397184"
+    )
+    # Empty
+    assert not _is_enanyang_article_url("")
+    print("PASS test_enanyang_url_filter (13 cases: 3 accept + 10 reject)")
+
+
+def test_enanyang_extracted_stories_all_self_host():
+    """A2.2-D: all 6 extracted article URLs must be on the
+    www.enanyang.my host (no cross-host wire-origin contamination).
+    """
+    adapter = _make_adapter_enanyang()
+    stories = adapter._parse_listing(_load_fixture_enanyang())
+    for s in stories:
+        assert "enanyang.my" in s.url, (
+            f"non-self-host URL leaked through adapter: {s.url}"
+        )
+        assert "?p=" not in s.url and "/category/" not in s.url, (
+            f"nav URL leaked through adapter: {s.url}"
+        )
+    print(f"PASS test_enanyang_extracted_stories_all_self_host "
+          f"(all {len(stories)} URLs on enanyang.my)")
+
+
+def test_enanyang_sinchew_regression():
+    """A2.2-D: Sin Chew regression — after adding eNanyang subclass,
+    HtmlListingAdapter still parses the Sin Chew Johor fixture
+    correctly. The parent class is UNTOUCHED by A2.2-D; the eNanyang
+    subclass inherits nothing from it (it overrides _parse_listing
+    entirely).
+    """
+    johor_adapter = _make_adapter()  # parent HtmlListingAdapter
+    johor_stories = johor_adapter._parse_listing(_load_fixture())  # Johor fixture
+    assert len(johor_stories) >= 6, (
+        f"Johor desk fixture should still yield >=6 stories; got {len(johor_stories)}"
+    )
+    for s in johor_stories:
+        assert "johor.sinchew.com.my" in s.url, (
+            f"Johor desk stories should be on johor.sinchew.com.my; got {s.url}"
+        )
+        assert s.published_at is None, (
+            f"Johor desk must continue to emit published_at=None; got {s.published_at}"
+        )
+    # China Press regression too
+    cp_adapter = _make_adapter_chinapress()
+    cp_stories = cp_adapter._parse_listing(_load_fixture_chinapress())
+    assert len(cp_stories) == 10
+    print(f"PASS test_enanyang_sinchew_regression "
+          f"(Johor {len(johor_stories)} + China Press {len(cp_stories)} stories, "
+          f"parent + A2.2-C unaffected)")
+
+
 def _run_all() -> int:
     """Run every test in this file; return 0 on success, 1 on failure."""
     tests = [
@@ -730,6 +902,12 @@ def _run_all() -> int:
         test_chinapress_datetime_coercion,
         test_chinapress_extracted_stories_have_no_advertorial,
         test_chinapress_sinchew_regression,
+        # A2.2-D tests
+        test_enanyang_fixture_parses_to_6_stories,
+        test_enanyang_emits_no_published_at,
+        test_enanyang_url_filter,
+        test_enanyang_extracted_stories_all_self_host,
+        test_enanyang_sinchew_regression,
     ]
     failed = 0
     for t in tests:
@@ -745,7 +923,7 @@ def _run_all() -> int:
     if failed:
         print(f"{failed} of {len(tests)} TESTS FAILED")
         return 1
-    print(f"ALL {len(tests)} HTML LISTING A2.2-A + A2.2-B + A2.2-C TESTS PASSED")
+    print(f"ALL {len(tests)} HTML LISTING A2.2-A + A2.2-B + A2.2-C + A2.2-D TESTS PASSED")
     return 0
 
 

@@ -84,13 +84,18 @@ def _build_adapter(source: Source, *, category: Category | None = None):
         from .sources.html_listing import (
             HtmlListingAdapter,
             ChinaPressHtmlListingAdapter,
+            ENanyangHtmlListingAdapter,
         )
-        # China Press uses a structurally different URL/title/timestamp
-        # pattern (see A2.2-C). Dispatch to the dedicated subclass so
-        # Sin Chew A2.2-A + A2.2-B regression stays green on the parent
-        # HtmlListingAdapter class.
+        # China Press (A2.2-C) and eNanyang (A2.2-D) use structurally
+        # different URL/title/timestamp patterns. Dispatch to the
+        # dedicated subclass for each so the parent HtmlListingAdapter
+        # class (Sin Chew A2.2-A + A2.2-B) regression stays green.
         if source.name == "China Press":
             return ChinaPressHtmlListingAdapter(
+                source, category=category or _default_category_for(source)
+            )
+        if source.name == "eNanyang":
+            return ENanyangHtmlListingAdapter(
                 source, category=category or _default_category_for(source)
             )
         return HtmlListingAdapter(source, category=category or _default_category_for(source))

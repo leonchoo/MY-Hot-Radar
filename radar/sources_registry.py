@@ -22,6 +22,7 @@ History:
   A2.2-A (2026-09-30): 1 HTML listing source added (Sin Chew Johor). Total: 8.
   A2.2-B (2026-09-30): 1 HTML listing source added (Sin Chew Main). Total: 9.
   A2.2-C (2026-09-30): 1 HTML listing source added (China Press). Total: 10.
+  A2.2-D (2026-09-30): 1 HTML listing source added (eNanyang, Tier C). Total: 11.
 
 Current mix:
 
@@ -35,6 +36,7 @@ Current mix:
   Malaysian Chinese Johor news (HTML)         Sin Chew Johor desk Tier B
   Malaysian Chinese main news (HTML)          Sin Chew Main       Tier B
   Malaysian Chinese national news (HTML)      China Press / 中国报 Tier B
+  Malaysian Chinese national news (HTML)      eNanyang / 南洋商报   Tier C
 
 Tier justifications (also carried in each Source's `notes`):
 
@@ -321,6 +323,61 @@ REGISTERED_SOURCES: List[Source] = [
                "the A1 Chinese place-name aliases (马来西亚 / "
                "新加坡 / 吉隆坡 / 柔佛 / 新山 / 马新 / 新马). "
                "Sin Chew subdomains are NOT separately registered."),
+    ),
+
+    # ---- 11. Malaysia (Chinese, HTML listing) — A2.2-D -------------------
+    # eNanyang / 南洋商报 — sister paper of Sin Chew Daily, also part
+    # of the same publisher family but with its own canonical domain
+    # (enanyang.my, NOT a sinchew.com.my subdomain).
+    #
+    # Live-verified 2026-09-30 (https://www.enanyang.my/, sha12
+    # 29c349994c0b, byte-identical across 3 consecutive fetches):
+    # 6 unique /news/20260930/{Section}/{numeric_id} articles per
+    # fetch (4 Finance, 1 International, 1 State). All titles
+    # extracted from <img alt="TITLE"> inside a Swiper carousel.
+    # No <h1>/<h2>/<h3> article cards on the homepage. 0 <time>
+    # tags, 0 datetime= attributes, 0 relative time strings — the
+    # listing page emits published_at=None for all 6 stories (per
+    # spec rule).
+    #
+    # Tier: **C** (NOT B). Per Chinese Source Discovery Audit,
+    # eNanyang was flagged as Tier-C candidate / NEEDS
+    # VALIDATION. A2.2-D validation-first probe confirms the
+    # borderline classification:
+    #
+    #   - Volume 6 is below typical Tier-B threshold (10+ items).
+    #   - published_at is None for every story (no timestamp data).
+    #   - 90.5% of homepage URLs are navigation (57/63 are
+    #     /category/{section}/{subsection} nav links; only 6 are
+    #     article URLs).
+    #   - Despite being a 100-year-old established national outlet
+    #     (南洋商报, since 1923), the website implementation is
+    #     sparse.
+    #
+    # WP-JSON / RSS / sitemap all 404; vega.enanyang.my is the
+    # WordPress CDN host but the JSON API is disabled. Joined
+    # registry in A2.2-D (2026-09-30).
+    Source(
+        name="eNanyang",
+        type=SourceType.HTML_LISTING,
+        url="https://www.enanyang.my/",
+        reliability=3,  # Tier C: lower than Tier B's reliability=4
+        country="MY",
+        languages=[Language.ZH],
+        tier=SourceTier.C,
+        notes=("Custom-CMS HTML listing page. Chinese. National "
+               "Malaysian Chinese daily (南洋商报, since 1923). "
+               "Only ~6 articles on the homepage (Swiper carousel "
+               "with <img alt='TITLE'> as title source; no "
+               "<h1>/<h2>/<h3> cards). published_at=None for every "
+               "story (listing has no timestamp). 90.5% of homepage "
+               "URLs are navigation, only 6 are articles. Tier C "
+               "(NEEDS VALIDATION cleared in A2.2-D but volume + "
+               "no-timestamp = borderline). Joined registry in "
+               "A2.2-D (2026-09-30). Sin Chew family but separate "
+               "canonical domain. Verification engine treats Tier C "
+               "as fallback 'Tier C or single lower-tier coverage -> "
+               "REPORTED' with confidence 0.30 (vs Tier-B 0.60)."),
     ),
 ]
 
