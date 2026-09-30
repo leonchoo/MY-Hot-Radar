@@ -19,6 +19,7 @@ History:
 
   Radar-2 (2026-09-29): 5 RSS sources.
   A2.3 (2026-09-30): 2 WP-JSON sources added (Chinese). Total: 7.
+  A2.2-A (2026-09-30): 1 HTML listing source added (Sin Chew Johor). Total: 8.
 
 Current mix:
 
@@ -29,6 +30,7 @@ Current mix:
   Malaysian regional news (English, RSS)      Borneo Post         Tier B
   Malaysian Chinese news (WP-JSON)            Kwong Wah Yit Poh   Tier B
   Malaysian Chinese news (WP-JSON)            Guang Ming Daily    Tier B
+  Malaysian Chinese Johor news (HTML)         Sin Chew Johor desk Tier B
 
 Tier justifications (also carried in each Source's `notes`):
 
@@ -168,6 +170,40 @@ REGISTERED_SOURCES: List[Source] = [
                "Joined registry in A2.3 (2026-09-30). "
                "Cross-language dedup works via the A1 Chinese place-name aliases "
                "(马来西亚 / 新加坡 / 吉隆坡 / 柔佛 / 新山 / 马新 / 新马)."),
+    ),
+
+    # ---- 8. Malaysia (Chinese, HTML listing) — A2.2-A ----------------------
+    # Sin Chew Johor desk / 星洲日报柔佛版 — Johor-focused microsite
+    # under the Sin Chew Daily publisher. WP-JSON, RSS, and sitemap
+    # all return 404; the homepage is a custom-CMS HTML page with
+    # ~38 dated article URLs in /news/YYYYMMDD/johor/{id} form.
+    # HtmlListingAdapter walks <h2 class="title"> and <a class=
+    # "internalLink" data-title="..."> blocks. The listing page
+    # only carries relative time strings ("16分钟前") so
+    # published_at is None by default — see adapter docstring.
+    # Tier B — established regional outlet, not Tier A.
+    # This is NOT a separate publisher; it is Sin Chew Daily's
+    # Johor desk.
+    Source(
+        name="Sin Chew Johor desk",
+        type=SourceType.HTML_LISTING,
+        url="https://johor.sinchew.com.my/",
+        reliability=4,
+        country="MY",
+        languages=[Language.ZH],
+        tier=SourceTier.B,
+        notes=("Custom-CMS HTML listing page. Chinese. Johor-focused "
+               "microsite under Sin Chew Daily (星洲日报). "
+               "~16-38 dated article URLs on the homepage. "
+               "Joined registry in A2.2-A (2026-09-30). "
+               "Listing page only carries relative time strings, "
+               "so published_at=None by default. "
+               "Cross-language dedup works via the A1 Chinese "
+               "place-name aliases (马来西亚 / 新加坡 / 吉隆坡 / "
+               "柔佛 / 新山 / 马新 / 新马). "
+               "Sin Chew Main (https://www.sinchew.com.my/) is a "
+               "separate source requiring its own HTML adapter; "
+               "deferred to a future batch."),
     ),
 ]
 

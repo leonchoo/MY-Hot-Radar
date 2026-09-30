@@ -36,12 +36,27 @@ class SourceType(str, Enum):
     PUBLIC_SOCIAL = "PUBLIC_SOCIAL"
     SEARCH_RESULT = "SEARCH_RESULT"
     WP_JSON = "WP_JSON"  # WordPress JSON API (/wp-json/wp/v2/posts).
-                              # Added in A2.1 for Chinese sources
-                              # Kwong Wah (www.kwongwah.com.my) and
-                              # Guang Ming (guangming.com.my). A2.2
-                              # may add HTML_LISTING separately for
-                              # Sin Chew / China Press. See
-                              # docs/CHINESE_WP_JSON_A21_IMPLEMENTATION.md.
+                          # Added in A2.1 for Chinese sources
+                          # Kwong Wah (www.kwongwah.com.my) and
+                          # Guang Ming (guangming.com.my). A2.2
+                          # may add HTML_LISTING separately for
+                          # Sin Chew / China Press. See
+                          # docs/CHINESE_WP_JSON_A21_IMPLEMENTATION.md.
+    HTML_LISTING = "HTML_LISTING"  # Custom-CMS HTML scraping.
+                          # Used in A2.2-A for the Sin Chew Johor
+                          # desk (https://johor.sinchew.com.my/),
+                          # which does not expose WP-JSON, RSS, or
+                          # a sitemap. The adapter walks the HTML
+                          # listing and extracts <h2 class="title">
+                          # article cards plus <a class="internalLink"
+                          # data-title="..."> blocks, filtering for
+                          # the URL pattern /news/YYYYMMDD/johor/{id}.
+                          # See docs/CHINESE_HTML_A22A_IMPLEMENTATION.md.
+                          # published_at is None by default: the
+                          # listing page only carries relative time
+                          # strings ("16分钟前"). Absolute timestamps
+                          # require fetching each article page, which
+                          # is deferred to a future batch.
 
 
 class SourceTier(str, Enum):
