@@ -263,9 +263,21 @@ def cluster(stories: List[Story]) -> Tuple[List[Topic], Dict[str, str]]:
       - categories_seen: the set of categories (we pick the most common).
       - related_urls: deduped list of URLs.
 
-    The single-topic rule is:
-      Greedy union-find: for each story in order, attach to the first
-      existing topic it strongly matches; otherwise create a new topic.
+    Cluster construction rule (A2.6 Candidate C — all-members match):
+
+      - First story: creates a new topic (singleton cluster).
+      - Subsequent story ``s``: try existing topics in order.
+        - If the topic is a singleton (size 1): accept if
+          ``_is_strong_match(s, only_member)`` (preserves original 2-source behavior).
+        - If the topic has >= 2 members: accept ONLY if
+          ``_is_strong_match(s, m)`` is True for EVERY ``m in members``.
+          This blocks transitive-closure chain merges where
+          ``(A↔B)=MERGE`` and ``(B↔C)=MERGE`` but ``(A↔C)=NO MERGE`` would
+          otherwise pull C into the cluster via B as a bridge.
+      - If no topic accepts: create a new topic.
+
+    The pairwise scoring inside ``_is_strong_match`` is unchanged — only
+    the cluster-level acceptance rule is tightened for non-singleton topics.
     """
     topics: List[Topic] = []
     story_to_topic: Dict[str, str] = {}
@@ -282,9 +294,16 @@ def cluster(stories: List[Story]) -> Tuple[List[Topic], Dict[str, str]]:
         for t in topics:
             # pairwise match using existing topic members
             members = by_topic[t.id]
-            if any(_is_strong_match(s, m) for m in members):
-                matched_topic = t
-                break
+            if len(members) == 1:
+                # Singleton cluster: original any-match behavior.
+                if _is_strong_match(s, members[0]):
+                    matched_topic = t
+                    break
+            else:
+                # Multi-member cluster (Candidate C): require ALL members to match.
+                if all(_is_strong_match(s, m) for m in members):
+                    matched_topic = t
+                    break
         if matched_topic is None:
             t = Topic(
                 title=s.title,

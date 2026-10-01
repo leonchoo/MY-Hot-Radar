@@ -416,7 +416,17 @@ _ENTITY_STOPWORDS = frozenset({
     "plans", "planned", "planning",
     "asks", "asked", "asking",
     "calls", "called", "calling",
-})
+        # A2.8-R1 — Minimal entity bridge guard.
+        # A2.5 chain investigation replay proved these two tokens were the *first*
+        # false bridge of t_d687fc (CNA ↔ Borneo Post merged via shared {period,
+        # transition}). Adding them here eliminates that bridge while leaving every
+        # other entity token (including `man`, `kata`, `dr`) intact for legitimate
+        # same-source analyst merges and cross-language dedup.
+        # Do NOT expand this list without a documented A2.5/A2.7 replay showing
+        # the new token is the root cause of a verified false merge. See
+        # docs/CHINESE_DEDUP_ENTITY_GUARD_A28R1.md.
+        "period", "transition",
+    })
 
 
 def entity_overlap(a: str, b: str) -> Tuple[int, int, float]:
