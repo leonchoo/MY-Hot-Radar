@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MY Hot Radar · Newsroom</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="newsroom-header">
+    <h1>MY HOT RADAR · NEWSROOM</h1>
+    <div class="subtitle">中文新闻室 · Forum v2 Topic / Thread / Event 只读视图</div>
+  </header>
+
+  <div class="container">
+    <section class="stats" id="stats">
+      <!-- populated by JS -->
+    </section>
+
+    <section class="filter-bar">
+      <div class="filter-group" id="classification-filters">
+        <span class="filter-label">分类:</span>
+        <span class="filter-chip active" data-classification="ALL">全部</span>
+      </div>
+      <div class="filter-group" id="status-filters">
+        <span class="filter-label">状态:</span>
+        <span class="filter-chip active" data-status="ALL">全部状态</span>
+      </div>
+    </section>
+
+    <section class="topic-list" id="topic-list">
+      <div class="empty">加载中...</div>
+    </section>
+  </div>
+
+  <script src="/static/index.js"></script>
+</body>
+</html>
