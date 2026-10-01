@@ -38,8 +38,10 @@ function escapeHtml(s) {
 }
 
 function formatTimestamp(iso) {
-  if (!iso) return "";
-  return iso.replace("T", " ").replace(/Z$/, "").substring(0, 19);
+  // Phase 8A — delegate to shared MYT formatter. Do NOT strip "Z" or
+  // do "+8 hours" arithmetic here — that was the bug that caused
+  // "07:15:40" to display instead of "15:15:40 MYT".
+  return MYT_FORMAT.formatMyt(iso);
 }
 
 function buildStats() {

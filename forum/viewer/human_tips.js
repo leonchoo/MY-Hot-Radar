@@ -42,18 +42,13 @@ function escapeHtml(s) {
 }
 
 function utcToMyt(utc) {
-  if (!utc) return "";
-  // Parse UTC ISO timestamp and convert to UTC+8
-  const m = utc.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
-  if (!m) return utc;
-  const [, y, mo, d, h, mi, s] = m.map(Number);
-  // UTC + 8 hours
-  let hh = h + 8;
-  let dd = d;
-  if (hh >= 24) { hh -= 24; dd += 1; }
-  // Pad
-  const pad = n => String(n).padStart(2, "0");
-  return `${y}-${pad(mo)}-${pad(dd)} ${pad(hh)}:${pad(mi)}:${pad(s)} MYT`;
+  // Phase 8A — delegate to shared MYT formatter (forum/viewer/format.js).
+  // The previous manual +8 arithmetic produced invalid dates like
+  // "2026-09-31" and "2026-12-32" because day overflow didn't roll
+  // into the next month or year. The shared formatter uses
+  // Intl.DateTimeFormat with Asia/Kuala_Lumpur which handles all edge
+  // cases correctly. See forum/viewer/format.js for the implementation.
+  return MYT_FORMAT.formatMyt(utc);
 }
 
 function buildStats() {
