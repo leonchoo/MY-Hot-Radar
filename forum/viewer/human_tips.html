@@ -5,154 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>人工发现 · MY Hot Radar · Newsroom</title>
   <link rel="stylesheet" href="/static/styles.css">
-  <style>
-    .tip-card {
-      background: #fff;
-      border-radius: 8px;
-      padding: 18px 20px;
-      margin-bottom: 14px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-      border-left: 4px solid #ec4899;
-      transition: box-shadow 0.15s, transform 0.15s;
-      cursor: pointer;
-    }
-    .tip-card:hover {
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      transform: translateY(-1px);
-    }
-    .tip-card.priority-LOW { border-left-color: #6b7280; }
-    .tip-card.priority-MEDIUM { border-left-color: #3b82f6; }
-    .tip-card.priority-HIGH { border-left-color: #ea580c; }
-    .tip-card.priority-URGENT {
-      border-left-color: #dc2626;
-      background: linear-gradient(0deg, #fff 0%, #fff5f5 100%);
-    }
-    .tip-card.resolved {
-      opacity: 0.6;
-      border-left-color: #6b7280;
-    }
-    .tip-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    .tip-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #111827;
-      margin: 0;
-      word-break: break-word;
-    }
-    .tip-priority {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-weight: 600;
-    }
-    .tip-priority.LOW { background: #f3f4f6; color: #374151; }
-    .tip-priority.MEDIUM { background: #dbeafe; color: #1e40af; }
-    .tip-priority.HIGH { background: #fed7aa; color: #9a3412; }
-    .tip-priority.URGENT {
-      background: #dc2626;
-      color: #fff;
-    }
-    .tip-status {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-weight: 500;
-    }
-    .tip-status.OPEN { background: #fee2e2; color: #991b1b; }
-    .tip-status.ACKNOWLEDGED { background: #fef3c7; color: #92400e; }
-    .tip-status.INVESTIGATING { background: #fed7aa; color: #9a3412; }
-    .tip-status.LINKED { background: #d1fae5; color: #065f46; }
-    .tip-status.RESOLVED { background: #e5e7eb; color: #4b5563; }
-    .tip-meta {
-      font-size: 11px;
-      color: #6b7280;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px 12px;
-      margin-top: 6px;
-    }
-    .tip-description {
-      font-size: 13px;
-      color: #4b5563;
-      margin-top: 8px;
-      line-height: 1.5;
-      word-break: break-word;
-    }
-    .tip-evidence {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #6b7280;
-    }
-    .tip-evidence a {
-      color: #2563eb;
-      word-break: break-all;
-    }
-    .tip-link-row {
-      margin-top: 6px;
-      font-size: 12px;
-    }
-    .tip-timeline {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px dashed #e5e7eb;
-      font-size: 12px;
-    }
-    .timeline-event {
-      padding: 4px 0;
-      color: #4b5563;
-    }
-    .timeline-event .ts {
-      color: #9ca3af;
-      font-family: ui-monospace, Menlo, monospace;
-      font-size: 10px;
-      margin-right: 8px;
-    }
-    .timeline-event .agent-name {
-      font-weight: 600;
-      color: #111827;
-    }
-    .timeline-event .evt-type {
-      background: #f3f4f6;
-      padding: 1px 6px;
-      border-radius: 4px;
-      font-family: ui-monospace, Menlo, monospace;
-      font-size: 10px;
-      color: #4b5563;
-      margin-right: 4px;
-    }
-    .timeline-event .evt-note {
-      color: #4b5563;
-      margin-left: 6px;
-    }
-    .empty-tip {
-      text-align: center;
-      padding: 60px 20px;
-      color: #9ca3af;
-    }
-    .tip-toolbar {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-      background: #fff;
-      padding: 12px 16px;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .toolbar-title {
-      font-size: 13px;
-      color: #6b7280;
-      margin-right: 4px;
-    }
-  </style>
+  <link rel="stylesheet" href="/static/human_tips.css">
 </head>
 <body>
   <header class="newsroom-header">
@@ -177,6 +30,74 @@
       <span class="filter-chip" data-status="INVESTIGATING">INVESTIGATING</span>
       <span class="filter-chip" data-status="LINKED">LINKED</span>
       <span class="filter-chip" data-status="RESOLVED">RESOLVED</span>
+      <span class="toolbar-spacer"></span>
+      <button id="b-new-tip" class="btn-primary" type="button">📝 我要报料</button>
+    </section>
+
+    <!-- Create form panel (hidden by default) -->
+    <section id="create-panel" class="create-panel" hidden>
+      <h2>📝 提交人工发现</h2>
+      <p class="hint">彪哥手动发现一条新闻,交给 Radar 验证。Radar 将创建或匹配一个 Topic。</p>
+
+      <form id="tip-form" class="tip-form" autocomplete="off">
+        <div class="form-row">
+          <label for="f-title">标题 <span class="required">*</span></label>
+          <input id="f-title" name="title" type="text" maxlength="200" required
+                 placeholder="例:柔佛烟霾情况恶化">
+          <span class="field-error" id="err-title"></span>
+        </div>
+
+        <div class="form-row">
+          <label for="f-description">新闻描述</label>
+          <textarea id="f-description" name="description" rows="3" maxlength="2000"
+                    placeholder="今天发现多个来源都在讨论柔佛烟霾情况,建议 Radar 检查。"></textarea>
+        </div>
+
+        <div class="form-row">
+          <label for="f-source-url">原始来源链接 <span class="optional">(可选)</span></label>
+          <input id="f-source-url" name="source_url" type="url" maxlength="500"
+                 placeholder="https://example.com/news">
+        </div>
+
+        <div class="form-row">
+          <label for="f-evidence">证据链接 <span class="optional">(可选,逗号分隔)</span></label>
+          <input id="f-evidence" name="evidence_urls" type="text" maxlength="2000"
+                 placeholder="https://example.com/shot1.png, https://example.com/shot2.png">
+          <span class="field-hint">截图/照片/补充 URL</span>
+        </div>
+
+        <div class="form-row form-row-inline">
+          <div class="form-col">
+            <label for="f-priority">优先级</label>
+            <select id="f-priority" name="priority">
+              <option value="LOW">LOW · 低</option>
+              <option value="MEDIUM" selected>MEDIUM · 中</option>
+              <option value="HIGH">HIGH · 高</option>
+              <option value="URGENT">URGENT · 紧急</option>
+            </select>
+          </div>
+          <div class="form-col">
+            <label for="f-target-agent">目标 Agent</label>
+            <select id="f-target-agent" name="target_agent">
+              <option value="radar" selected>radar · Radar 验证</option>
+              <option value="default">default · Default 编辑审核</option>
+            </select>
+          </div>
+          <div class="form-col">
+            <label for="f-tags">标签 <span class="optional">(可选,逗号分隔)</span></label>
+            <input id="f-tags" name="tags" type="text" maxlength="200"
+                   placeholder="johor, jerebu">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" id="b-submit-tip" class="btn-primary">提交给 Radar</button>
+          <button type="button" id="b-cancel" class="btn-secondary">取消</button>
+        </div>
+
+        <div id="form-error" class="form-error" hidden></div>
+        <div id="form-success" class="form-success" hidden></div>
+      </form>
     </section>
 
     <div id="tip-list">

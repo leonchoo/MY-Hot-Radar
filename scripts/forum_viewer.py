@@ -401,6 +401,128 @@ def get_human_tips_api(paths: forum_v2.ForumV2Paths) -> Dict[str, Any]:
     }
 
 
+def post_human_tip_api(
+    payload: Dict[str, Any],
+    paths: forum_v2.ForumV2Paths,
+) -> Tuple[int, Dict[str, Any]]:
+    """POST /api/human_tips — create a new Human Tip.
+
+    Accepts the same fields as human_tips.HumanTipsStore.create_tip().
+    The agent is hard-coded to "hermes" since the "Human Tip" button is
+    for human submission only (per Phase 8B / Phase 7 spec).
+
+    Field normalization rules (matches HumanTip dataclass + create_tip):
+      * title           required, non-empty string
+      * description     optional, defaults to ""
+      * source_url      optional, defaults to "" (must be "" or https URL)
+      * evidence_urls   optional, list of strings
+      * priority        optional, must be in TIP_PRIORITIES
+      * target_agent    optional, must be "radar" or "default"
+      * tags            optional, list of strings
+      * source_message_id optional
+      * author          ignored (always "hermes" — server-side constant)
+
+    Returns: (http_status, response_body)
+    """
+    if not isinstance(payload, dict):
+        return 400, {"error": "invalid_payload",
+                       "message": "request body must be a JSON object"}
+
+    title = (payload.get("title") or "").strip()
+    if not title:
+        return 400, {"error": "missing_title",
+                       "message": "title is required"}
+
+    # Normalize optional fields
+    description = payload.get("description") or ""
+    if not isinstance(description, str):
+        description = str(description)
+
+    source_url = payload.get("source_url") or ""
+    if source_url is None:
+        source_url = ""
+    if not isinstance(source_url, str):
+        source_url = str(source_url)
+
+    evidence_urls = payload.get("evidence_urls") or []
+    if evidence_urls is None:
+        evidence_urls = []
+    if not isinstance(evidence_urls, list):
+        return 400, {"error": "invalid_evidence_urls",
+                       "message": "evidence_urls must be a list"}
+    # Filter out None / non-string, drop empties
+    clean_evidence = []
+    for url in evidence_urls:
+        if url is None:
+            continue
+        url_str = str(url).strip()
+        if url_str:
+            clean_evidence.append(url_str)
+
+    priority = (payload.get("priority") or "MEDIUM").upper()
+    if priority not in human_tips.TIP_PRIORITIES:
+        return 400, {"error": "invalid_priority",
+                       "message": f"priority must be one of {human_tips.TIP_PRIORITIES}",
+                       "got": priority}
+
+    target_agent = (payload.get("target_agent") or "radar").lower()
+    if target_agent not in ("radar", "default"):
+        return 400, {"error": "invalid_target_agent",
+                       "message": "target_agent must be 'radar' or 'default'",
+                       "got": target_agent}
+
+    tags = payload.get("tags") or []
+    if tags is None:
+        tags = []
+    if not isinstance(tags, list):
+        return 400, {"error": "invalid_tags",
+                       "message": "tags must be a list"}
+    clean_tags = [str(t) for t in tags if t is not None]
+
+    source_message_id = payload.get("source_message_id")
+    if source_message_id is not None and not isinstance(source_message_id, str):
+        source_message_id = str(source_message_id)
+
+    # author is always "hermes" — Phase 8B/7 requirement.
+    # Frontend cannot override this.
+    author = "hermes"
+
+    # Create
+    tip_paths = human_tips.HumanTipsPaths(paths.root if paths else None)
+    store = human_tips.HumanTipsStore(tip_paths)
+
+    try:
+        tip, evt = store.create_tip(
+            title=title,
+            description=description,
+            source_url=source_url,
+            evidence_urls=clean_evidence,
+            priority=priority,
+            target_agent=target_agent,
+            tags=clean_tags,
+            author=author,
+            source_message_id=source_message_id,
+        )
+    except human_tips.TipPermissionError as e:
+        return 403, {"error": "permission_denied",
+                       "message": str(e)}
+    except human_tips.TipError as e:
+        return 400, {"error": "human_tip_error",
+                       "message": str(e)}
+    except Exception as e:
+        import traceback
+        return 500, {"error": "internal_error",
+                       "message": f"{type(e).__name__}: {e}",
+                       "traceback": traceback.format_exc()}
+
+    return 201, {
+        "schema_version": "forum/viewer-v1-human_tips",
+        "ok": True,
+        "tip": tip.to_dict(),
+        "event": evt.to_dict(),
+    }
+
+
 # ---------------------------------------------------------------------------
 # HTTP server
 # ---------------------------------------------------------------------------
@@ -435,7 +557,7 @@ class ViewerHTTPHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
-    def _route(self, parsed) -> None:
+    def _route(self, parsed, method="GET", body=None) -> None:
         path = parsed.path
 
         # API
@@ -455,7 +577,11 @@ class ViewerHTTPHandler(BaseHTTPRequestHandler):
             self._send_json(200, get_dashboard_api(self.forum_paths))
             return
         if path == "/api/human_tips":
-            self._send_json(200, get_human_tips_api(self.forum_paths))
+            if method == "POST":
+                status, payload = post_human_tip_api(body or {}, self.forum_paths)
+                self._send_json(status, payload)
+            else:
+                self._send_json(200, get_human_tips_api(self.forum_paths))
             return
 
         # Static files (HTML)
@@ -474,7 +600,20 @@ class ViewerHTTPHandler(BaseHTTPRequestHandler):
             if ".." in rel_file or "/" in rel_file:
                 self._send_json(403, {"error": "forbidden"})
                 return
-            self._send_file(self.viewer_dir / rel_file, "text/css; charset=utf-8")
+            # Map file extension → content-type
+            if rel_file.endswith(".js"):
+                ct = "text/javascript; charset=utf-8"
+            elif rel_file.endswith(".css"):
+                ct = "text/css; charset=utf-8"
+            elif rel_file.endswith(".html"):
+                ct = "text/html; charset=utf-8"
+            elif rel_file.endswith(".svg"):
+                ct = "image/svg+xml"
+            elif rel_file.endswith(".json"):
+                ct = "application/json; charset=utf-8"
+            else:
+                ct = "application/octet-stream"
+            self._send_file(self.viewer_dir / rel_file, ct)
             return
         if path == "/labels.json":
             self._send_json(200, {
@@ -491,9 +630,44 @@ class ViewerHTTPHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
             parsed = urlparse(self.path)
-            self._route(parsed)
+            self._route(parsed, "GET")
         except Exception as e:
             self._send_json(500, {"error": "internal_error", "message": str(e)})
+
+    def do_POST(self):
+        """Handle POST requests. Currently only /api/human_tips."""
+        try:
+            # Read request body
+            content_length = int(self.headers.get("Content-Length", "0") or "0")
+            raw = self.rfile.read(content_length) if content_length > 0 else b""
+            # Decode UTF-8 (CRITICAL for Chinese)
+            try:
+                text = raw.decode("utf-8")
+            except UnicodeDecodeError:
+                # Fall back to latin-1 to never crash on encoding
+                text = raw.decode("latin-1")
+            # Parse JSON
+            body: Any = None
+            if text.strip():
+                try:
+                    body = json.loads(text)
+                except json.JSONDecodeError as e:
+                    self._send_json(
+                        400,
+                        {"error": "invalid_json",
+                          "message": f"Could not parse JSON: {e}"},
+                    )
+                    return
+            parsed = urlparse(self.path)
+            self._route(parsed, "POST", body or {})
+        except Exception as e:
+            import traceback
+            self._send_json(
+                500,
+                {"error": "internal_error",
+                  "message": f"{type(e).__name__}: {e}",
+                  "traceback": traceback.format_exc()},
+            )
 
 
 def make_handler(forum_paths: forum_v2.ForumV2Paths, viewer_dir: Path):

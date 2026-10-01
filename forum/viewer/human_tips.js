@@ -167,6 +167,133 @@ async function loadTips() {
   renderTips();
 }
 
+
+async function submitTip(payload) {
+  // POST /api/human_tips — server handles agent="hermes" hard-coded
+  const res = await fetch("/api/human_tips", {
+    method: "POST",
+    headers: { "Content-Type": "application/json; charset=utf-8" },
+    body: JSON.stringify(payload),
+  });
+  let body = null;
+  try {
+    body = await res.json();
+  } catch (e) {
+    // ignore parse error; will be reported below
+  }
+  return { status: res.status, body };
+}
+
+function showFormSuccess(tip) {
+  const successEl = document.getElementById("form-success");
+  const tipId = tip.tip_id;
+  const status = tip.status || "OPEN";
+  const priority = tip.priority || "MEDIUM";
+  const target = tip.target_agent || "radar";
+  const topicId = tip.topic_id || "";
+  successEl.innerHTML = `
+    <strong>已提交给 Radar</strong>
+    <span class="success-line">状态: <code>${escapeHtml(status)}</code></span>
+    <span class="success-line">优先级: <code>${escapeHtml(priority)}</code></span>
+    <span class="success-line">目标: <code>${escapeHtml(target)}</code></span>
+    <span class="success-line">Tip ID: <code>${escapeHtml(tipId)}</code></span>
+    ${topicId ? `<span class="success-line">Topic: <a href="/topic.html?id=${encodeURIComponent(topicId)}">${escapeHtml(topicId)}</a></span>` : ""}
+  `;
+  successEl.hidden = false;
+}
+
+function showFormError(message) {
+  const errorEl = document.getElementById("form-error");
+  errorEl.textContent = "提交失败: " + message;
+  errorEl.hidden = false;
+}
+
+function hideFormMessages() {
+  document.getElementById("form-error").hidden = true;
+  document.getElementById("form-success").hidden = true;
+}
+
+function clearForm() {
+  document.getElementById("f-title").value = "";
+  document.getElementById("f-description").value = "";
+  document.getElementById("f-source-url").value = "";
+  document.getElementById("f-evidence").value = "";
+  document.getElementById("f-tags").value = "";
+  document.getElementById("f-priority").value = "MEDIUM";
+  document.getElementById("f-target-agent").value = "radar";
+  document.getElementById("err-title").textContent = "";
+}
+
+function toggleCreatePanel(show) {
+  const panel = document.getElementById("create-panel");
+  const btn = document.getElementById("b-new-tip");
+  if (show === undefined) {
+    show = panel.hidden;
+  }
+  panel.hidden = !show;
+  btn.textContent = show ? "✕ 取消" : "📝 我要报料";
+  if (show) {
+    document.getElementById("f-title").focus();
+  }
+}
+
+async function handleSubmit(event) {
+  event.preventDefault();
+  hideFormMessages();
+
+  const title = document.getElementById("f-title").value.trim();
+  if (!title) {
+    document.getElementById("err-title").textContent = "标题必填";
+    showFormError("标题不能为空");
+    return;
+  }
+  document.getElementById("err-title").textContent = "";
+
+  // Parse comma-separated fields
+  const evidenceRaw = document.getElementById("f-evidence").value.trim();
+  const evidenceUrls = evidenceRaw
+    ? evidenceRaw.split(",").map(s => s.trim()).filter(Boolean)
+    : [];
+  const tagsRaw = document.getElementById("f-tags").value.trim();
+  const tags = tagsRaw
+    ? tagsRaw.split(",").map(s => s.trim()).filter(Boolean)
+    : [];
+
+  const payload = {
+    title,
+    description: document.getElementById("f-description").value.trim(),
+    source_url: document.getElementById("f-source-url").value.trim(),
+    evidence_urls: evidenceUrls,
+    priority: document.getElementById("f-priority").value,
+    target_agent: document.getElementById("f-target-agent").value,
+    tags,
+  };
+
+  // Disable submit button while in flight
+  const submitBtn = document.getElementById("b-submit-tip");
+  submitBtn.disabled = true;
+  submitBtn.textContent = "提交中…";
+
+  try {
+    const { status, body } = await submitTip(payload);
+    if (status === 200 || status === 201) {
+      showFormSuccess(body.tip || body);
+      clearForm();
+      // Reload tip list to show the new one
+      try { await loadTips(); } catch (e) { /* ignore */ }
+    } else {
+      const errMsg = (body && (body.message || body.error)) || `服务器返回: ${status}`;
+      showFormError(errMsg);
+      if (body && body.trace) {
+        console.error("Server traceback:", body.trace);
+      }
+    }
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "提交给 Radar";
+  }
+}
+
 (async () => {
   document.querySelectorAll(".filter-chip").forEach(chip => {
     chip.onclick = () => {
@@ -176,6 +303,15 @@ async function loadTips() {
       renderTips();
     };
   });
+
+  // Create form handlers (Phase 8B)
+  document.getElementById("b-new-tip").onclick = () => toggleCreatePanel();
+  document.getElementById("b-cancel").onclick = () => {
+    clearForm();
+    hideFormMessages();
+    toggleCreatePanel(false);
+  };
+  document.getElementById("tip-form").addEventListener("submit", handleSubmit);
   try {
     await loadTips();
   } catch (e) {
