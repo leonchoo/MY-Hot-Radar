@@ -47,6 +47,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
 import forum_v2  # noqa: E402
+import forum_i18n  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -65,6 +66,44 @@ DEFAULT_RADAR_OUTPUT = (
 
 class IntegrationError(Exception):
     pass
+
+
+# ---------------------------------------------------------------------------
+# 中文 i18n helpers (Phase 4 — 中文新闻室)
+# ---------------------------------------------------------------------------
+
+def _wrap_payload_forum(payload: Optional[Dict]) -> Optional[Dict]:
+    """Wrap a payload for Forum v2 by translating note/summary/reason/etc.
+
+    The schema keys remain English (machine contract). Human-readable
+    strings become bilingual {"en": ..., "zh": ...}. Existing English
+    content is kept under "en"; Chinese content is generated under "zh"
+    by the i18n module.
+
+    If payload is None or not a dict, returns it unchanged.
+    """
+    if payload is None:
+        return None
+    if not isinstance(payload, dict):
+        return payload
+    return forum_i18n.i18n_payload(payload)
+
+
+def _wrap_evidence(evidence: Optional[Dict]) -> Optional[Dict]:
+    """Wrap evidence for Forum v2.
+
+    If evidence contains a `source_description` field, translate it
+    to Chinese. Otherwise pass through.
+    """
+    if not isinstance(evidence, dict):
+        return evidence
+    if "source_description" in evidence:
+        ev = dict(evidence)
+        ev["source_description"] = forum_i18n.i18n_payload(
+            {"note": ev["source_description"]}
+        ).get("note", ev["source_description"])
+        return ev
+    return evidence
 
 
 # ---------------------------------------------------------------------------
@@ -192,40 +231,63 @@ def collector_emit_observation(
       3. Otherwise create a new Topic with status=NEW.
 
     Returns (topic, event, was_reactivated, was_created).
+
+    中文新闻室 (Phase 4):
+      * Title is stored as plain string (backward compat).
+      * topic.json also gets `title_i18n` field with bilingual titles.
+      * Event payload gets `note` (bilingual) describing the observation.
     """
     paths = paths or forum_v2.ForumV2Paths()
     paths.ensure_layout()
     existing = find_topic_for_observation(title, paths=paths)
 
+    title_zh = forum_i18n.translate_title(title)
+    note_bilingual = forum_i18n.collector_observation_note(evidence)
     payload = build_event_with_source_message(
-        payload={"observation": evidence, "title": title},
+        payload={
+            "observation": evidence,
+            "title": title,
+            "note": note_bilingual,
+        },
         source_message_id=source_message_id,
     )
 
     if existing is None:
-        # Brand-new Topic.
-        topic, evt, was_reactivated = forum_v2.create_topic(
-            title=title,
-            agent="collector",
-            paths=paths,
-            classification=classification,
-            languages=languages,
-            tags=tags,
-            event_payload=payload,
-            event_evidence=evidence,
-            confidence=confidence,
-        )
-        return topic, evt, False, True
+            # Brand-new Topic.
+            topic, evt, was_reactivated = forum_v2.create_topic(
+                title=title,
+                agent="collector",
+                paths=paths,
+                classification=classification,
+                languages=languages,
+                tags=tags,
+                event_payload=_wrap_payload_forum({
+                    **payload,
+                    "title_i18n": forum_i18n.title_payload(title),
+                }),
+                event_evidence=_wrap_evidence(evidence),
+                confidence=confidence,
+            )
+            return topic, evt, False, True
 
     # Existing Topic.
     # Reactivate if CLOSED; otherwise append an OBSERVATION event.
     if existing.status in (forum_v2.TopicLifecycle.CLOSED.value,):
+        note_reactive = forum_i18n.collector_social_heat_note(evidence)
+        payload_reactive = build_event_with_source_message(
+            payload={
+                "observation": evidence,
+                "title": title,
+                "note": note_reactive,
+            },
+            source_message_id=source_message_id,
+        )
         topic, evt, _ = forum_v2.create_topic(
             title=title,
             agent="collector",
             paths=paths,
-            event_payload=payload,
-            event_evidence=evidence,
+            event_payload=_wrap_payload_forum(payload_reactive),
+            event_evidence=_wrap_evidence(evidence),
             confidence=confidence,
         )
         return topic, evt, True, False
@@ -235,8 +297,8 @@ def collector_emit_observation(
         topic_id=existing.topic_id,
         agent="collector",
         event_type="OBSERVATION",
-        payload=payload,
-        evidence=evidence,
+        payload=_wrap_payload_forum(payload),
+        evidence=_wrap_evidence(evidence),
         confidence=confidence,
         paths=paths,
     )
@@ -256,6 +318,9 @@ def collector_emit_social_heat_signal(
     Looks up by title linkage. If found, emits SOCIAL_HEAT_SIGNAL and
     transitions the Topic to REACTIVATED. If not found, this is an
     error (the heat signal must reference a known Topic).
+
+    中文新闻室 (Phase 4):
+      * Payload gets `note` (bilingual) describing the social heat.
     """
     paths = paths or forum_v2.ForumV2Paths()
     existing = find_topic_for_observation(title, paths=paths)
@@ -265,15 +330,18 @@ def collector_emit_social_heat_signal(
             f"cannot find existing Topic"
         )
     payload = build_event_with_source_message(
-        payload={"title": title},
+        payload={
+            "title": title,
+            "note": forum_i18n.collector_social_heat_note(evidence),
+        },
         source_message_id=source_message_id,
     )
     topic, evt = forum_v2.append_event(
         topic_id=existing.topic_id,
         agent="collector",
         event_type="SOCIAL_HEAT_SIGNAL",
-        payload=payload,
-        evidence=evidence,
+        payload=_wrap_payload_forum(payload),
+        evidence=_wrap_evidence(evidence),
         confidence=confidence,
         paths=paths,
         next_status=forum_v2.TopicLifecycle.REACTIVATED.value,
@@ -308,14 +376,15 @@ def radar_emit_source_update(
     """
     paths = paths or forum_v2.ForumV2Paths()
     payload = build_event_with_source_message(
-        payload={
-            "radar_topic_id": radar_topic_id,
-            "url": source_url,
-            "source_name": source_name,
-            "language": language,
-        },
-        source_message_id=source_message_id,
-    )
+            payload={
+                "radar_topic_id": radar_topic_id,
+                "url": source_url,
+                "source_name": source_name,
+                "language": language,
+                "note": forum_i18n.radar_source_note(source_name, language),
+            },
+            source_message_id=source_message_id,
+        )
     # Look up by either radar_topic_id linkage OR title linkage.
     existing = find_topic_for_radar_topic(radar_topic_id, title, paths=paths)
     if existing is None:
@@ -340,7 +409,7 @@ def radar_emit_source_update(
         topic_id=existing.topic_id,
         agent="radar",
         event_type="SOURCE_UPDATE",
-        payload=payload,
+        payload=_wrap_payload_forum(payload),
         evidence={"source_url": source_url, "source_name": source_name},
         paths=paths,
         next_status=forum_v2.TopicLifecycle.RADAR_TRACKING.value
@@ -358,12 +427,15 @@ def radar_emit_classification_update(
 ) -> Tuple[forum_v2.Topic, forum_v2.Event]:
     """MHR Radar updates Topic classification."""
     paths = paths or forum_v2.ForumV2Paths()
-    payload = {"classification": classification}
+    payload = {
+        "classification": classification,
+        "note": forum_i18n.radar_classification_note(classification),
+    }
     topic, evt = forum_v2.append_event(
         topic_id=topic_id,
         agent="radar",
         event_type="CLASSIFICATION_UPDATE",
-        payload=payload,
+        payload=_wrap_payload_forum(payload),
         confidence=confidence,
         paths=paths,
     )
@@ -378,13 +450,17 @@ def radar_emit_cross_source_confirmation(
     paths: Optional[forum_v2.ForumV2Paths] = None,
 ) -> Tuple[forum_v2.Topic, forum_v2.Event]:
     paths = paths or forum_v2.ForumV2Paths()
-    payload = {"url": source_url, "source_name": source_name}
+    payload = {
+        "url": source_url,
+        "source_name": source_name,
+        "note": forum_i18n.radar_cross_source_note(source_name),
+    }
     topic, evt = forum_v2.append_event(
         topic_id=topic_id,
         agent="radar",
         event_type="CROSS_SOURCE_CONFIRMATION",
-        payload=payload,
-        evidence={"source_url": source_url, "source_name": source_name},
+        payload=_wrap_payload_forum(payload),
+        evidence=_wrap_evidence({"source_url": source_url, "source_name": source_name}),
         paths=paths,
     )
     return topic, evt
@@ -398,12 +474,16 @@ def radar_emit_momentum_update(
     paths: Optional[forum_v2.ForumV2Paths] = None,
 ) -> Tuple[forum_v2.Topic, forum_v2.Event]:
     paths = paths or forum_v2.ForumV2Paths()
-    payload = {"delta_score": delta_score, "window": window}
+    payload = {
+        "delta_score": delta_score,
+        "window": window,
+        "note": forum_i18n.radar_momentum_note(delta_score, window),
+    }
     topic, evt = forum_v2.append_event(
         topic_id=topic_id,
         agent="radar",
         event_type="MOMENTUM_UPDATE",
-        payload=payload,
+        payload=_wrap_payload_forum(payload),
         paths=paths,
     )
     return topic, evt
@@ -424,7 +504,9 @@ def default_emit_editorial_review(
         topic_id=topic_id,
         agent="default",
         event_type="EDITORIAL_REVIEW",
-        payload={"note": note},
+        payload=_wrap_payload_forum({
+            "note": forum_i18n.default_review_note(_classify_topic(topic_id, paths)),
+        }),
         paths=paths,
         next_status=forum_v2.TopicLifecycle.EDITORIAL_REVIEW.value,
     )
@@ -439,11 +521,16 @@ def default_emit_publish(
     paths: Optional[forum_v2.ForumV2Paths] = None,
 ) -> Tuple[forum_v2.Topic, forum_v2.Event]:
     paths = paths or forum_v2.ForumV2Paths()
+    cls = _classify_topic(topic_id, paths)
     topic, evt = forum_v2.append_event(
         topic_id=topic_id,
         agent="default",
         event_type="PUBLISH",
-        payload={"canonical_url": canonical_url, "slug": slug},
+        payload=_wrap_payload_forum({
+            "canonical_url": canonical_url,
+            "slug": slug,
+            "note": forum_i18n.default_publish_note(canonical_url, slug, cls),
+        }),
         paths=paths,
         next_status=forum_v2.TopicLifecycle.PUBLISHED.value,
     )
@@ -461,7 +548,9 @@ def default_emit_monitor(
         topic_id=topic_id,
         agent="default",
         event_type="MONITOR",
-        payload={"note": note},
+        payload=_wrap_payload_forum({
+            "note": forum_i18n.default_monitor_note(note or ""),
+        }),
         paths=paths,
         next_status=forum_v2.TopicLifecycle.MONITORING.value,
     )
@@ -479,7 +568,10 @@ def default_emit_follow_up(
         topic_id=topic_id,
         agent="default",
         event_type="FOLLOW_UP",
-        payload={"decision": decision},
+        payload=_wrap_payload_forum({
+            "decision": decision,
+            "note": forum_i18n.default_follow_up_note(decision),
+        }),
         paths=paths,
         next_status=forum_v2.TopicLifecycle.FOLLOW_UP.value,
     )
@@ -497,7 +589,10 @@ def default_emit_close(
         topic_id=topic_id,
         agent="default",
         event_type="CLOSE",
-        payload={"reason": reason},
+        payload=_wrap_payload_forum({
+            "reason": reason,
+            "note": forum_i18n.default_close_note(reason or ""),
+        }),
         paths=paths,
         next_status=forum_v2.TopicLifecycle.CLOSED.value,
     )
@@ -516,10 +611,22 @@ def default_update_article(
         topic_id=topic_id,
         agent="default",
         event_type="UPDATE_ARTICLE",
-        payload={"canonical_url": canonical_url, "change_summary": change_summary},
+        payload=_wrap_payload_forum({
+            "canonical_url": canonical_url,
+            "change_summary": change_summary,
+            "note": forum_i18n.default_update_article_note(change_summary),
+        }),
         paths=paths,
     )
     return topic, evt
+
+
+def _classify_topic(topic_id: str, paths: Optional[forum_v2.ForumV2Paths]) -> str:
+    """Helper: read a Topic's classification; return "" if not found."""
+    t = forum_v2.get_topic(topic_id, paths=paths)
+    if t is None:
+        return ""
+    return getattr(t, "classification", "") or ""
 
 
 def get_full_thread(
@@ -560,14 +667,19 @@ def performance_emit_report(
 ) -> Tuple[forum_v2.Topic, forum_v2.Event]:
     paths = paths or forum_v2.ForumV2Paths()
     payload = build_event_with_source_message(
-        payload={"velocity": velocity, "engagement": engagement, "window": window},
+        payload={
+            "velocity": velocity,
+            "engagement": engagement,
+            "window": window,
+            "note": forum_i18n.performance_report_note(velocity, engagement, window),
+        },
         source_message_id=source_message_id,
     )
     topic, evt = forum_v2.append_event(
         topic_id=topic_id,
         agent="mhr_performance",
         event_type="PERFORMANCE_REPORT",
-        payload=payload,
+        payload=_wrap_payload_forum(payload),
         confidence=confidence,
         paths=paths,
     )
@@ -582,12 +694,16 @@ def performance_emit_sustained(
     paths: Optional[forum_v2.ForumV2Paths] = None,
 ) -> Tuple[forum_v2.Topic, forum_v2.Event]:
     paths = paths or forum_v2.ForumV2Paths()
-    payload = {"duration_hours": duration_hours, "sources_increasing": sources_increasing}
+    payload = {
+        "duration_hours": duration_hours,
+        "sources_increasing": sources_increasing,
+        "note": forum_i18n.performance_sustained_note(duration_hours, sources_increasing),
+    }
     topic, evt = forum_v2.append_event(
         topic_id=topic_id,
         agent="mhr_performance",
         event_type="SUSTAINED_SIGNAL",
-        payload=payload,
+        payload=_wrap_payload_forum(payload),
         paths=paths,
     )
     return topic, evt
@@ -600,12 +716,15 @@ def performance_emit_cooling(
     paths: Optional[forum_v2.ForumV2Paths] = None,
 ) -> Tuple[forum_v2.Topic, forum_v2.Event]:
     paths = paths or forum_v2.ForumV2Paths()
-    payload = {"window": window}
+    payload = {
+        "window": window,
+        "note": forum_i18n.performance_cooling_note(window),
+    }
     topic, evt = forum_v2.append_event(
         topic_id=topic_id,
         agent="mhr_performance",
         event_type="COOLING_SIGNAL",
-        payload=payload,
+        payload=_wrap_payload_forum(payload),
         paths=paths,
     )
     return topic, evt
@@ -775,7 +894,7 @@ def bridge_v1_message_to_v2_event(
         # If no Topic matches, create one with the subject as title
         topic, evt, was_reactivated, was_created = collector_emit_observation(
             title=title,
-            evidence=evidence,
+            evidence=_wrap_evidence(evidence),
             source_message_id=message_id,
             paths=paths,
         )
@@ -793,7 +912,7 @@ def bridge_v1_message_to_v2_event(
     # Default: Collector observation
     topic, evt, was_reactivated, was_created = collector_emit_observation(
         title=title,
-        evidence=evidence,
+        evidence=_wrap_evidence(evidence),
         source_message_id=message_id,
         paths=paths,
     )
