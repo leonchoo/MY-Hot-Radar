@@ -557,12 +557,15 @@ def wire_default_editorial_run(
                 actions["review"] += 1
 
             elif status == "EDITORIAL_REVIEW":
-                forum_integration.default_emit_monitor(
-                    topic_id=topic.topic_id,
-                    note="reviewed but no decision yet",
-                    paths=paths,
+                # Was reviewed but not yet decided; pick FOLLOW_UP
+                # (EDITORIAL_REVIEW -> MONITORING is not a valid transition;
+                # FOLLOW_UP is the correct path back to monitoring state)
+                forum_integration.default_emit_follow_up(
+                topic_id=topic.topic_id,
+                note="reviewed but no decision yet",
+                paths=paths,
                 )
-                actions["monitor"] += 1
+                actions["follow_up"] += 1
 
             elif status == "PUBLISHED" and len(perf_reports) > 0:
                 latest_perf = perf_reports[-1]
