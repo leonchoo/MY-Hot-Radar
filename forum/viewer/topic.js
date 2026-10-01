@@ -177,7 +177,7 @@ function eventCardHtml(e) {
       <span>event_id: ${escapeHtml(e.event_id || "")}</span>
       <span>agent: ${escapeHtml(e.agent || "")}</span>
       <span>event_type: ${escapeHtml(e.event_type || "")}</span>
-      <span>timestamp: ${escapeHtml(e.timestamp || "")}</span>
+      <span>timestamp: ${escapeHtml(ts)}</span>
       ${e.confidence !== undefined && e.confidence !== null ? `<span>confidence: ${escapeHtml(String(e.confidence))}</span>` : ""}
     </div>
   `;

@@ -255,6 +255,76 @@ class TestViewerMytFormatter(unittest.TestCase):
         self.assertNotIn('let hh = h + 8', body)
         self.assertIn('MYT_FORMAT.formatMyt', body)
 
+    # ---- topic.js must use MYT in machine-fields too ---------------
+
+    def test_topic_js_machine_fields_uses_myt(self):
+        """Regression: Phase 8A-r2 found that topic.js line 180 was
+        rendering `e.timestamp` directly (raw UTC) inside the
+        technical-details section (`machine-fields` div). The fix
+        changed it to use the local `ts` variable which is already
+        MYT-formatted. This test guards that regression.
+        """
+        with urllib.request.urlopen(VIEWER_REQUIRED_HOST + "/static/topic.js", timeout=5) as resp:
+            body = resp.read().decode("utf-8")
+        # Find the machine-fields block — it must NOT reference
+        # e.timestamp directly; it must use the formatted `ts` variable.
+        import re
+        m = re.search(r'<span>timestamp:\s*\$\{escapeHtml\(([^)]+)\)\}</span>', body)
+        self.assertIsNotNone(m,
+                            "topic.js must render a timestamp field in machine-fields")
+        rendered_var = m.group(1).strip()
+        # Acceptable: `ts` (already MYT-formatted) or `ts || ''`
+        # NOT acceptable: `e.timestamp`, `e.timestamp || ""`, `event.timestamp`
+        self.assertIn("ts", rendered_var.lower(),
+                      f"machine-fields timestamp must use the formatted variable, "
+                      f"not raw {rendered_var!r}")
+        self.assertNotIn("e.timestamp", rendered_var,
+                         f"machine-fields timestamp must NOT use raw e.timestamp "
+                         f"(renders as UTC). Got {rendered_var!r}")
+        self.assertNotIn("event.timestamp", rendered_var)
+
+    # ---- double-conversion prevention -------------------------------
+
+    def test_formatjs_rejects_non_z_inputs(self):
+        """Defensive: the formatter must NEVER accept strings without
+        'Z' suffix. This prevents double +8 (e.g. feeding an already
+        MYT-formatted string back in)."""
+        with urllib.request.urlopen(VIEWER_REQUIRED_HOST + "/static/format.js", timeout=5) as resp:
+            body = resp.read().decode("utf-8")
+        # The implementation must explicitly reject non-Z inputs
+        self.assertIn("_isValidIsoUtc", body,
+                      "format.js must validate input is Z-suffixed")
+        # And not use Date.parse fallback
+        self.assertNotIn("Date.parse", body,
+                         "format.js must not silently parse non-Z strings via Date.parse")
+
+    # ---- served HTML pages have no raw UTC timestamps ---------------
+
+    def test_served_home_has_no_raw_utc(self):
+        with urllib.request.urlopen(VIEWER_REQUIRED_HOST + "/", timeout=5) as resp:
+            body = resp.read().decode("utf-8")
+        # The HTML served from the viewer must NOT contain any
+        # raw ISO UTC timestamps like "2026-10-01T07:15:40Z".
+        # (The HTML itself is mostly scaffolding; the timestamps come
+        # from JS rendering. But we still verify it's clean.)
+        import re
+        leaked = re.findall(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", body)
+        self.assertEqual(leaked, [], f"Home HTML leaks raw UTC: {leaked[:3]}")
+
+    def test_served_topic_has_no_raw_utc(self):
+        with urllib.request.urlopen(VIEWER_REQUIRED_HOST + "/topic.html?id=T_ae36733de0f4cf3e", timeout=5) as resp:
+            body = resp.read().decode("utf-8")
+        import re
+        leaked = re.findall(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", body)
+        self.assertEqual(leaked, [], f"Topic HTML leaks raw UTC: {leaked[:3]}")
+
+    def test_served_human_tips_has_no_raw_utc(self):
+        with urllib.request.urlopen(VIEWER_REQUIRED_HOST + "/human_tips.html", timeout=5) as resp:
+            body = resp.read().decode("utf-8")
+        import re
+        leaked = re.findall(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", body)
+        self.assertEqual(leaked, [], f"Human Tips HTML leaks raw UTC: {leaked[:3]}")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
