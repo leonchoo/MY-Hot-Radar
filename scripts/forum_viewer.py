@@ -40,6 +40,7 @@ VIEWER_DIR = HERE.parent / "forum" / "viewer"
 sys.path.insert(0, str(HERE))
 import forum_v2  # noqa: E402
 import forum_i18n  # noqa: E402
+import human_tips  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -382,6 +383,24 @@ def get_dashboard_api(paths: forum_v2.ForumV2Paths) -> Dict[str, Any]:
     }
 
 
+def get_human_tips_api(paths: forum_v2.ForumV2Paths) -> Dict[str, Any]:
+    """GET /api/human_tips — list all human tips with their events."""
+    tip_paths = human_tips.HumanTipsPaths(paths.root if paths else None)
+    store = human_tips.HumanTipsStore(tip_paths)
+    tips = store.list_tips()
+    out = []
+    for t in tips:
+        td = t.to_dict()
+        events = store.get_events(t.tip_id)
+        td["_events"] = [e.to_dict() for e in events]
+        out.append(td)
+    return {
+        "schema_version": "forum/viewer-v1-human_tips",
+        "tips": out,
+        "total": len(out),
+    }
+
+
 # ---------------------------------------------------------------------------
 # HTTP server
 # ---------------------------------------------------------------------------
@@ -435,6 +454,9 @@ class ViewerHTTPHandler(BaseHTTPRequestHandler):
         if path == "/api/dashboard":
             self._send_json(200, get_dashboard_api(self.forum_paths))
             return
+        if path == "/api/human_tips":
+            self._send_json(200, get_human_tips_api(self.forum_paths))
+            return
 
         # Static files (HTML)
         if path == "/" or path == "/index.html":
@@ -442,6 +464,9 @@ class ViewerHTTPHandler(BaseHTTPRequestHandler):
             return
         if path == "/topic.html":
             self._send_file(self.viewer_dir / "topic.html", "text/html; charset=utf-8")
+            return
+        if path == "/human_tips.html":
+            self._send_file(self.viewer_dir / "human_tips.html", "text/html; charset=utf-8")
             return
         if path.startswith("/static/"):
             rel_file = path[len("/static/"):]

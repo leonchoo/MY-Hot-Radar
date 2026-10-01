@@ -53,6 +53,9 @@ import runtime_adapters.collector as adapter_collector  # noqa: E402
 import runtime_adapters.radar as adapter_radar  # noqa: E402
 import runtime_adapters.performance as adapter_performance  # noqa: E402
 import runtime_adapters.default as adapter_default  # noqa: E402
+import runtime_adapters.human_tip as adapter_human_tip  # noqa: E402
+import human_tips  # noqa: E402
+import human_tips_runtime  # noqa: E402
 
 
 DEFAULT_FORUM_ROOT = Path(r"C:\MY-Hot-Radar-Bridge\forum")
@@ -117,16 +120,37 @@ def do_run_once(*, agents: List[str],
         ordered.append(("collector", lambda rid: adapter_collector.run_collector_runtime(
             forum_paths=paths, run_id=rid)))
     if "radar" in agents:
-        ordered.append(("radar", lambda rid: adapter_radar.run_radar_runtime(
-            forum_paths=paths, run_id=rid)))
+        # Radar also picks up Human Tips awaiting ACK
+        def _radar_with_tips(rid):
+            radar_result = adapter_radar.run_radar_runtime(
+                forum_paths=paths, run_id=rid)
+            tip_result = adapter_human_tip.process_open_tips(
+                forum_paths=paths, run_id=f"{rid}_tips")
+            # Aggregate tip events into radar result
+            radar_result.forum_events_written += tip_result.forum_events_written
+            radar_result.topics_processed += tip_result.topics_processed
+            for n in tip_result.notes:
+                radar_result.notes.append(f"tip:{n}")
+            return radar_result
+        ordered.append(("radar", _radar_with_tips))
     if "performance" in agents or "mhr_performance" in agents:
         ordered.append(("performance", lambda rid: adapter_performance.run_performance_runtime(
             forum_paths=paths, run_id=rid)))
     if "default" in agents:
-        ordered.append(("default", lambda rid: adapter_default.run_default_runtime(
-            forum_paths=paths, run_id=rid,
-            decisions_input=default_decisions,
-        )))
+        # Default reviews LINKED Human Tips
+        def _default_with_tips(rid):
+            default_result = adapter_default.run_default_runtime(
+                forum_paths=paths, run_id=rid,
+                decisions_input=default_decisions,
+            )
+            tip_result = adapter_human_tip.process_linked_tips_for_default(
+                forum_paths=paths, run_id=f"{rid}_tips")
+            default_result.forum_events_written += tip_result.forum_events_written
+            default_result.topics_processed += tip_result.topics_processed
+            for n in tip_result.notes:
+                default_result.notes.append(f"tip:{n}")
+            return default_result
+        ordered.append(("default", _default_with_tips))
 
     for agent_name, fn in ordered:
         run_id = runtime_state.make_run_id(agent_name)
@@ -188,11 +212,9 @@ def do_health(*, runtime_state_path: Path = DEFAULT_RUNTIME_STATE,
 
     Output schema:
       {
-        "agents": {
-          "collector": {"last_run": ..., "last_status": ..., "forum_sync": ...},
-          ...
-        },
-        "forum": {"topics": N, "events": N, "status": ...},
+        "agents": {...},
+        "forum": {...},
+        "human_tips": {"by_status": {...}, "total": N}
       }
     """
     store = runtime_state.RuntimeStateStore(runtime_state_path)
@@ -207,9 +229,10 @@ def do_health(*, runtime_state_path: Path = DEFAULT_RUNTIME_STATE,
             "events": state.forum_events,
             "status": state.forum_status,
         },
+        "human_tips": {},
     }
 
-    # Try to refresh live counts (best-effort, don't fail health if Forum is broken)
+    # Try to refresh live counts (best-effort)
     try:
         topics = forum_v2.list_topics(paths=forum_paths)
         events_total = 0
@@ -231,8 +254,16 @@ def do_health(*, runtime_state_path: Path = DEFAULT_RUNTIME_STATE,
             "failed_runs": rec.failed_runs,
             "last_error": rec.last_error,
             "last_run_topics": rec.last_run_topics,
-            "last_run_events": rec.last_run_events,
+            "last_run_events": rec.forum_events_written if hasattr(rec, "forum_events_written") else rec.last_run_events,
         }
+
+    # Human tip stats (Phase 7)
+    try:
+        tip_paths = human_tips.HumanTipsPaths(forum_paths.root if forum_paths else None)
+        tip_stats = human_tips_runtime.stats_summary(tip_paths)
+        out["human_tips"] = tip_stats
+    except Exception as e:
+        out["human_tips"] = {"error": f"{type(e).__name__}:{e}"}
 
     return out
 
@@ -321,6 +352,92 @@ def do_shutdown(*, runtime_state_path: Path = DEFAULT_RUNTIME_STATE) -> Dict[str
     return {"ok": True, "state_path": str(runtime_state_path)}
 
 
+def do_tip_subcommand(args, forum_paths: forum_v2.ForumV2Paths) -> Dict[str, Any]:
+    """Handle the 'tip' subcommand for Human Tip management."""
+    tip_paths = human_tips.HumanTipsPaths(forum_paths.root if forum_paths else None)
+    store = human_tips.HumanTipsStore(tip_paths)
+
+    tip_command = getattr(args, "tip_command", None)
+    if tip_command == "create":
+        tip, evt = store.create_tip(
+            title=args.title,
+            description=getattr(args, "description", "") or "",
+            source_url=getattr(args, "source_url", "") or "",
+            evidence_urls=list(getattr(args, "evidence_url", []) or []),
+            priority=getattr(args, "priority", "MEDIUM"),
+            tags=list(getattr(args, "tag", []) or []),
+            target_agent=getattr(args, "target_agent", "radar"),
+            author=getattr(args, "author", "hermes"),
+            source_message_id=getattr(args, "source_message_id", None),
+        )
+        return {"ok": True, "tip_id": tip.tip_id, "status": tip.status,
+                "created_at": tip.created_at, "event_id": evt.event_id}
+
+    elif tip_command == "list":
+        tips = store.list_tips(status=getattr(args, "status", None))
+        return {"ok": True, "count": len(tips), "tips": [t.to_dict() for t in tips]}
+
+    elif tip_command == "show":
+        tip = store.get_tip(args.tip_id)
+        if tip is None:
+            return {"ok": False, "error": "not_found", "tip_id": args.tip_id}
+        events = store.get_events(args.tip_id)
+        return {
+            "ok": True,
+            "tip": tip.to_dict(),
+            "events": [e.to_dict() for e in events],
+        }
+
+    elif tip_command == "stats":
+        return {"ok": True, "stats": human_tips_runtime.stats_summary(tip_paths)}
+
+    elif tip_command == "ack":
+        agent = args.agent if args.agent and args.agent != "all" else "radar"
+        tip, evt = store.ack_tip(args.tip_id, agent=agent, note=args.note)
+        return {"ok": True, "tip": tip.to_dict(), "event_id": evt.event_id}
+
+    elif tip_command == "investigate":
+        agent = args.agent if args.agent and args.agent != "all" else "radar"
+        tip, evt = store.investigate_tip(args.tip_id, agent=agent, note=args.note)
+        return {"ok": True, "tip": tip.to_dict(), "event_id": evt.event_id}
+
+    elif tip_command == "link":
+        agent = args.agent if args.agent and args.agent != "all" else "radar"
+        tip = store.get_tip(args.tip_id)
+        if tip is None:
+            return {"ok": False, "error": "tip_not_found"}
+        try:
+            updated_tip, topic, was_created = human_tips_runtime.link_tip_to_topic(
+                tip=tip,
+                forum_paths=forum_paths,
+                create_if_missing=True,
+                agent=agent,
+                note=args.note,
+            )
+            return {
+                "ok": True,
+                "tip": updated_tip.to_dict(),
+                "topic_id": topic.topic_id,
+                "was_created": was_created,
+            }
+        except Exception as e:
+            return {"ok": False, "error": f"{type(e).__name__}:{e}"}
+
+    elif tip_command == "resolve":
+        agent = args.agent if args.agent and args.agent != "all" else "default"
+        topic_id = getattr(args, "topic_id", None)
+        tip, evt = store.resolve_tip(
+            args.tip_id,
+            resolution=args.resolution,
+            agent=agent,
+            note=args.note,
+            topic_id=topic_id,
+        )
+        return {"ok": True, "tip": tip.to_dict(), "event_id": evt.event_id}
+
+    return {"ok": False, "error": f"unknown_tip_command:{tip_command}"}
+
+
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
@@ -329,7 +446,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="MHR Newsroom Runtime")
     parser.add_argument("command",
                         choices=["startup", "run-once", "health", "reconcile",
-                                 "shutdown", "status"],
+                                 "shutdown", "status", "tip"],
                         help="Runtime command")
     parser.add_argument("--agent", default="all",
                         help="comma-separated: collector,radar,performance,default,all")
@@ -339,6 +456,30 @@ def main(argv: Optional[List[str]] = None) -> int:
                         help="Forum v2 root path")
     parser.add_argument("--json", action="store_true",
                         help="Output as JSON")
+
+    # Tip subcommands
+    tip_sub = parser.add_argument_group("tip", "Human Tip subcommands")
+    tip_sub.add_argument("--tip-command", dest="tip_command", default=None,
+                         choices=["create", "list", "show", "stats",
+                                  "ack", "investigate", "link", "resolve"])
+    tip_sub.add_argument("--title")
+    tip_sub.add_argument("--description", default="")
+    tip_sub.add_argument("--source-url", default="")
+    tip_sub.add_argument("--priority", default="MEDIUM",
+                         choices=human_tips.TIP_PRIORITIES)
+    tip_sub.add_argument("--evidence-url", action="append", default=[])
+    tip_sub.add_argument("--tag", action="append", default=[])
+    tip_sub.add_argument("--target-agent", default="radar",
+                         choices=["radar", "default"])
+    tip_sub.add_argument("--author", default="hermes")
+    tip_sub.add_argument("--source-message-id", default=None)
+    tip_sub.add_argument("--tip-id")
+    tip_sub.add_argument("--topic-id")
+    tip_sub.add_argument("--note", default="")
+    tip_sub.add_argument("--resolution", choices=human_tips.TIP_RESOLUTION_KINDS)
+    tip_sub.add_argument("--status",
+                         choices=human_tips.TIP_STATUSES + [None])
+
     args = parser.parse_args(argv)
 
     forum_paths = forum_v2.ForumV2Paths(Path(args.forum_root))
@@ -372,6 +513,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         )
     elif args.command == "shutdown":
         result = do_shutdown(runtime_state_path=runtime_state_path)
+    elif args.command == "tip":
+        result = do_tip_subcommand(args, forum_paths)
     else:
         result = {"ok": False, "error": f"unknown_command:{args.command}"}
 
