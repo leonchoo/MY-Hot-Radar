@@ -540,3 +540,57 @@ header.newsroom-header .subtitle {
     font-size: 10px;
   }
 }
+/* Phase 10.5 — LAN access strip */
+.lan-strip {
+  background: linear-gradient(0deg, #fef3c7 0%, #fefce8 100%);
+  border: 1px solid #facc15;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: #713f12;
+}
+.lan-strip-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin: 2px 0;
+}
+.lan-strip-label {
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #facc15;
+  color: #422006;
+}
+.lan-strip-url {
+  font-family: ui-monospace, Menlo, monospace;
+  color: #1f2937;
+}
+.lan-strip-url a {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+.lan-strip-warning {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #92400e;
+}
+.lan-strip-warning strong {
+  color: #7c2d12;
+}
+@media (prefers-color-scheme: dark) {
+  .lan-strip {
+    background: #422006;
+    border-color: #facc15;
+    color: #fef3c7;
+  }
+  .lan-strip-url { color: #fef3c7; }
+  .lan-strip-url a { color: #fde68a; }
+  .lan-strip-warning { color: #fde68a; }
+  .lan-strip-warning strong { color: #fef3c7; }
+}

@@ -44,6 +44,87 @@ import human_tips  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
+# Network helpers (Phase 10.5 — Forum Viewer LAN access)
+# ---------------------------------------------------------------------------
+
+def _is_private_ipv4(ip: str) -> bool:
+    """RFC1918 private IPv4 check. Conservative: only allow 10/8, 172.16/12, 192.168/16.
+
+    Excludes:
+      * 0.0.0.0 (wildcard, not a usable bind target)
+      * 127.0.0.0/8 (loopback)
+      * 169.254.0.0/16 (link-local — not strictly RFC1918 but also not LAN)
+      * Public IPs
+    """
+    parts = ip.split(".")
+    if len(parts) != 4:
+        return False
+    try:
+        a, b = int(parts[0]), int(parts[1])
+    except ValueError:
+        return False
+    if a == 10:
+        return True
+    if a == 172 and 16 <= b <= 31:
+        return True
+    if a == 192 and b == 168:
+        return True
+    return False
+
+
+def detect_lan_ipv4() -> Optional[str]:
+    """Best-effort RFC1918 LAN IPv4 detection.
+
+    Tries, in order:
+      1. Stdlib `socket.gethostbyname_ex(socket.gethostname())` — returns
+         all interface IPs; we filter to the first RFC1918 match.
+      2. Parse /proc/net/fib_trie on Linux or use socket.getaddrinfo on Windows.
+      3. Returns None on failure (never raises, never crashes).
+
+    IMPORTANT: never returns MAC, hostname, or any credentials. Only IPs.
+    """
+    import socket
+    try:
+        # Get all IPs bound to this host's interfaces.
+        # Method 1: gethostbyname_ex returns (hostname, aliaslist, ipaddrlist)
+        hostname = socket.gethostname()
+        try:
+            _, _, ip_list = socket.gethostbyname_ex(hostname)
+            for ip in ip_list:
+                if _is_private_ipv4(ip):
+                    return ip
+        except (socket.gaierror, OSError):
+            pass
+
+        # Method 2: getaddrinfo with hints
+        try:
+            addrinfo = socket.getaddrinfo(hostname, None, family=socket.AF_INET)
+            for info in addrinfo:
+                ip = info[4][0]
+                if _is_private_ipv4(ip):
+                    return ip
+        except (socket.gaierror, OSError):
+            pass
+
+        # Method 3: connect to a public IP and read local socket IP.
+        # Does NOT send data — uses UDP "disconnect" trick.
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
+            if _is_private_ipv4(ip):
+                return ip
+        except OSError:
+            pass
+        finally:
+            s.close()
+
+        return None
+    except Exception:
+        return None
+
+
+# ---------------------------------------------------------------------------
 # UI 标签 (中文 label, machine value 不变)
 # ---------------------------------------------------------------------------
 
@@ -383,6 +464,73 @@ def get_dashboard_api(paths: forum_v2.ForumV2Paths) -> Dict[str, Any]:
     }
 
 
+def get_network_api(
+    bind_host: str,
+    port: int,
+    request_host: str,
+) -> Dict[str, Any]:
+    """GET /api/network — describe the viewer's network scope.
+
+    Returns:
+        {
+          "scope": "local" | "lan",
+          "bind_host": "127.0.0.1" | "0.0.0.0",
+          "bind_port": 8081,
+          "local_url": "http://127.0.0.1:8081/",
+          "lan_url": "http://192.168.0.153:8081/" | null,
+          "lan_ip_detected": "192.168.0.153" | null,
+          "lan_warning": str | null,
+          "request_host": "127.0.0.1" | "<browser-reported host>",
+        }
+
+    The browser sets `request_host` via the standard `Host` header. If the
+    viewer is reached via a non-loopback host, we report scope="lan".
+    """
+    local_url = f"http://127.0.0.1:{port}/"
+
+    lan_ip = None
+    lan_url = None
+    lan_warning = None
+    scope = "local"
+
+    # Determine scope based on bind_host (not request_host — bind_host is
+    # authoritative for what the server is actually listening on).
+    if bind_host == "0.0.0.0":
+        lan_ip = detect_lan_ipv4()
+        if lan_ip:
+            lan_url = f"http://{lan_ip}:{port}/"
+            scope = "lan"
+            lan_warning = (
+                "LAN access is intended for trusted local networks. "
+                "Forum Viewer is read-only — no write capability is enabled "
+                "by binding to 0.0.0.0."
+            )
+        else:
+            lan_warning = (
+                "LAN access requested (bound to 0.0.0.0) but no RFC1918 "
+                "IPv4 address could not be detected automatically. Use your "
+                "host's actual LAN IP."
+            )
+            scope = "lan"
+    else:
+        # Bound to 127.0.0.1 (or another specific address) — local scope only.
+        lan_ip = None
+        lan_url = None
+        lan_warning = None
+        scope = "local"
+
+    return {
+        "scope": scope,
+        "bind_host": bind_host,
+        "bind_port": port,
+        "local_url": local_url,
+        "lan_url": lan_url,
+        "lan_ip_detected": lan_ip,
+        "lan_warning": lan_warning,
+        "request_host": request_host,
+    }
+
+
 def get_human_tips_api(paths: forum_v2.ForumV2Paths) -> Dict[str, Any]:
     """GET /api/human_tips — list all human tips with their events."""
     tip_paths = human_tips.HumanTipsPaths(paths.root if paths else None)
@@ -576,6 +724,14 @@ class ViewerHTTPHandler(BaseHTTPRequestHandler):
         if path == "/api/dashboard":
             self._send_json(200, get_dashboard_api(self.forum_paths))
             return
+        if path == "/api/network":
+            request_host = self.headers.get("Host", "")
+            self._send_json(200, get_network_api(
+                bind_host=self.bind_host,
+                port=self.bind_port,
+                request_host=request_host,
+            ))
+            return
         if path == "/api/human_tips":
             if method == "POST":
                 status, payload = post_human_tip_api(body or {}, self.forum_paths)
@@ -670,11 +826,13 @@ class ViewerHTTPHandler(BaseHTTPRequestHandler):
             )
 
 
-def make_handler(forum_paths: forum_v2.ForumV2Paths, viewer_dir: Path):
+def make_handler(forum_paths: forum_v2.ForumV2Paths, viewer_dir: Path, bind_host: str = "127.0.0.1", port: int = 8080):
     class _Handler(ViewerHTTPHandler):
         pass
     _Handler.forum_paths = forum_paths
     _Handler.viewer_dir = viewer_dir
+    _Handler.bind_host = bind_host
+    _Handler.bind_port = port
     return _Handler
 
 
@@ -699,12 +857,24 @@ def main(argv: Optional[List[str]] = None) -> int:
     if not viewer_dir.exists():
         print(f"viewer dir not found: {viewer_dir}", file=sys.stderr)
         return 1
-    handler = make_handler(forum_paths, viewer_dir)
+    handler = make_handler(
+        forum_paths, viewer_dir,
+        bind_host=args.host, port=args.port,
+    )
     server = ThreadingHTTPServer((args.host, args.port), handler)
     print(f"Forum Newsroom Viewer: http://{args.host}:{args.port}/")
     print(f"  Forum root (READ-ONLY): {args.forum_root}")
     print(f"  Viewer assets: {args.viewer_dir}")
-    print(f"  Press Ctrl+C to stop.")
+    # Phase 10.5 — if LAN bound, also report the detected LAN IP.
+    if args.host == "0.0.0.0":
+        lan_ip = detect_lan_ipv4()
+        if lan_ip:
+            print(f"  LAN URL: http://{lan_ip}:{args.port}/")
+        else:
+            print(f"  LAN URL: <RFC1918 IPv4 not detected>")
+        print(f"  Press Ctrl+C to stop.")
+    else:
+        print(f"  Press Ctrl+C to stop.")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

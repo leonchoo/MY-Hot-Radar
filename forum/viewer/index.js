@@ -155,3 +155,44 @@ async function loadTopics() {
       `<div class="empty">加载失败: ${escapeHtml(e.message)}</div>`;
   }
 })();
+
+
+// Phase 10.5 — Network scope + LAN URL strip
+(async function() {
+  try {
+    const res = await fetch("/api/network");
+    if (!res.ok) return;
+    const net = await res.json();
+    if (net.scope !== "lan") return;  // local scope — show nothing
+
+    const strip = document.createElement("section");
+    strip.className = "lan-strip";
+    let html = `<div class="lan-strip-row">`;
+    html += `<span class="lan-strip-label">LOCAL</span>`;
+    html += `<span class="lan-strip-url"><a href="${escapeHtml(net.local_url)}">${escapeHtml(net.local_url)}</a></span>`;
+    html += `</div>`;
+    html += `<div class="lan-strip-row">`;
+    html += `<span class="lan-strip-label">LAN</span>`;
+    if (net.lan_url) {
+      html += `<span class="lan-strip-url"><a href="${escapeHtml(net.lan_url)}">${escapeHtml(net.lan_url)}</a></span>`;
+    } else {
+      html += `<span class="lan-strip-url">(no RFC1918 IPv4 detected)</span>`;
+    }
+    html += `</div>`;
+    if (net.lan_warning) {
+      html += `<div class="lan-strip-warning">⚠ <strong>${escapeHtml(net.lan_warning)}</strong></div>`;
+    }
+    strip.innerHTML = html;
+
+    // Insert before the breadcrumb
+    const breadcrumb = document.querySelector(".breadcrumb");
+    if (breadcrumb && breadcrumb.parentNode) {
+      breadcrumb.parentNode.insertBefore(strip, breadcrumb);
+    } else {
+      const container = document.querySelector(".container");
+      if (container) container.insertBefore(strip, container.firstChild);
+    }
+  } catch (e) {
+    // network detection failed silently — no strip shown
+  }
+})();
