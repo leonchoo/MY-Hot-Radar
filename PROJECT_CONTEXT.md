@@ -39,9 +39,9 @@ Goal:
 | Hosting | Cloudflare Pages project `my-hot-radar` |
 | Source-of-truth branch | `master` |
 | Auto-deploy | via Cloudflare Pages GitHub integration (must be ON) |
-| Sitemap | `/sitemap.xml` (12 URLs, apex only) |
+| Sitemap | `/sitemap.xml` (25 URLs, apex only) |
 | robots.txt | Cloudflare-managed (Content-Signal enabled) |
-| Privacy/Terms | present, MVP-honest |
+| Privacy/Terms | present, real Simplified Chinese (rewritten 2026-10-10) |
 
 ---
 
@@ -73,29 +73,30 @@ detection of momentum, not just delivery of headlines.
 
 ## Current Stage
 
-**MVP** — the static site is live and deployed.
+**MVP 演示阶段已结束**（2026-10-10 全站整改后，站点已发布正式真实文章并移除占位/Demo 页面）。
 
 Important constraints:
 
-- **All currently displayed stories are SAMPLE / DEMO** — explicit and labelled.
-- Site does **not** yet run a live radar / crawler.
-- Site does **not** yet have a newsroom, editor team, or real-time signals.
+- **正式发布的真实文章已上线**（2026-10 起 16 篇）；`DEMO / SAMPLE` 标记仅适用于显式标记的演示内容。
+- Site does **not** yet run a live radar / crawler (still true).
+- Site does **not** yet have real-time signals; the editorial workflow is rule-driven
+  (see the Document Map / Agent entry rules above).
 - Site serves the demo layout, design system, and information architecture.
 - The News Radar system is **planned**, **not implemented**.
 
 ---
 
-## Main Categories (5)
+## Main Categories (current)
 
 | Key | Display | Chinese |
 |---|---|---|
 | `malaysia` | Malaysia | 马来西亚 |
-| `viral` | Viral | 网络爆红 |
-| `celebrity` | Celebrity | 娱乐圈 |
-| `food` | Food & Lifestyle | 美食 · 生活 |
-| `world` | World | 国际 |
+| `world` | World | 国际新闻 |
+| `hot` | Hot Now | 热门头条 |
+| `all` | All | 全部新闻 |
 
-Plus the **Hot Now** aggregator (`hot/`) and the **Article** demo (`article/example/`).
+`viral` / `celebrity` / `food` 占位分类与 `article/example/` 演示页已于 2026-10-10
+随全站整改移除，不再是公开栏目。
 
 ---
 
@@ -169,12 +170,29 @@ relevant state documents.
 
 ## Document Map
 
+> **Agent 入口指引（binding）**：所有处理新闻选题、采编、写作、内容、分类、网站发布或
+> 线上验证的 Agent，在执行任务前必须先阅读本文件（含下方 Document Map），
+> 并按任务类型读取对应规则文件：
+>
+> - **本地（马来西亚）新闻**的选题、采编与写作任务：先阅读 `docs/LOCAL_NEWS_EDITORIAL_RULES.md`（本地新闻编辑规则）。
+> - **国际新闻**选题与采编任务：读取 `NEWS_RADAR.md`（国际新闻选题与核实）。
+> - **国际新闻**写作任务：读取 `CONTENT_RULES.md`（含国际新闻编辑规则）。
+> - 发布与线上验收任务：读取 `VERIFICATION_RULES.md`（发布后线上验收）。
+> - **发现规则冲突时，先报告冲突并等待裁决，不得自行选择性忽略。**
+> - **上述规则不因更换 Agent、模型或会话而失效。**
+> - 所有 Agent 遵循本项目的 `DEVELOPMENT_RULES.md` 与 `EXPERIENCE.md` 治理规则。
+
 This file lives in a memory pack. Read order before a task:
 
 | Task kind | Files to read |
 |---|---|
 | Website / UI / HTML edit | this file + `DEVELOPMENT_RULES.md` |
 | News Radar / crawler / scoring | this file + `DEVELOPMENT_RULES.md` + `NEWS_RADAR.md` + `CONTENT_RULES.md` + `VERIFICATION_RULES.md` |
+| 本地新闻选题 / 采编 | this file + `docs/LOCAL_NEWS_EDITORIAL_RULES.md`（本地新闻编辑规则） |
+| 本地新闻写稿 | this file + `docs/LOCAL_NEWS_EDITORIAL_RULES.md` + `CONTENT_RULES.md` |
+| 新闻选题 / 采编（国际新闻） | this file + `NEWS_RADAR.md`（国际新闻选题与核实）+ `VERIFICATION_RULES.md` |
+| 文章写作（国际新闻） | this file + `CONTENT_RULES.md`（国际新闻编辑规则） |
+| 发布与线上验收 | this file + `VERIFICATION_RULES.md`（发布后线上验收） |
 | Content production / Facebook posts | this file + `CONTENT_RULES.md` |
 | Verifying past decisions / evolution | this file + `EXPERIENCE.md` |
 
