@@ -236,6 +236,12 @@
   </url>
 
   <url>
+    <loc>https://myhotradar.com/world/pentagon-us-troop-death-toll-iran-21/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
     <loc>https://myhotradar.com/about/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
