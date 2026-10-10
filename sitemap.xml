@@ -218,6 +218,12 @@
   </url>
 
   <url>
+    <loc>https://myhotradar.com/world/middle-east-oil-brent-above-104-oct-10/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
     <loc>https://myhotradar.com/about/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
