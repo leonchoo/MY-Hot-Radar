@@ -173,3 +173,20 @@ above are a target, not a binding spec.
 - Every score / status decision must be stored with the inputs that
   produced it (no black-box-only outputs).
 - Every "publish" action must pass a review gate.
+
+---
+
+## 国际新闻选题与核实（编辑规则，binding）
+
+> 本节是**编辑规则**，由人工 / Agent 在执行国际新闻选题与采编时遵守；
+> 它不是 Radar 管线的实现规范，不依赖 Radar 代码存在与否。
+> 选题核实通过后的写作要求见 `CONTENT_RULES.md → International news editorial rules`；
+> 发布后的线上验收见 `VERIFICATION_RULES.md → 发布后线上验收`。
+
+- 国际新闻不必抢时间，优先选择事实稳定、资料充分、具有持续阅读价值的事件。
+- 优先使用可靠的中国和美国来源交叉核实核心事实。
+- 不要求中国和美国对事件立场一致。双方报道不同的时候，明确说明差异。
+- 区分已经确认的事实、官方立场、媒体报道、争议说法和未经证实的推测。
+- 优先查阅原始公告、官方文件及可靠媒体报道。
+- 核心事实无法核实，或关键来源相互矛盾且无法合理解释时，暂缓发布。
+- 不编造事实、引述、数据、事件时间线或预测。

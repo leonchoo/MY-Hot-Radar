@@ -172,3 +172,24 @@ This document is the **target** for verification behavior. The Radar
 must enforce these rules **at the time of publishing**, not after.
 A topic that has not met the minimum-evidence bar must not appear in a
 publishable view — it stays in an internal `WATCH` state.
+
+---
+
+## 发布后线上验收（binding，适用于每篇发布文章）
+
+每篇文章发布后，Agent 必须亲自检查**真实线上页面**，而不能只看本地文件或 Git 操作结果。
+
+至少检查：
+
+- 文章详情页是否显示正确正文。
+- 对应分类页是否实际显示该文章。
+- 首页是否按照现有收录规则展示文章。
+- Sitemap 是否包含正确 URL。
+- 点击分类列表中的文章，是否能打开正确详情页。
+- 页面是否仍存在占位内容、错误导航、旧列表或缓存问题。
+
+每项必须报告 `PASS / FAIL / UNKNOWN`，并提供实际 URL 和证据。
+
+**文章详情页可访问，不代表分类收录成功；Git push 成功，也不代表发布验收通过。**
+如果文章应该出现在分类页却没有出现，必须调查分类数据源、索引生成和部署流程，
+不能直接宣布发布成功。
