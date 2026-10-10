@@ -134,6 +134,18 @@
   </url>
 
   <url>
+    <loc>https://myhotradar.com/malaysia/pas-bn-melaka-polls-cooperation/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/malaysia/sprm-reinvestigate-rm350k-internal-probe/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
     <loc>https://myhotradar.com/about/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
