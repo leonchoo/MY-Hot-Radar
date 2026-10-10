@@ -8,57 +8,135 @@
   </url>
 
   <url>
-    <loc>https://myhotradar.com/hot/</loc>
-    <changefreq>hourly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
     <loc>https://myhotradar.com/malaysia/</loc>
     <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://myhotradar.com/viral/</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://myhotradar.com/celebrity/</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://myhotradar.com/food/</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
+    <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://myhotradar.com/world/</loc>
     <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/hot/</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/all/</loc>
+    <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://myhotradar.com/article/example/</loc>
-    <changefreq>monthly</changefreq>
+    <loc>https://myhotradar.com/malaysia/badminton-causes-sudden-death-43yo/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/malaysia/citikas-join-parti-kita/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/malaysia/johor-1198-schools-closed-haze-two-days/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/malaysia/karate-asian-games-gold-award-140k/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/malaysia/kpm-haze-school-close-standard/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/malaysia/nsembilan-education-close/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/malaysia/pontian-three-siblings-truck-crash/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/malaysia/private-plane-smuggled-521kg-meth-laos/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/hot/diesel-petrol-contamination-multiple-states/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/hot/haze-end-northeast-monsoon-oct-9/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/hot/haze-going-away-wind-change/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/hot/myanmar-fraud-park-boss-cash-stolen-6m/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/hot/palm-oil-companies-caused-indonesia-haze-index/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/hot/student-jump-from-3rd-floor-academic-pressure/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/h/24yo-athlete-died-after-match-collapse/</loc>
+    <changefreq>weekly</changefreq>
     <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/article/treasury-2027-inflation-1-8-to-2-8-pct/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
   </url>
 
   <url>
     <loc>https://myhotradar.com/about/</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.3</priority>
   </url>
 
   <url>
     <loc>https://myhotradar.com/contact/</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.4</priority>
+    <priority>0.3</priority>
   </url>
 
   <url>
@@ -71,12 +149,6 @@
     <loc>https://myhotradar.com/terms/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
-  </url>
-
-  <url>
-    <loc>https://myhotradar.com/article/treasury-2027-inflation-1-8-to-2-8-pct/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
   </url>
 
 </urlset>
