@@ -146,6 +146,18 @@
   </url>
 
   <url>
+    <loc>https://myhotradar.com/malaysia/police-shootings-jb-pj-48-hours/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://myhotradar.com/malaysia/budget-2027-maternity-leave-98-days/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
     <loc>https://myhotradar.com/about/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
