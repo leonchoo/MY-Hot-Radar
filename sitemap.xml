@@ -73,4 +73,10 @@
     <priority>0.3</priority>
   </url>
 
+  <url>
+    <loc>https://myhotradar.com/article/treasury-2027-inflation-1-8-to-2-8-pct/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
 </urlset>
