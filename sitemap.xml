@@ -200,6 +200,12 @@
   </url>
 
   <url>
+    <loc>https://myhotradar.com/world/riyadh-airport-attack-suspended-oct-10/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
     <loc>https://myhotradar.com/about/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
