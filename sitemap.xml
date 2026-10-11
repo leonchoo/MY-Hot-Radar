@@ -271,4 +271,10 @@
     <priority>0.3</priority>
   </url>
 
+  <url>
+    <loc>https://myhotradar.com/world/zaporizhzhia-russia-airstrike-20-dead-oct-10/</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
 </urlset>
