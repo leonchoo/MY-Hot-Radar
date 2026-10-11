@@ -361,4 +361,9 @@
     <priority>0.8</priority>
   </url>
 
+  <url>
+    <loc>https://myhotradar.com/world/sg-haze-marina-bay-sands-visibility-oct-2026/</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
